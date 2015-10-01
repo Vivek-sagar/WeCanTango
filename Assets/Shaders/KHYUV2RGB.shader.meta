@@ -1,0 +1,12 @@
+fileFormatVersion: 2
+guid: 16ddab72077d9da498591ff953fa0938
+timeCreated: 1442369142
+licenseType: Free
+ShaderImporter:
+  defaultTextures:
+  - _YTex: {fileID: 2800000, guid: cddac1ca29cfc424893ad899c16fe6e6, type: 3}
+  - _UTex: {fileID: 2800000, guid: 7a8047b13d05545f4a638d344b442e0a, type: 3}
+  - _VTex: {fileID: 2800000, guid: 27a016a7bf441429fbbbe3f147781ce5, type: 3}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

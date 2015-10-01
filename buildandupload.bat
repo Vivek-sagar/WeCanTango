@@ -1,0 +1,1 @@
+%ANDROID_SDK_ROOT%\platform-tools\adb.exe -d install -r "%1"
