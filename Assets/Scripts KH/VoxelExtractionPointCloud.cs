@@ -213,7 +213,6 @@ public class Voxel
 #endif
 	public void setUnOccupied()
 	{
-		pcount = 0;
 		flags.Set ((int)VF.VX_OCCUPIED, false);
 	}
 
@@ -534,11 +533,11 @@ public class VoxelGrid
 				//vx.setFace(flag,true);
 				neighbour.setFace(invertflag(flag),true);
 			}
-			else
-			{
+			//else
+			//{
 				//vx.setFace(flag,false);
-				neighbour.setFace(invertflag(flag),false);
-			}
+			//	neighbour.setFace(invertflag(flag),false);
+			//}
 		}
 	}
 

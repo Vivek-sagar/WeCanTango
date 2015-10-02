@@ -22,25 +22,28 @@ public class TriggerScript : MonoBehaviour {
 		biome = BiomeScript.Instance;
 		defaultFlag = leftcam.clearFlags;
 		defaultLightIntensity = light.intensity;
-		fourpts = new Vector3[2];
+		fourpts = new Vector3[3];
 
 		if(cubeswitch != null)
 		{
-			initPts();
+			updatePts();
 		}
 	}
 
-	void initPts()
+	void updatePts()
 	{
-		fourpts [0] = cubeswitch.bounds.min;
-		fourpts [1] = cubeswitch.bounds.max;
-		fourpts [2] = cubeswitch.bounds.center;
+		fourpts [0] = cubeswitch.gameObject.transform.position + cubeswitch.bounds.extents;
+		fourpts [1] = cubeswitch.gameObject.transform.position - cubeswitch.bounds.extents;
+		fourpts [2] = cubeswitch.gameObject.transform.position;
 	}
 
 
 	// Update is called once per frame
 	void Update () {
-		if(!triggered && cubeswitch!=null && (vxe.isVoxelThere(fourpts[0]) || vxe.isVoxelThere(fourpts[1]) || vxe.isVoxelThere(fourpts[2])))
+		updatePts ();
+		if(!triggered && cubeswitch!=null && 
+		   (vxe.isVoxelThere(fourpts[0]) || vxe.isVoxelThere(fourpts[1]) || vxe.isVoxelThere(fourpts[2]))
+		   )
 		{
 			triggeredEvent();
 		}
@@ -48,14 +51,14 @@ public class TriggerScript : MonoBehaviour {
 
 	void OnTriggerEnter(Collider other)
 	{
-		if (triggered)
-			return;
-		GameObject othergo = other.gameObject;
+		//if (triggered)
+		//	return;
+		//GameObject othergo = other.gameObject;
 
-		if (othergo.tag == "Player") 
-		{
-			triggeredEvent();
-		}
+		//if (othergo.tag == "Player") 
+		//{
+		//	triggeredEvent();
+		//}
 	}
 
 	void triggeredEvent()
@@ -88,4 +91,5 @@ public class TriggerScript : MonoBehaviour {
 		light.intensity = defaultLightIntensity;
 		biome.resetBiomes ();
 	}
+
 }
