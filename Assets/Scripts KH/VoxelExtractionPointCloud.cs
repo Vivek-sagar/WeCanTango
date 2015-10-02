@@ -3,7 +3,7 @@
 #define USE_NORMALS
 #define USE_UV
 //#define USE_CHUNK_FRUSTUM_CULLING
-//#define VOXEL_DELETION
+#define VOXEL_DELETION
 
 using UnityEngine;
 using System.Collections;
@@ -14,8 +14,8 @@ public static class VoxelConsts
 	public static int CHUNK_SIZE = 8;
 	public static int PT_THRES = 30;
 	public static int VOXEL_RES = 10;
-	public static int FRAME_THRES = 5;
-	public static int DEL_FRAME_THRES = 7;
+	public static int FRAME_THRES = 10;
+	public static int DEL_FRAME_THRES = 10;
 	public static int PT_DEL_THRES = 5;
 	public static Vec3Int[] CardinalDir = new Vec3Int[]{ new Vec3Int(0,0,1), new Vec3Int(0,0,-1), new Vec3Int(-1,0,0), new Vec3Int(1,0,0), new Vec3Int(0,1,0), new Vec3Int(0,-1,0) };
 	public static Vector3[] CardinalV3Dir = new Vector3[]{ new Vector3(0,0,1), new Vector3(0,0,-1), new Vector3(-1,0,0), new Vector3(1,0,0), new Vector3(0,1,0), new Vector3(0,-1,0) };
@@ -496,6 +496,8 @@ public class VoxelGrid
 		for(int i=0;i<6;i++)
 		{
 			VF flag = (VF)i;
+			vx.setFace(flag,false);
+
 			Vector3 dir = VoxelConsts.CardinalV3Dir[i];
 			
 			Voxel neighbour = getVoxel(new Vec3Int(vec + dir));
@@ -520,19 +522,21 @@ public class VoxelGrid
 		for(int i=0;i<6;i++)
 		{
 			VF flag = (VF)i;
+			vx.setFace(flag,false);
+
 			Vector3 dir = VoxelConsts.CardinalV3Dir[i];
-			
+
 			Voxel neighbour = getVoxel(new Vec3Int(vec + dir));
 			bool occupied = neighbour.isOccupied();
 			
 			if(occupied)
 			{
-				vx.setFace(flag,true);
+				//vx.setFace(flag,true);
 				neighbour.setFace(invertflag(flag),true);
 			}
 			else
 			{
-				vx.setFace(flag,false);
+				//vx.setFace(flag,false);
 				neighbour.setFace(invertflag(flag),false);
 			}
 		}
@@ -886,6 +890,13 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 		return p;
 	}
 
+	public bool isVoxelThere(Vector3 wldcoords)
+	{
+		Vec3Int cvCoord = ToGrid (wldcoords);
+		Voxel vx = grid.getVoxel(cvCoord);
+		return vx.isOccupied ();
+	}
+
 	//optimize later
 	public bool RayCast(Vector3 start, Vector3 dir, float dist, ref Vector3 vxcood, ref Vector3 normal)
 	{
@@ -963,7 +974,7 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 #if VOXEL_DELETION
 	public void KillerRayCast(Vector3 start)
 	{
-		const float step = 0.5f;
+		const float step = 1.0f;
 		Vector3 end = camera.transform.position;
 
 		Vector3 vstart = ToGridUnTrunc (start);
@@ -975,7 +986,7 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 		Vector3 pt = vstart + dir * offset;
 
 
-		for(float i=offset;i<(mag - 4.0f);i+=step)
+		for(float i=offset;i<mag;i+=step)
 		{
 			Vec3Int cvCoord = new Vec3Int(pt);
 			Voxel vx = grid.getVoxel(cvCoord);
@@ -1021,15 +1032,16 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 	public void addAndRender (TangoPointCloud pointCloud) 
 	{
 		int count = pointCloud.m_pointsCount;
+		int numrays = Mathf.FloorToInt((float)count * 0.03f);
 
 #if VOXEL_DELETION
 		Random.seed = framecount % 20;
-		for (int i=0; i<50; i++) 
+		for (int i=0; i<numrays; i++) 
 		{
 			int index = Random.Range(0,count);
 			Vector3 pt = pointCloud.m_points[index];
-			Vector3 ranvec = new Vector3(Random.value - 0.5f,Random.value - 0.5f,Random.value - 0.5f) * voxel_size * 2;
-			KillerRayCast(pt + ranvec);
+			//Vector3 ranvec = new Vector3(Random.value - 0.5f, Random.value - 0.5f, Random.value - 0.5f) * voxel_size * 2;
+			KillerRayCast(pt);
 
 		}
 #endif
