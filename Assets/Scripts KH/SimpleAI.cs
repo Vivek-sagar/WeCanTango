@@ -34,6 +34,11 @@ public class SimpleAI : MonoBehaviour
 {
 	VoxelExtractionPointCloud vxe;
 	public AI_STATE ai_state;
+	public AI_TYPE ai_type;
+	public GameObject emotion;
+	public AudioClip emotionClip;
+	public float xRot = 0;
+
 	Vector3 lastposition;
 
 	Transform myTrans;
@@ -41,10 +46,8 @@ public class SimpleAI : MonoBehaviour
 	AudioSource au_source;
 	Animator myAnim;
 
-	public GameObject emotion;
-	public AI_TYPE ai_type;
-	public AudioClip idleClip, emotionClip;
-	public float xRot = 0;
+
+
 	static Vector3[] directions = {
 		new Vector3 (0, 0, 1),
 		new Vector3 (0, 0, -1),
@@ -107,45 +110,18 @@ public class SimpleAI : MonoBehaviour
 	IEnumerator startMoving ()
 	{
 		ai_state = AI_STATE.MOVING;
-		PlayIdleNoises ();
+		//PlayIdleNoises ();
 
-		while ((int)ai_state < 2) {
+		while ((int)ai_state < 3) {
 			Vector3 dir = getNextMove ();
 			myTrans.forward = dir;
-
+			PlayEmotionNoises (AI_STATE.RUNNING);
 			for (float i=0; i< vxe.voxel_size * STEP; i+=Time.deltaTime * 0.2f) {
 				//condition ? result if true : result if false ;
 				runStep = (ai_state == AI_STATE.RUNNING) ? 2 : 1;
 				myTrans.position += dir * vxe.voxel_size * runStep * STEP * Time.deltaTime * 0.2f;
 				yield return null;
 			}
-		}
-	}
-
-	public void PlayAngryNoises ()
-	{
-		if (ai_state != AI_STATE.ATTACKING) {
-			au_source.Stop ();
-			au_source.clip = (idleClip);
-			return;
-		}
-		if (!au_source.isPlaying) {
-			au_source.clip = (emotionClip);
-			au_source.loop = true;
-			au_source.Play ();
-		}
-	}
-
-	public void PlayIdleNoises ()
-	{
-		if (ai_state != AI_STATE.MOVING) {
-			au_source.Stop ();
-			return;
-		}
-		if (!au_source.isPlaying) {
-			au_source.clip = (idleClip);
-			au_source.loop = true;
-			au_source.Play ();
 		}
 	}
 
@@ -159,7 +135,7 @@ public class SimpleAI : MonoBehaviour
 		for (float i=0; i< vxe.voxel_size * STEP; i+=Time.deltaTime * 0.2f) {
 			//condition ? result if true : result if false ;
 			//myTrans.forward = dir;
-
+			
 			myTrans.position += dir * vxe.voxel_size * 2 * STEP * Time.deltaTime * 0.8f;
 			yield return null;
 		}
@@ -167,36 +143,51 @@ public class SimpleAI : MonoBehaviour
 		myAnim.SetBool ("isAngry", false);
 	}
 
+	#region Audio_Functions
+	public void PlayEmotionNoises (AI_STATE emotionState)
+	{
+		if (ai_state != emotionState) {
+			au_source.Stop ();
+			return;
+		}
+		if (!au_source.isPlaying) {
+			au_source.clip = (emotionClip);
+			au_source.loop = true;
+			au_source.Play ();
+		}
+	}
+
+	/*public void PlayIdleNoises ()
+	{
+		if (ai_state != AI_STATE.MOVING) {
+			au_source.Stop ();
+			return;
+		}
+		if (!au_source.isPlaying) {
+			au_source.clip = (idleClip);
+			au_source.loop = true;
+			au_source.Play ();
+		}
+	}*/
+	#endregion Audio_Functions
+
 	public void init ()
 	{
 		StartCoroutine (startMoving ());
 	}
 
-	IEnumerator BounceHeart (Vector3 target)
+	IEnumerator BounceHeart (Transform target)
 	{
 		ai_state = AI_STATE.AFFECTION;
-		myTrans.LookAt (target);
+
+		Vector3 diff = target.position - myTrans.position;
+		//myTrans.LookAt (target);
 		myAnim.SetBool ("showAffection", true);
 		while (ai_state == AI_STATE.AFFECTION) {
+			//myTrans.Rotate (Vector3.up * 10f * Time.deltaTime);
 			yield return null;
 		}
 		myAnim.SetBool ("showAffection", false);
-		/*Vector3 dir = emotion.transform.up;
-			emotion.transform.up = dir;
-			
-			for (float i=0; i< vxe.voxel_size * STEP; i+=Time.deltaTime * 0.2f) {
-				emotion.transform.position += dir * vxe.voxel_size * STEP * Time.deltaTime * 0.2f;
-				yield return null;
-			}
-
-			dir = emotion.transform.up * -1f;
-			
-			for (float i=0; i< vxe.voxel_size * STEP; i+=Time.deltaTime * 0.2f) {
-				emotion.transform.position += dir * vxe.voxel_size * STEP * Time.deltaTime * 0.2f;
-				yield return null;
-			}
-		}
-		emotion.transform.position = origin;*/
 		yield return null;
 	}
 
@@ -214,7 +205,7 @@ public class SimpleAI : MonoBehaviour
 				break;
 			case AI_TYPE.NICE:
 				if (ai_state != AI_STATE.AFFECTION)
-					StartCoroutine (BounceHeart (other.transform.position));
+					StartCoroutine (BounceHeart (other.transform));
 				break;
 			}
 			emotion.SetActive (true);
