@@ -13,7 +13,7 @@ public class HandDetectorScript : Singleton<HandDetectorScript> {
 		pointArr = new Vector3[1000];
 		pointStack = new IndexStack<Vector3> (pointArr);
 		centroid = new Vector3 (0, 0, 1);
-		controlObj.GetComponent<MeshRenderer>().enabled = false;
+		controlObj.GetComponent<ParticleSystem>().Stop();
 	}
 
 	public void addPoint(Vector3 pt)
@@ -32,11 +32,11 @@ public class HandDetectorScript : Singleton<HandDetectorScript> {
 
 		if (count < 5)
 		{
-			controlObj.GetComponent<MeshRenderer>().enabled = false;
+			controlObj.GetComponent<ParticleSystem>().Stop();
 			return;
 		}
 		else
-			controlObj.GetComponent<MeshRenderer>().enabled = true;
+			controlObj.GetComponent<ParticleSystem>().Play();
 
 		for(int i=0;i<count;i++)
 		{

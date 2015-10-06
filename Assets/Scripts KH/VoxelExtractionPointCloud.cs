@@ -637,17 +637,21 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 
 	Vector3 offset;
 	float scale;
-	
+
+	[HideInInspector]
 	public int num_voxels_x;
+	[HideInInspector]
 	public int num_voxels_y;
+	[HideInInspector]
 	public int num_voxels_z;
 
 	int num_verts_x;
 	int num_verts_y;
 	int num_verts_z;
-	
+
+	[HideInInspector]
 	public float voxel_size;
-	
+	[HideInInspector]
 	public VoxelGrid grid;
 
     [HideInInspector]
@@ -657,6 +661,8 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 	private object lockthis = new object(); 
 
 	int vertex_count;
+
+	[HideInInspector]
 	public int chunk_size;
 	//Vector3 jitter;
 	public string debugString;
@@ -1032,8 +1038,8 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 	{
 		int count = pointCloud.m_pointsCount;
 		int numrays = Mathf.FloorToInt((float)count * 0.03f);
-
-#if VOXEL_DELETION
+		
+		#if VOXEL_DELETION
 		Random.seed = framecount % 20;
 		for (int i=0; i<numrays; i++) 
 		{
@@ -1041,9 +1047,9 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 			Vector3 pt = pointCloud.m_points[index];
 			//Vector3 ranvec = new Vector3(Random.value - 0.5f, Random.value - 0.5f, Random.value - 0.5f) * voxel_size * 2;
 			KillerRayCast(pt);
-
+			
 		}
-#endif
+		#endif
 
 		for(int i=0; i< count; i++)
 		{
@@ -1056,8 +1062,9 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 			grid.setVoxel(coords);
 
 		}
-
+		
 		renderVoxelGrid ();
+
 	}
 
 

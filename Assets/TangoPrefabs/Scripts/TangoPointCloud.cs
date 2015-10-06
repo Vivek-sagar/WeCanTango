@@ -89,12 +89,19 @@ public class TangoPointCloud : MonoBehaviour, ITangoDepth
     
 	public bool isScanning = true;
 
+	IndexStack<Vector3> frontRenderer;
+	Vector3[] pointArr;
+	const int frontPointCount = 300;
+	public Camera camera;
     /// <summary>
     /// Use this for initialization.
     /// </summary>
     public void Start() 
     {
-        m_tangoApplication = FindObjectOfType<TangoApplication>();
+		pointArr = new Vector3[frontPointCount];
+		frontRenderer = new IndexStack<Vector3> (pointArr);
+        
+		m_tangoApplication = FindObjectOfType<TangoApplication>();
         m_tangoApplication.Register(this);
         
         m_unityWorldTStartService.SetColumn(0, new Vector4(1.0f, 0.0f, 0.0f, 0.0f));
@@ -193,20 +200,32 @@ public class TangoPointCloud : MonoBehaviour, ITangoDepth
 
                 if (m_updatePointsMesh)
                 {
+					frontRenderer.clear();
+					for (int i = 0; i < m_pointsCount; ++i)
+					{
+						if(frontRenderer.getCount() >= frontPointCount)
+							break;
+						if((camera.transform.position - m_points[i]).sqrMagnitude < 0.64f)
+							frontRenderer.push(m_points[i]);
+					}
                     // Need to update indicies too!
-                    int[] indices = new int[m_pointsCount];
-                    for (int i = 0; i < m_pointsCount; ++i)
+					int[] indices = new int[frontRenderer.getCount()];
+					for (int i = 0; i < frontRenderer.getCount(); ++i)
                     {
                         indices[i] = i;
                     }
 
+					Vector3[] pointsArray = new Vector3[frontRenderer.getCount()];
+					System.Array.Copy(frontRenderer.getArray(),pointsArray,frontRenderer.getCount());
+
+
                     m_mesh.Clear();
-                    m_mesh.vertices = m_points;
+					m_mesh.vertices = pointsArray;
                     m_mesh.SetIndices(indices, MeshTopology.Points, 0);
                 }
 
                 // The color should be pose relative, we need to store enough info to go back to pose values.
-                m_renderer.material.SetMatrix("depthCameraTUnityWorld", unityWorldTDepthCamera.inverse);
+                //m_renderer.material.SetMatrix("depthCameraTUnityWorld", unityWorldTDepthCamera.inverse);
 
 				//VoxelExtractionPointCloud.Instance.computeDepthPlanes(ref unityWorldTDepthCamera, unityWorldTDepthCamera * new Vector4(0,0,0,1), minpts, maxpts);
 				if(isScanning)
