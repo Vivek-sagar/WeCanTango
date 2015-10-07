@@ -931,13 +931,13 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 		return ToGrid (wldcoords) / (int)VoxelConsts.CHUNK_SIZE;
 	}
 
-	public Vector3 getVoxelNormal(Voxel vx, Vector3 dir)
+	public Vector3 getVoxelNormal(Voxel vx)
 	{
 		Vector3 _normal = Vector3.zero;
 		for(int j=0;j<6;j++)
 		{
 			VF flag = (VF)j;
-			if(vx.getFace(flag) && Vector3.Dot (VoxelConsts.CardinalV3Dir[j],dir) < 0)
+			if(vx.getFace(flag) && Vector3.Dot (VoxelConsts.CardinalV3Dir[j],camera.transform.forward) < 0)
 			{
 				_normal += VoxelConsts.CardinalV3Dir[j];
 			}
@@ -983,7 +983,7 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 				{
 					surfcount++;
 
-					if(Vector3.Dot(getVoxelNormal(voxel,camera.transform.forward),norm) > 0.99f)
+					if(Vector3.Dot(getVoxelNormal(voxel),norm) > 0.99f)
 						normalcount++;
 				}
 			}
