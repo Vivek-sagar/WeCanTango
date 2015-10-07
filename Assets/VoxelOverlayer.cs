@@ -108,7 +108,7 @@ public class VoxelOverlayer : MonoBehaviour {
 		_mesh.SetIndices (indexArray , MeshTopology.Quads, 0);
 	}
 
-	void overlayCurrentChunk()
+	public void overlayCurrentChunk()
 	{
 		Vector3 pt = camera.transform.position;
 		for(int i=0;i<overlayInstanceCount;i++)
@@ -133,6 +133,6 @@ public class VoxelOverlayer : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
-		overlayCurrentChunk ();
+
 	}
 }

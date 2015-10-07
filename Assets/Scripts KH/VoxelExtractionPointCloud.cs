@@ -19,6 +19,7 @@ public static class VoxelConsts
 	public static int PT_DEL_THRES = 5;
 	public static Vec3Int[] CardinalDir = new Vec3Int[]{ new Vec3Int(0,0,1), new Vec3Int(0,0,-1), new Vec3Int(-1,0,0), new Vec3Int(1,0,0), new Vec3Int(0,1,0), new Vec3Int(0,-1,0) };
 	public static Vector3[] CardinalV3Dir = new Vector3[]{ new Vector3(0,0,1), new Vector3(0,0,-1), new Vector3(-1,0,0), new Vector3(1,0,0), new Vector3(0,1,0), new Vector3(0,-1,0) };
+	public static BitArray surfaceSet = new BitArray (new bool[]{true,true,true,true,true,true,false,false});
 }
 
 public class IndexStack<T>
@@ -184,7 +185,7 @@ public class Voxel
 #if VOXEL_DELETION
 	public byte dcount = 0;
 #endif
-	BitArray flags = new BitArray (8, false);
+	public BitArray flags = new BitArray (8, false);
 
 	public Voxel()
 	{
@@ -505,7 +506,7 @@ public class VoxelGrid
 		for(int i=0;i<6;i++)
 		{
 			VF flag = (VF)i;
-			vx.setFace(flag,true);
+			vx.setFace(flag,false);
 
 			Vector3 dir = VoxelConsts.CardinalV3Dir[i];
 			
@@ -520,7 +521,6 @@ public class VoxelGrid
 			else
 			{
 				vx.setFace(flag,true);
-				neighbour.setFace(invertflag(flag),true);
 			}
 		}
 	}
@@ -671,6 +671,7 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 	public int chunk_size;
 	//Vector3 jitter;
 	public string debugString;
+	public Material debugMaterial;
 	public Camera camera;
 
 	Matrix4x4 MVP = Matrix4x4.identity;
@@ -756,9 +757,11 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 					chunkGameObjects [i,j,k].GetComponent<MeshRenderer>().enabled = false;
 					continue;
 				}
+
 				Vec3Int chunkcoords = new Vec3Int(i,j,k);
 
 				chunk.istack.clear ();
+
 
 				
 				//if((camera.transform.position - chunkGameObjects [i,j,k].transform.position).sqrMagnitude > 64)
@@ -771,7 +774,6 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 						chunk.init(chunkGameObjects [i,j,k].GetComponent<MeshFilter>().mesh);
 						chunkGameObjects [i,j,k].GetComponent<MeshRenderer>().enabled = true;
 					}
-
 
 					for(int x=0;x<chunk_size;x++)
 						for(int y=0;y<chunk_size;y++)
@@ -907,6 +909,17 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 		return vx.isOccupied ();
 	}
 
+	public Vec3Int getVoxelCoordsFromPt(Vector3 wldcoords)
+	{
+		return ToGrid (wldcoords);
+	}
+
+	public Voxel getVoxelFromPt(Vector3 wldcoords)
+	{
+		Vec3Int cvCoord = ToGrid (wldcoords);
+		return grid.getVoxel(cvCoord);
+	}
+
 	public Chunks getChunkFromPt(Vector3 wldcoords)
 	{
 		Vec3Int cc = ToGrid (wldcoords) / (int)VoxelConsts.CHUNK_SIZE;
@@ -917,6 +930,68 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 	{
 		return ToGrid (wldcoords) / (int)VoxelConsts.CHUNK_SIZE;
 	}
+
+	public Vector3 getVoxelNormal(Voxel vx, Vector3 dir)
+	{
+		Vector3 _normal = Vector3.zero;
+		for(int j=0;j<6;j++)
+		{
+			VF flag = (VF)j;
+			if(vx.getFace(flag) && Vector3.Dot (VoxelConsts.CardinalV3Dir[j],dir) < 0)
+			{
+				_normal += VoxelConsts.CardinalV3Dir[j];
+			}
+		}
+
+		return _normal.normalized;
+	}
+
+	public bool isSurfaceVoxel(Voxel vx)
+	{
+		if (!vx.isOccupied ())
+			return false;
+
+		bool isSurface = false;
+
+		for(int j=0;j<6;j++)
+		{
+			VF flag = (VF)j;
+			isSurface |= vx.getFace(flag);
+		}
+
+		return isSurface;
+	}
+
+	public bool isChunkASurface(DIR normal, Chunks chunk, float threshold)
+	{
+		Vector3 norm = VoxelConsts.CardinalV3Dir [(int)normal];
+		int surfcount = 1;
+		int normalcount = 1;
+		
+		if (chunk.isEmpty ())
+			return false;
+
+
+		for(int x=0;x<chunk_size;x++)
+			for(int y=0;y<chunk_size;y++)
+				for(int z=0;z<chunk_size;z++)
+			{
+				Vec3Int vcoord = new Vec3Int(x,y,z);
+				Voxel voxel = chunk.getVoxel(vcoord);
+
+				if(isSurfaceVoxel(voxel))
+				{
+					surfcount++;
+
+					if(Vector3.Dot(getVoxelNormal(voxel,camera.transform.forward),norm) > 0.99f)
+						normalcount++;
+				}
+			}
+		
+		return ((float)normalcount / (float)surfcount) > threshold;
+
+	}
+
 
 	//optimize later
 	public bool RayCast(Vector3 start, Vector3 dir, float dist, ref Vector3 vxcood, ref Vector3 normal)
@@ -937,7 +1012,7 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 				for(int j=0;j<6;j++)
 				{
 					VF flag = (VF)j;
-					if(vx.getFace(flag) && Vector3.Dot (dir,VoxelConsts.CardinalV3Dir[j]) < 0)
+					if(vx.getFace(flag) && Vector3.Dot (dir, VoxelConsts.CardinalV3Dir[j]) < 0)
 					{
 						_normal += VoxelConsts.CardinalV3Dir[j];
 					}
@@ -975,7 +1050,7 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 				for(int j=0;j<6;j++)
 				{
 					VF flag = (VF)j;
-					if(ovx.getFace(flag) && Vector3.Dot (dir,VoxelConsts.CardinalV3Dir[j]) < 0)
+					if(ovx.getFace(flag) && Vector3.Dot (dir, VoxelConsts.CardinalV3Dir[j]) < 0 )
 					{
 						_normal += VoxelConsts.CardinalV3Dir[j];
 					}
@@ -1127,7 +1202,7 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 			
 			for(int i=0;i<10;i++)
 			{
-				debugPtCloud.m_points[i] = new Vector3(Random.Range (-2.0f,2.0f), Random.Range (-2.0f,2.0f), Random.Range (-2.0f,2.0f));
+				debugPtCloud.m_points[i] = new Vector3(Random.Range (-1.0f,1.0f), 0, Random.Range (-1.0f,1.0f)) * 0.5f;
 			}
 
 			int count = debugPtCloud.m_pointsCount;
