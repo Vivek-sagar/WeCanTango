@@ -98,9 +98,11 @@ public class TangoPointCloud : MonoBehaviour, ITangoDepth
     /// </summary>
     public void Start() 
     {
-		pointArr = new Vector3[frontPointCount];
-		frontRenderer = new IndexStack<Vector3> (pointArr);
-        
+		if(m_updatePointsMesh)
+		{
+			pointArr = new Vector3[frontPointCount];
+			frontRenderer = new IndexStack<Vector3> (pointArr);
+		}
 		m_tangoApplication = FindObjectOfType<TangoApplication>();
         m_tangoApplication.Register(this);
         
@@ -210,6 +212,7 @@ public class TangoPointCloud : MonoBehaviour, ITangoDepth
 					}
                     // Need to update indicies too!
 					int[] indices = new int[frontRenderer.getCount()];
+
 					for (int i = 0; i < frontRenderer.getCount(); ++i)
                     {
                         indices[i] = i;

@@ -99,6 +99,7 @@
      <Compile Include="Assets\TangoSDK\TangoUX\Scripts\Listeners\UxExceptionEventListener.cs" />
      <Compile Include="Assets\TangoSDK\TangoUX\Scripts\TangoUx.cs" />
      <Compile Include="Assets\TriggerScript.cs" />
+     <Compile Include="Assets\VoxelOverlayer.cs" />
      <None Include="Assets\Shaders\outlineShader.shader" />
      <None Include="Assets\Plugins\Android\tango-ux-support-library\res\values\strings.xml" />
      <None Include="Assets\Plugins\Android\tango-ux-support-library\bin\R.txt" />

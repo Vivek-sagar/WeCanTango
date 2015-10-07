@@ -131,6 +131,16 @@ public struct Vec3Int
 	{
 		return new Vec3Int(a.x % b, a.y % b, a.z % b); 
 	}
+
+	public static bool operator== (Vec3Int a, Vec3Int b)
+	{
+		return a.x == b.x && a.y == b.y && a.z == b.z;
+	}
+
+	public static bool operator!= (Vec3Int a, Vec3Int b)
+	{
+		return a.x != b.x || a.y != b.y || a.z != b.z;
+	}
 }
 
 public enum VF : int
@@ -495,7 +505,7 @@ public class VoxelGrid
 		for(int i=0;i<6;i++)
 		{
 			VF flag = (VF)i;
-			vx.setFace(flag,false);
+			vx.setFace(flag,true);
 
 			Vector3 dir = VoxelConsts.CardinalV3Dir[i];
 			
@@ -533,11 +543,6 @@ public class VoxelGrid
 				//vx.setFace(flag,true);
 				neighbour.setFace(invertflag(flag),true);
 			}
-			//else
-			//{
-				//vx.setFace(flag,false);
-			//	neighbour.setFace(invertflag(flag),false);
-			//}
 		}
 	}
 
@@ -900,6 +905,17 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 		Vec3Int cvCoord = ToGrid (wldcoords);
 		Voxel vx = grid.getVoxel(cvCoord);
 		return vx.isOccupied ();
+	}
+
+	public Chunks getChunkFromPt(Vector3 wldcoords)
+	{
+		Vec3Int cc = ToGrid (wldcoords) / (int)VoxelConsts.CHUNK_SIZE;
+		return grid.voxelGrid [cc.x, cc.y, cc.z];
+	}
+
+	public Vec3Int getChunkCoords(Vector3 wldcoords)
+	{
+		return ToGrid (wldcoords) / (int)VoxelConsts.CHUNK_SIZE;
 	}
 
 	//optimize later
