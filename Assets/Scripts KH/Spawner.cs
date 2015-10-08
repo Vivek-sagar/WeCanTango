@@ -14,6 +14,7 @@ public class Spawner : MonoBehaviour
 {
 	VoxelExtractionPointCloud vxe;
 	BiomeScript biome;
+	public GameObject portal;
 	public Spawns[] spawns;
 	public Camera camera;
 	int count = 0;
@@ -101,5 +102,13 @@ public class Spawner : MonoBehaviour
 			}
 		}
 		return false;
+	}
+
+
+	void dropInPortal (DIR normalDir, Vector3 chunkCoord, float threshold =0.6f)
+	{
+		Chunks chunk = vxe.getChunkFromPt (chunkCoord);
+		vxe.isChunkASurface (normalDir, chunk, threshold);
+
 	}
 }

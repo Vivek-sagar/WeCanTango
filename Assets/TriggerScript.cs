@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class TriggerScript : MonoBehaviour {
+public class TriggerScript : MonoBehaviour
+{
 	BiomeScript biome;
 	public Material tranformMat;
 	bool triggered = false;
@@ -17,20 +18,20 @@ public class TriggerScript : MonoBehaviour {
 	CameraClearFlags defaultFlag;
 	float defaultLightIntensity;
 	// Use this for initialization
-	void Start () {
+	void Start ()
+	{
 		vxe = VoxelExtractionPointCloud.Instance;
 		biome = BiomeScript.Instance;
 		defaultFlag = leftcam.clearFlags;
 		defaultLightIntensity = light.intensity;
 		fourpts = new Vector3[3];
 
-		if(cubeswitch != null)
-		{
-			updatePts();
+		if (cubeswitch != null) {
+			updatePts ();
 		}
 	}
 
-	void updatePts()
+	void updatePts ()
 	{
 		fourpts [0] = cubeswitch.gameObject.transform.position + cubeswitch.bounds.extents;
 		fourpts [1] = cubeswitch.gameObject.transform.position - cubeswitch.bounds.extents;
@@ -39,17 +40,18 @@ public class TriggerScript : MonoBehaviour {
 
 
 	// Update is called once per frame
-	void Update () {
+	void Update ()
+	{
 		updatePts ();
-		if(!triggered && cubeswitch!=null && 
-		   (vxe.isVoxelThere(fourpts[0]) || vxe.isVoxelThere(fourpts[1]) || vxe.isVoxelThere(fourpts[2]))
-		   )
-		{
-			triggeredEvent();
+		//If this has not been triggered, has a cube switch and there is a voxel somewhere near it from positive to negative extents 
+		if (!triggered && cubeswitch != null && 
+			(vxe.isVoxelThere (fourpts [0]) || vxe.isVoxelThere (fourpts [1]) || vxe.isVoxelThere (fourpts [2]))
+		   ) {
+			triggeredEvent ();
 		}
 	}
 
-	void OnTriggerEnter(Collider other)
+	void OnTriggerEnter (Collider other)
 	{
 		//if (triggered)
 		//	return;
@@ -61,7 +63,7 @@ public class TriggerScript : MonoBehaviour {
 		//}
 	}
 
-	void triggeredEvent()
+	void triggeredEvent ()
 	{
 		partsys.startLifetime = 3;
 		partsys.startColor = Color.cyan;
@@ -79,13 +81,18 @@ public class TriggerScript : MonoBehaviour {
 		triggered = true;
 	}
 
-	IEnumerator worldTransform()
+	/// <summary>
+	/// Worlds the transform.
+	/// </summary>
+	public IEnumerator worldTransform ()
 	{
+		//Have parameter for BIOME instead of Material, 
+		//so a whole Biome is set, and the old biome (animals, and environment included are destroyed)
 		biome.setAllMaterials (tranformMat);
 		leftcam.clearFlags = CameraClearFlags.Skybox;
 		rightcam.clearFlags = CameraClearFlags.Skybox;
 		light.intensity = 1.0f;
-		yield return new WaitForSeconds(10.0f);
+		yield return new WaitForSeconds (10.0f);
 		leftcam.clearFlags = defaultFlag;
 		rightcam.clearFlags = defaultFlag;
 		light.intensity = defaultLightIntensity;
