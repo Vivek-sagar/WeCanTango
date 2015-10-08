@@ -16,7 +16,7 @@ public static class VoxelConsts
 	public static int VOXEL_RES = 10;
 	public static int FRAME_THRES = 10;
 	public static int DEL_FRAME_THRES = 10;
-	public static int PT_DEL_THRES = 5;
+	public static int PT_DEL_THRES = 30;
 	public static Vec3Int[] CardinalDir = new Vec3Int[]{ new Vec3Int(0,0,1), new Vec3Int(0,0,-1), new Vec3Int(-1,0,0), new Vec3Int(1,0,0), new Vec3Int(0,1,0), new Vec3Int(0,-1,0) };
 	public static Vector3[] CardinalV3Dir = new Vector3[]{ new Vector3(0,0,1), new Vector3(0,0,-1), new Vector3(-1,0,0), new Vector3(1,0,0), new Vector3(0,1,0), new Vector3(0,-1,0) };
 	public static BitArray surfaceSet = new BitArray (new bool[]{true,true,true,true,true,true,false,false});
@@ -1070,11 +1070,12 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 	}
 
 	//optimize later
-	public bool GroundedRayCast(Vector3 start, Vector3 dir, float dist, ref Vector3 vxcood, ref Vector3 normal, float step=1.0f)
+	public bool GroundedRayCast(Vector3 start, Vector3 dir, float dist, ref Vector3 vxcood, ref Vector3 normal, ref bool notgrounded, float step=1.0f)
 	{
 		Vector3 pt = ToGridUnTrunc (start);
 		dir = dir.normalized;
-		
+		notgrounded = false;
+
 		for(float i=0;i<dist;i+=step)
 		{
 			Vec3Int cvCoord = new Vec3Int(pt);
@@ -1101,8 +1102,10 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 
 			Voxel lowerVoxel = grid.getVoxel(cvCoord + VoxelConsts.CardinalDir[(int)DIR.DIR_DOWN]);
 			if(!lowerVoxel.isOccupied())
+			{
+				notgrounded = true;
 				break;
-			
+			}
 			pt += dir;
 		}
 		
