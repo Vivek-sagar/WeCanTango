@@ -55,6 +55,7 @@
      <Compile Include="Assets\Google-Unity\Scripts\AndroidHelper.cs" />
      <Compile Include="Assets\Google-Unity\Scripts\AndroidLifecycle.cs" />
      <Compile Include="Assets\GrowScript.cs" />
+     <Compile Include="Assets\JumpingAI.cs" />
      <Compile Include="Assets\OrientationTrigger.cs" />
      <Compile Include="Assets\Scripts KH\BiomeScript.cs" />
      <Compile Include="Assets\Scripts KH\CameraEmulation.cs" />

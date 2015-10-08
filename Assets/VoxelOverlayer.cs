@@ -1,26 +1,29 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class VoxelOverlayer : MonoBehaviour {
+public class VoxelOverlayer : Singleton<VoxelOverlayer> {
 	VoxelExtractionPointCloud vxe;
 	public Camera camera;
 	public GameObject overlay;
-	public GameObject[] overlayInstances;
+	public GameObject[,,] overlayInstances;
 	public Material material;
-	const int overlayInstanceCount = 2;
+	const int overlayInstanceCount = 27;
+	const int dim = 3;
 	// Use this for initialization
 	void Start () {
 		vxe = VoxelExtractionPointCloud.Instance;
-		overlayInstances = new GameObject[overlayInstanceCount];
-		for (int i=0; i<overlayInstanceCount; i++)
+		overlayInstances = new GameObject[dim,dim,dim];
+		for (int i=0; i<dim; i++)
+			for (int j=0; j<dim; j++)
+				for (int k=0; k<dim; k++)
 		{
 			Mesh mesh = new Mesh();
 			mesh.vertices = ChunkTemplate.Instance.vertices;
 			mesh.normals = ChunkTemplate.Instance.normals;
 			mesh.uv = ChunkTemplate.Instance.uvs;
 
-			overlayInstances [i] = Instantiate (overlay);
-			overlayInstances [i].GetComponent<MeshFilter>().mesh = mesh;
+			overlayInstances [i,j,k] = Instantiate (overlay);
+			overlayInstances [i,j,k].GetComponent<MeshFilter>().mesh = mesh;
 		}
 		overlay.SetActive (false);
 	}
@@ -41,7 +44,7 @@ public class VoxelOverlayer : MonoBehaviour {
 				if(voxel.isOccupied())
 				{
 					Vector3 vwrldcoord = vxe.FromGrid(chunkCoords * vxe.chunk_size + vcoord);
-					if( (vwrldcoord - camera.transform.position).sqrMagnitude > 0.49f )
+					if( (vwrldcoord - camera.transform.position).sqrMagnitude > 0.64f )
 						continue;
 
 					//front
@@ -111,22 +114,21 @@ public class VoxelOverlayer : MonoBehaviour {
 	public void overlayCurrentChunk()
 	{
 		Vector3 pt = camera.transform.position;
-		for(int i=0;i<overlayInstanceCount;i++)
+		Vec3Int chunkCoords = vxe.getChunkCoords (pt);
+
+
+		for(int x=-1;x<=1;x++)
+			for(int y=-1;y<=1;y++)
+				for(int z=-1;z<=1;z++)
 		{
-			Vec3Int camchunk = vxe.getChunkCoords (pt);
-			Chunks chunk = vxe.getChunkFromPt(pt);
+			Vec3Int camchunk = chunkCoords + new Vec3Int(x,y,z);
+			Chunks chunk = vxe.grid.voxelGrid[camchunk.x, camchunk.y, camchunk.z];
 			GameObject refChunk = vxe.chunkGameObjects [camchunk.x, camchunk.y, camchunk.z];
-			overlayInstances[i].transform.position = refChunk.transform.position - camera.transform.forward * 0.01f;
-			overlayInstances[i].GetComponent<MeshRenderer> ().material = material;
+			GameObject overlayInstance = overlayInstances[x + 1, y + 1, z + 1];
+			overlayInstance.transform.position = refChunk.transform.position - camera.transform.forward * 0.01f;
+			overlayInstance.GetComponent<MeshRenderer> ().material = material;
 
-			buildChunkMesh(chunk,camchunk,overlayInstances[i].GetComponent<MeshFilter>().mesh);
-
-			Vec3Int nextcamchunk = new Vec3Int();
-			do
-			{
-				pt += camera.transform.forward * vxe.voxel_size;
-				nextcamchunk = vxe.getChunkCoords(pt);
-			}while(camchunk == nextcamchunk);
+			buildChunkMesh(chunk,camchunk,overlayInstance.GetComponent<MeshFilter>().mesh);
 		}
 	
 	}

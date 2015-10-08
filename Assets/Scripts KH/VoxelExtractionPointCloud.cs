@@ -994,12 +994,12 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 
 
 	//optimize later
-	public bool RayCast(Vector3 start, Vector3 dir, float dist, ref Vector3 vxcood, ref Vector3 normal)
+	public bool RayCast(Vector3 start, Vector3 dir, float dist, ref Vector3 vxcood, ref Vector3 normal, float step=1.0f)
 	{
 		Vector3 pt = ToGridUnTrunc (start);
 		dir = dir.normalized;
 
-		for(float i=0;i<dist;i+=1.0f)
+		for(float i=0;i<dist;i+=step)
 		{
 			Vec3Int cvCoord = new Vec3Int(pt);
 			Voxel vx = grid.getVoxel(cvCoord);
@@ -1026,16 +1026,17 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 			pt += dir;
 		}
 
+		vxcood = FromGridUnTrunc(pt);
 		return false;
 	}
 
 	//optimize later
-	public bool OccupiedRayCast(Vector3 start, Vector3 dir, float dist, ref Vector3 vxcood, ref Vector3 normal)
+	public bool OccupiedRayCast(Vector3 start, Vector3 dir, float dist, ref Vector3 vxcood, ref Vector3 normal, float step=1.0f)
 	{
 		Vector3 pt = ToGridUnTrunc (start);
 		dir = dir.normalized;
 		
-		for(float i=0;i<dist;i+=1.0f)
+		for(float i=0;i<dist;i+=step)
 		{
 			Vec3Int cvCoord = new Vec3Int(pt);
 			Voxel vx = grid.getVoxel(cvCoord);
@@ -1063,7 +1064,49 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 			
 			pt += dir;
 		}
+
+		vxcood = FromGridUnTrunc(pt);
+		return false;
+	}
+
+	//optimize later
+	public bool GroundedRayCast(Vector3 start, Vector3 dir, float dist, ref Vector3 vxcood, ref Vector3 normal, float step=1.0f)
+	{
+		Vector3 pt = ToGridUnTrunc (start);
+		dir = dir.normalized;
 		
+		for(float i=0;i<dist;i+=step)
+		{
+			Vec3Int cvCoord = new Vec3Int(pt);
+			Voxel vx = grid.getVoxel(cvCoord);
+
+			if(vx.isOccupied())
+			{
+				vxcood = FromGridUnTrunc(cvCoord.ToVec3() + new Vector3(0.5f,0.5f,0.5f));
+				Vector3 _normal = new Vector3();
+				
+				for(int j=0;j<6;j++)
+				{
+					VF flag = (VF)j;
+					if(vx.getFace(flag) && Vector3.Dot (dir, VoxelConsts.CardinalV3Dir[j]) < 0)
+					{
+						_normal += VoxelConsts.CardinalV3Dir[j];
+					}
+				}
+				
+				normal = _normal.normalized;
+				
+				return true;
+			}
+
+			Voxel lowerVoxel = grid.getVoxel(cvCoord + VoxelConsts.CardinalDir[(int)DIR.DIR_DOWN]);
+			if(!lowerVoxel.isOccupied())
+				break;
+			
+			pt += dir;
+		}
+		
+		vxcood = FromGridUnTrunc(pt);
 		return false;
 	}
 
@@ -1155,7 +1198,6 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 		}
 		
 		renderVoxelGrid ();
-
 	}
 
 
@@ -1202,7 +1244,7 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 			
 			for(int i=0;i<10;i++)
 			{
-				debugPtCloud.m_points[i] = new Vector3(Random.Range (-1.0f,1.0f), 0, Random.Range (-1.0f,1.0f)) * 0.5f;
+				debugPtCloud.m_points[i] = new Vector3(Random.Range (-100.0f,100.0f), Random.Range (-15.0f,15.0f), Random.Range (-100.0f,100.0f)) * 0.005f;
 			}
 
 			int count = debugPtCloud.m_pointsCount;

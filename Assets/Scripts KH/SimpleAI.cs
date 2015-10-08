@@ -4,10 +4,12 @@ using System.Collections;
 public enum AI_STATE
 {
 	MOVING = 0,
-	STOPPED = 1
+	STOPPED = 1,
+	JUMPING = 2,
+	FALLING = 3
 }
 
-enum DIRECTIONS : int
+public enum DIRECTIONS : int
 {
 	FORWARD = 0,
 	BACKWARD = 1,

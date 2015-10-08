@@ -28,7 +28,7 @@ public class Spawner : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		framecount++;
-		if(framecount % 120 != 0 || count > 20)
+		if(framecount % 120 != 0 || count > 0)
 			return;
 
 		Random.seed = (int)(Time.deltaTime * 1000);
@@ -50,8 +50,6 @@ public class Spawner : MonoBehaviour {
 			{
 				GameObject newsphere = (GameObject)Instantiate (spawnObject, pos + normal * VoxelExtractionPointCloud.Instance.voxel_size * 0.5f, Quaternion.identity);
 				newsphere.SetActive (true);
-				SimpleAI ai = newsphere.GetComponent<SimpleAI>();
-
 				//newsphere.GetComponent<GrowScript>().init(pos, normal, (Vector3.Dot (normal,Vector3.up) > 0.999f) );
 				count++;
 			}
