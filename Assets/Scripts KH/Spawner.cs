@@ -17,6 +17,8 @@ public class Spawner : MonoBehaviour {
 	public Camera camera;
 	int count = 0;
 	int framecount = 0;
+	public int spawnLimit = 0;
+	public int spawnInterval = 120;
 	// Use this for initialization
 	void Start () {
 		vxe = VoxelExtractionPointCloud.Instance;
@@ -28,7 +30,7 @@ public class Spawner : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		framecount++;
-		if(framecount % 120 != 0 || count > 0)
+		if(framecount % spawnInterval != 0 || count >= spawnLimit)
 			return;
 
 		Random.seed = (int)(Time.deltaTime * 1000);
