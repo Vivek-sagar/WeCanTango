@@ -47,7 +47,7 @@ public class JumpingAI : MonoBehaviour {
 				}
 				else
 				{
-					fallPosition += Vector3.up * vxe.voxel_size * 0.5f;
+					fallPosition += Vector3.up * vxe.voxel_size;
 					ai_state = AI_STATE.FALLING;
 				}
 
@@ -66,7 +66,7 @@ public class JumpingAI : MonoBehaviour {
 			bool isThereSurface = vxe.OccupiedRayCast (coords, Vector3.up, BIG_STEP, ref jumpPosition, ref norm);
 			if(isThereSurface)
 			{
-				jumpPosition -= Vector3.up * vxe.voxel_size * 0.5f;
+				jumpPosition += Vector3.up * vxe.voxel_size;
 				ai_state = AI_STATE.JUMPING;
 				return dir;
 			}
@@ -76,6 +76,13 @@ public class JumpingAI : MonoBehaviour {
 		return Vector3.zero;
 		
 	}
+
+	Vector3 getQuadBeizierPt(Vector3 p0, Vector3 p1, Vector3 p2, float t)
+	{
+		float oneMinusT = (1 - t);
+		return oneMinusT * oneMinusT * p0 + 2 * oneMinusT * t * p1 + t * t * p2;
+	}
+
 
 	IEnumerator moveit()
 	{
@@ -93,24 +100,32 @@ public class JumpingAI : MonoBehaviour {
 					transform.position = Vector3.Lerp(currentPosition,movePosition,i);
 					yield return null;
 				}
+				transform.position = movePosition;
+				yield return new WaitForSeconds(2.0f);
 				break;
 			case AI_STATE.JUMPING:
-				for(float i=0; i< 1.0f; i+=Time.deltaTime)
+				Vector3 highpt = (currentPosition + jumpPosition) * 0.5f;
+				highpt.y += vxe.voxel_size * 7.0f;
+				for(float i=0; i< 1.0f; i+=Time.deltaTime * 0.2f)
 				{
-					transform.position = Vector3.Lerp(currentPosition,jumpPosition,i);
+					transform.position = getQuadBeizierPt(currentPosition,highpt,jumpPosition,i);//Vector3.Lerp(currentPosition,jumpPosition,i);
 					yield return null;
 				}
+				transform.position = jumpPosition;
+				yield return new WaitForSeconds(2.0f);
 				break;
 			case AI_STATE.FALLING:
-				for(float i=0; i< 1.0f; i+=Time.deltaTime)
+				for(float i=0; i< 1.0f; i+=Time.deltaTime * 0.2f)
 				{
 					transform.position = Vector3.Lerp(currentPosition,fallPosition,i);
 					yield return null;
 				}
+				transform.position = fallPosition;
+				yield return new WaitForSeconds(2.0f);
 				break;
 			case AI_STATE.STOPPED:
 			default:
-				yield return new WaitForSeconds(1.0f);
+				yield return new WaitForSeconds(2.0f);
 				break;
 			}
 		}
