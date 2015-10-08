@@ -13,13 +13,12 @@ public class JumpingAI : MonoBehaviour {
 	const int STEP = 5;
 	const int BIG_STEP = 100;
 	float stepdownThreshold;
-	public bool start = false;
 	// Use this for initialization
 	void Start () {
 		ai_state = AI_STATE.STOPPED;
 		vxe = VoxelExtractionPointCloud.Instance;
 		lastposition = new Vector3 ();
-		stepdownThreshold = vxe.voxel_size;
+		stepdownThreshold = vxe.voxel_size * 2;
 		stepdownThreshold = stepdownThreshold * stepdownThreshold;
 		init ();
 	}
@@ -47,26 +46,19 @@ public class JumpingAI : MonoBehaviour {
 				}
 				else
 				{
-					fallPosition += Vector3.up * vxe.voxel_size;
+					fallPosition += Vector3.up * vxe.voxel_size * 0.5f;
 					ai_state = AI_STATE.FALLING;
 				}
 
 				return dir;
 			}
-			/*
-			else
-			{
-				movePosition = coords;
-				ai_state = AI_STATE.MOVING;
-				return dir;
-			}*/
 		}
 		else
 		{
 			bool isThereSurface = vxe.OccupiedRayCast (coords, Vector3.up, BIG_STEP, ref jumpPosition, ref norm);
 			if(isThereSurface)
 			{
-				jumpPosition += Vector3.up * vxe.voxel_size;
+				jumpPosition -= Vector3.up * vxe.voxel_size * 0.5f;
 				ai_state = AI_STATE.JUMPING;
 				return dir;
 			}
@@ -104,24 +96,30 @@ public class JumpingAI : MonoBehaviour {
 				yield return new WaitForSeconds(2.0f);
 				break;
 			case AI_STATE.JUMPING:
-				Vector3 highpt = (currentPosition + jumpPosition) * 0.5f;
-				highpt.y += vxe.voxel_size * 7.0f;
-				for(float i=0; i< 1.0f; i+=Time.deltaTime * 0.2f)
 				{
-					transform.position = getQuadBeizierPt(currentPosition,highpt,jumpPosition,i);//Vector3.Lerp(currentPosition,jumpPosition,i);
-					yield return null;
+					Vector3 highpt = (currentPosition + jumpPosition) * 0.5f;
+					highpt.y += vxe.voxel_size * 7.0f;
+					for(float i=0; i< 1.0f; i+=Time.deltaTime * 0.75f)
+					{
+						transform.position = getQuadBeizierPt(currentPosition,highpt,jumpPosition,i);
+						yield return null;
+					}
+					transform.position = jumpPosition;
+					yield return new WaitForSeconds(2.0f);
 				}
-				transform.position = jumpPosition;
-				yield return new WaitForSeconds(2.0f);
 				break;
 			case AI_STATE.FALLING:
-				for(float i=0; i< 1.0f; i+=Time.deltaTime * 0.2f)
 				{
-					transform.position = Vector3.Lerp(currentPosition,fallPosition,i);
-					yield return null;
+					Vector3 highpt = (currentPosition + fallPosition) * 0.5f;
+					highpt.y += vxe.voxel_size * 5.0f;
+					for(float i=0; i< 1.0f; i+=Time.deltaTime * 0.75f)
+					{
+						transform.position = getQuadBeizierPt(currentPosition,highpt,fallPosition,i);
+						yield return null;
+					}
+					transform.position = fallPosition;
+					yield return new WaitForSeconds(2.0f);
 				}
-				transform.position = fallPosition;
-				yield return new WaitForSeconds(2.0f);
 				break;
 			case AI_STATE.STOPPED:
 			default:
