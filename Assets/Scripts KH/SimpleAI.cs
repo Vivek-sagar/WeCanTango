@@ -69,6 +69,7 @@ public class SimpleAI : MonoBehaviour
 		if (emotion != null)
 			emotion.SetActive (false);
 		au_source = GetComponent<AudioSource> ();
+
 		init ();
 	}
 

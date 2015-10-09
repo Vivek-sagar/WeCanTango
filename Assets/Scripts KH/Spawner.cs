@@ -34,10 +34,12 @@ public class Spawner : MonoBehaviour
 	}
 
 	static Vector3[] directions = {
+		new Vector3 (0, 0, 0),
 		new Vector3 (0, 0, 1),
 		new Vector3 (0, 0, -1),
 		new Vector3 (1, 0, 0),
 		new Vector3 (-1, 0, 0),
+		new Vector3 (0, 1, 0),
 	};
 
 	// Use this for initialization
@@ -77,7 +79,7 @@ public class Spawner : MonoBehaviour
 		if (vxe.RayCast (startpt, dir, 64, ref pos, ref normal)) {
 
 			if (!portal.activeInHierarchy) {
-				spawnPortal (pos, 0.6f, (framecount > 120));
+				spawnPortal (pos, 0.6f);
 			}
 
 			Vec3Int chunkcoord = vxe.ToGrid (pos) / vxe.chunk_size;
@@ -113,7 +115,7 @@ public class Spawner : MonoBehaviour
 		int surfaceCount = 0;
 		bool[] isChunkSurface = new bool[4];
 		Chunks chunk; 
-		for (int i=0; i<4; i++) {
+		for (int i=0; i<6; i++) {
 			//chunksAround [i] = vxe.getChunkFromPt (chunkVxCoord + );
 
 			chunk = vxe.getChunkFromPt (chunkCoord + directions [i] * 0.1f);
@@ -122,7 +124,7 @@ public class Spawner : MonoBehaviour
 				surfaceCount ++;
 		}	
 
-		if (surfaceCount > 3 || forceSpawn) {
+		if (surfaceCount > 5 || forceSpawn) {
 			portal.transform.position = chunkCoord;
 			portal.SetActive (true);
 		}
