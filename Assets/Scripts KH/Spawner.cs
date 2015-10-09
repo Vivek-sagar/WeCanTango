@@ -1,37 +1,40 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 
 [System.Serializable]
-public struct Spawns
-{
-	public GameObject[] obj;
+public struct BiomeSpawn
+{ 
+	//public GameObject[] obj;
 	//Make it so the BIOMES do not have to be in number order to be set
 	public BIOMES biome;
-	public bool[] sticksToWalls;
-	public int spawnCount;
+	public SpawnStuff[] SpawnList;
+	//public bool[] sticksToWalls;
+}
+
+[System.Serializable]
+public struct SpawnStuff
+{
+	public GameObject gameObject;
+	//public float spawnPercent;
+	public bool sticksToWalls;
 }
 
 public class Spawner : MonoBehaviour
 {
-
 	VoxelExtractionPointCloud vxe;
 	BiomeScript biome;
 	public GameObject portal;
-	public Spawns[] spawns;
-	public Camera camera;
+	public BiomeSpawn[] currentBioSet, portalBioSet;
+	public Camera backCam;
+	public Transform playerTrans;
 	int count = 0;
 	int framecount = 0;
-	public Transform playerTrans;
-	bool spawningPortal;
-
-	enum DIRECTIONS : int
-	{
-		FORWARD = 0,
-		BACKWARD = 1,
-		LEFT = 2,
-		RIGHT = 3,
-	}
+	
+	public int spawnMax;
+	bool isSpawningPortal;
+	Dictionary<BIOMES,BiomeSpawn> spawnTable = new Dictionary<BIOMES, BiomeSpawn> ();
 
 	static Vector3[] directions = {
 		new Vector3 (0, 0, 0),
@@ -45,6 +48,9 @@ public class Spawner : MonoBehaviour
 	// Use this for initialization
 	void Start ()
 	{
+		/*foreach (BiomeSet bm in currentBioSet) {
+			BiomeTable.Add (bm.biome, bm);
+		}*/
 		vxe = VoxelExtractionPointCloud.Instance;
 		biome = BiomeScript.Instance;
 
@@ -69,26 +75,32 @@ public class Spawner : MonoBehaviour
 		Random.seed = (int)(Time.deltaTime * 1000);
 
 		//A Random Point in your Camera View Port
-		Vector3 ranPt = new Vector3 (Random.Range (0.0f, 1.0f), Random.Range (0.0f, 1.0f), camera.nearClipPlane); 
+		Vector3 ranPt = new Vector3 (Random.Range (0.0f, 1.0f), Random.Range (0.0f, 1.0f), backCam.nearClipPlane); 
 		//The World Point you see thru camera
-		Vector3 startpt = camera.ViewportToWorldPoint (ranPt);
+		Vector3 startpt = backCam.ViewportToWorldPoint (ranPt);
 		//The Direction vector from Camera to start point
-		Vector3 dir = startpt - camera.transform.position;
+		Vector3 dir = startpt - backCam.transform.position;
 		Vector3 pos = new Vector3 (), normal = new Vector3 ();
 
 		if (vxe.RayCast (startpt, dir, 64, ref pos, ref normal)) {
 
+			//If the portal is not active, try spawning one
 			if (!portal.activeInHierarchy) {
 				spawnPortal (pos, 0.6f);
 			}
 
+			//Convert the voxel position into a Chunk World Position
 			Vec3Int chunkcoord = vxe.ToGrid (pos) / vxe.chunk_size;
+
+			//Loads up the BiomeMap through the grid size
 			BIOMES mybiome = biome.biomeMap [chunkcoord.x, chunkcoord.z];
 
-			int animal = Random.Range (0, spawns [(int)mybiome].obj.Length);
-			GameObject spawnObject = spawns [(int)mybiome].obj [animal];
+			//randomly chooses an animal to spawn
+			int animalIndex = Random.Range (0, spawnTable [mybiome].SpawnList.Length);
+			GameObject spawnObject = spawnTable [mybiome].SpawnList [animalIndex].gameObject;
 
-			if (spawns [(int)mybiome].sticksToWalls [animal] || Vector3.Dot (normal, Vector3.up) > 0.999f) {
+			//
+			if (spawnTable [mybiome].SpawnList [animalIndex].sticksToWalls || Vector3.Dot (normal, Vector3.up) > 0.999f) {
 				GameObject newsphere = (GameObject)Instantiate (spawnObject, pos + normal * VoxelExtractionPointCloud.Instance.voxel_size * 0.5f, Quaternion.identity);
 				newsphere.SetActive (true);
 				SimpleAI ai = newsphere.GetComponent<SimpleAI> ();
@@ -127,10 +139,28 @@ public class Spawner : MonoBehaviour
 		if (surfaceCount > 5 || forceSpawn) {
 			portal.transform.position = chunkCoord;
 			portal.SetActive (true);
+			SwapBiomeSets ();
+
 		}
 
 		//vxe.isChunkASurface (normalDir, chunkCenter, threshold);
 
+	}
+
+	/// <summary>
+	/// Swaps the biome sets.
+	/// </summary>
+	void SwapBiomeSets ()
+	{
+		BiomeSpawn[] tempSet = currentBioSet;
+		currentBioSet = portalBioSet;
+		portalBioSet = tempSet;
+		spawnTable.Clear ();
+		
+		for (int i =0; i<currentBioSet.Length; i++) {
+			spawnTable.Add (currentBioSet [i].biome, currentBioSet [i]);
+		}
+		biome.swapMaterials ();
 	}
 
 	/*void spawnPortal (Vec3Int chunkVxCoord, float threshold =0.6f)

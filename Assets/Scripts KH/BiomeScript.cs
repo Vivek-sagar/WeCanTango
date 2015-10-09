@@ -1,17 +1,17 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public enum BIOMES : int
 {
 	grass = 0,
 	ice = 1,
 	water = 2,
-	sand = 3
+	sand = 3,
 }
 
-
-
-public class BiomeScript : Singleton<BiomeScript> {
+public class BiomeScript : Singleton<BiomeScript>
+{
 	VoxelExtractionPointCloud vxe;
 	GameObject[,,] chunkObjs;
 
@@ -25,72 +25,89 @@ public class BiomeScript : Singleton<BiomeScript> {
 
 	public BiomeArea[] biomeArea;
 
+	[System.Serializable]
+	public struct BiomeSet
+	{
+		public Material tranformMat;
+		public BIOMES biome;
+	}
+
 	[HideInInspector]
-	public BIOMES[,] biomeMap; 
+	public BIOMES[,]
+		biomeMap; 
 
-	public Material[] materials;
+	public Material[] materials, portalMaterials;
 
+	Dictionary<BIOMES,BiomeSet> BiomeTable = new Dictionary<BIOMES, BiomeSet> ();
 	int num_chunks_x;
 	int num_chunks_y;
 	int num_chunks_z;
 	// Use this for initialization
-	void Start () {
+	void Start ()
+	{
 		vxe = VoxelExtractionPointCloud.Instance;
 		chunkObjs = vxe.chunkGameObjects;
 
 		num_chunks_x = vxe.num_chunks_x;
 		num_chunks_y = vxe.num_chunks_y;
 		num_chunks_z = vxe.num_chunks_z;
-
+		
 		initBiomes ();
 	}
 
-	void initBiomes()
+	void initBiomes ()
 	{
-		biomeMap = new BIOMES[num_chunks_x,num_chunks_z];
+		biomeMap = new BIOMES[num_chunks_x, num_chunks_z];
 
-		for(int i=0;i<num_chunks_x;i++)
-			for(int j=0;j<num_chunks_z;j++)
-		{
-			biomeMap[i,j] = BIOMES.sand;
+		for (int i=0; i<num_chunks_x; i++)
+			for (int j=0; j<num_chunks_z; j++) {
+				biomeMap [i, j] = BIOMES.sand;
 
-			Vector2 myvec = new Vector2(i,j);
-			for(int k=0;k<biomeArea.Length;k++)
-			{
-				Vector2 localvec = myvec - biomeArea[k].position;
+				Vector2 myvec = new Vector2 (i, j);
+				for (int k=0; k<biomeArea.Length; k++) {
+					Vector2 localvec = myvec - biomeArea [k].position;
 
-				if(localvec.sqrMagnitude < (biomeArea[k].radius * biomeArea[k].radius))
-				{
-					biomeMap[i,j] = biomeArea[k].biome;
+					if (localvec.sqrMagnitude < (biomeArea [k].radius * biomeArea [k].radius)) {
+						biomeMap [i, j] = biomeArea [k].biome;
+					}
 				}
 			}
-		}
 
 		resetBiomes ();
 	}
 
-	public void resetBiomes()
-	{
-		for(int i=0;i<num_chunks_x;i++)
-			for(int j=0;j<num_chunks_z;j++)
-				for(int k=0;k<num_chunks_y;k++)
-				{
-					chunkObjs[i,k,j].GetComponent<MeshRenderer>().material = materials[(int)biomeMap[i,j]];
-				}
-	}
-
-	public void setAllMaterials(Material mat)
+	/// <summary>
+	/// Resets the biomes.
+	/// </summary>
+	public void resetBiomes ()
 	{
 		for (int i=0; i<num_chunks_x; i++)
 			for (int j=0; j<num_chunks_z; j++)
-				for (int k=0; k<num_chunks_y; k++) 
-			{
-				chunkObjs[i,k,j].GetComponent<MeshRenderer>().material = mat;
-			}
+				for (int k=0; k<num_chunks_y; k++) {
+					chunkObjs [i, k, j].GetComponent<MeshRenderer> ().material = materials [(int)biomeMap [i, j]];
+				}
 	}
 
-	// Update is called once per frame
-	void Update () {
-	
+	/// <summary>
+	/// Resets the biomes.
+	/// </summary>
+	/// <param name="newMat">New materials to use.</param>
+	public void swapMaterials ()
+	{
+		Material[] newMats = materials;
+		materials = portalMaterials;
+		portalMaterials = newMats;
+
+		resetBiomes ();
 	}
+
+	public void setAllMaterials (Material mat)
+	{
+		for (int i=0; i<num_chunks_x; i++)
+			for (int j=0; j<num_chunks_z; j++)
+				for (int k=0; k<num_chunks_y; k++) {
+					chunkObjs [i, k, j].GetComponent<MeshRenderer> ().material = mat;
+				}
+	}
+
 }

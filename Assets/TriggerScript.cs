@@ -77,14 +77,14 @@ public class TriggerScript : MonoBehaviour
 		if (cubeswitch != null)
 			cubeswitch.gameObject.SetActive (false);
 		
-		StartCoroutine (worldTransform ());
+		StartCoroutine (worldTransform (true));
 		triggered = true;
 	}
 
 	/// <summary>
-	/// Worlds the transform.
+	/// Transforms the world.
 	/// </summary>
-	public IEnumerator worldTransform ()
+	public IEnumerator worldTransform (bool reset=false)
 	{
 		//Have parameter for BIOME instead of Material, 
 		//so a whole Biome is set, and the old biome (animals, and environment included are destroyed)
@@ -92,11 +92,14 @@ public class TriggerScript : MonoBehaviour
 		leftcam.clearFlags = CameraClearFlags.Skybox;
 		rightcam.clearFlags = CameraClearFlags.Skybox;
 		light.intensity = 1.0f;
-		yield return new WaitForSeconds (10.0f);
-		leftcam.clearFlags = defaultFlag;
-		rightcam.clearFlags = defaultFlag;
-		light.intensity = defaultLightIntensity;
-		biome.resetBiomes ();
+		if (reset) {
+			yield return new WaitForSeconds (10.0f);
+			leftcam.clearFlags = defaultFlag;
+			rightcam.clearFlags = defaultFlag;
+			light.intensity = defaultLightIntensity;
+			biome.resetBiomes ();
+		}
+		yield return null;
 	}
 
 }
