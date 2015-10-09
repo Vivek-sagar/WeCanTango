@@ -6,12 +6,15 @@ using System.Collections;
 public struct Spawns
 {
 	public GameObject[] obj;
+	//Make it so the BIOMES do not have to be in number order to be set
 	public BIOMES biome;
 	public bool[] sticksToWalls;
+	public int spawnCount;
 }
 
 public class Spawner : MonoBehaviour
 {
+
 	VoxelExtractionPointCloud vxe;
 	BiomeScript biome;
 	public GameObject portal;
@@ -19,11 +22,36 @@ public class Spawner : MonoBehaviour
 	public Camera camera;
 	int count = 0;
 	int framecount = 0;
+	public Transform playerTrans;
+	public bool onlyPortal;
+
+	enum DIRECTIONS : int
+	{
+		FORWARD = 0,
+		BACKWARD = 1,
+		LEFT = 2,
+		RIGHT = 3,
+	}
+
+	static Vector3[] directions = {
+		new Vector3 (0, 0, 1),
+		new Vector3 (0, 0, -1),
+		new Vector3 (1, 0, 0),
+		new Vector3 (-1, 0, 0),
+	};
+
 	// Use this for initialization
 	void Start ()
 	{
 		vxe = VoxelExtractionPointCloud.Instance;
 		biome = BiomeScript.Instance;
+
+		if (playerTrans == null)
+			playerTrans = GameObject.FindGameObjectWithTag ("Player").GetComponent<Transform> ();
+		spawnPortal (playerTrans.position, 0.6f);
+		//Debug Test for whether to use ActiveInHiearchy vs ActiveSelf
+		//Debug.Log (string.Format ("Portal Active In Hiearchay {0} , Portal Active Self {1} ", portal.activeInHierarchy, portal.activeSelf));
+
 		//for (int i=0; i<spawnObjects.Length; i++) 
 		//	spawnObjects[i].SetActive (false);
 	}
@@ -32,7 +60,7 @@ public class Spawner : MonoBehaviour
 	void Update ()
 	{
 		framecount++;
-		if (framecount % 120 != 0 || count > 20)
+		if (framecount % 120 != 0 || (count > 20 && !onlyPortal) || (count > 1 && onlyPortal))
 			return;
 
 		Random.seed = (int)(Time.deltaTime * 1000);
@@ -61,12 +89,57 @@ public class Spawner : MonoBehaviour
 				//newsphere.GetComponent<GrowScript>().init(pos, normal, (Vector3.Dot (normal,Vector3.up) > 0.999f) );
 				count++;
 			}
+
+			//if (!portal.activeInHierarchy) {
+
+			//}
+		
 		}
 
 	}
 
+/// <summary>
+/// Drops in the portal if there is a surface around the chunk World Coordinate.
+/// </summary>
+/// <param name="normalDir">Normal direction.</param>
+/// <param name="chunkCoord">Chunk coordinate.</param>
+/// <param name="threshold">Threshold.</param>
+	void spawnPortal (Vector3 chunkCoord, float threshold =0.6f)
+	{
+		DIR normalDir = DIR.DIR_UP;
+		//Chunks chunkCenter = vxe.getChunkFromPt (chunkCoord);
+		//Vec3Int chunkVxCoord = vxe.getChunkCoords (chunkCoord);
 
-	bool chunkSurfaceUp (Vec3Int chunkPos, int countThreshold)
+		int surfaceCount = 0;
+		bool[] isChunkSurface = new bool[4];
+		Chunks chunk; 
+		for (int i=0; i<4; i++) {
+			//chunksAround [i] = vxe.getChunkFromPt (chunkVxCoord + );
+
+			chunk = vxe.getChunkFromPt (chunkCoord + directions [i] * 0.1f);
+			isChunkSurface [i] = vxe.isChunkASurface (normalDir, chunk, threshold);
+			if (isChunkSurface [i])
+				surfaceCount ++;
+		}	
+
+		if (surfaceCount > 1) {
+			portal.transform.position = chunkCoord;
+			portal.SetActive (true);
+		}
+
+		//vxe.isChunkASurface (normalDir, chunkCenter, threshold);
+
+	}
+
+	/*void spawnPortal (Vec3Int chunkVxCoord, float threshold =0.6f)
+	{
+		Vector3 chunkWorldCoord = vxe.getChunkFromPt (chunkVxCoord);
+		
+		//vxe.isChunkASurface (normalDir, chunkCenter, threshold);
+		
+	}*/
+
+	/*bool chunkSurfaceUp (Vec3Int chunkPos, int countThreshold)
 	{
 		//voxel Volume = 512
 		if (vxe.grid.isOccupied (chunkPos))
@@ -102,13 +175,5 @@ public class Spawner : MonoBehaviour
 			}
 		}
 		return false;
-	}
-
-
-	void dropInPortal (DIR normalDir, Vector3 chunkCoord, float threshold =0.6f)
-	{
-		Chunks chunk = vxe.getChunkFromPt (chunkCoord);
-		vxe.isChunkASurface (normalDir, chunk, threshold);
-
-	}
+	}*/
 }

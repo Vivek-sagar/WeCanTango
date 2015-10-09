@@ -66,7 +66,8 @@ public class SimpleAI : MonoBehaviour
 		ai_state = AI_STATE.STOPPED;
 		vxe = VoxelExtractionPointCloud.Instance;
 		lastposition = new Vector3 ();
-		emotion.SetActive (false);
+		if (emotion != null)
+			emotion.SetActive (false);
 		au_source = GetComponent<AudioSource> ();
 		init ();
 	}
@@ -208,7 +209,8 @@ public class SimpleAI : MonoBehaviour
 					StartCoroutine (BounceHeart (other.transform));
 				break;
 			}
-			emotion.SetActive (true);
+			if (emotion != null)
+				emotion.SetActive (true);
 		}
 	}
 
@@ -222,7 +224,8 @@ public class SimpleAI : MonoBehaviour
 				ai_state = AI_STATE.MOVING;
 				break;		
 			}
-			emotion.SetActive (false);
+			if (emotion != null)
+				emotion.SetActive (false);
 		}
 	}
 }
