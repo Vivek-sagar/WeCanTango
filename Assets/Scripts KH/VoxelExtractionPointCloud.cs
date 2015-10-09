@@ -1031,6 +1031,28 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 	}
 
 	//optimize later
+	public bool CheapRayCast(Vector3 start, Vector3 dir, float dist, float step=1.0f)
+	{
+		Vector3 pt = ToGridUnTrunc (start);
+		dir = dir.normalized;
+		
+		for(float i=0;i<dist;i+=step)
+		{
+			Vec3Int cvCoord = new Vec3Int(pt);
+			Voxel vx = grid.getVoxel(cvCoord);
+			
+			if(vx.isOccupied())
+			{
+				return true;
+			}
+			
+			pt += dir;
+		}
+
+		return false;
+	}
+
+	//optimize later
 	public bool OccupiedRayCast(Vector3 start, Vector3 dir, float dist, ref Vector3 vxcood, ref Vector3 normal, float step=1.0f)
 	{
 		Vector3 pt = ToGridUnTrunc (start);

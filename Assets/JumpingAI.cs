@@ -23,39 +23,83 @@ public class JumpingAI : MonoBehaviour {
 		init ();
 	}
 
-	
-	Vector3 getNextMove()
+	Vector3 getNextMoveLimited()
 	{
 		Vector3 coords = Vector3.zero;
 		Vector3 norm = Vector3.zero;
+		bool notgrounded = false;
 		
-
 		Vector3 dir = Vector3.ProjectOnPlane((camera.transform.position - transform.position),Vector3.up).normalized;
-		bool hit = vxe.RayCast (transform.position, dir, STEP, ref coords, ref norm, 0.5f);
-
+		bool hit = vxe.GroundedRayCast (transform.position, dir, STEP, ref coords, ref norm, ref notgrounded, 0.5f);
+		
 		if(!hit)
 		{
-			bool isThereGround = vxe.RayCast (coords, Vector3.down, BIG_STEP, ref fallPosition, ref norm, 0.5f);
-
-			if(isThereGround)
+			if(notgrounded)
 			{
-				if((coords - fallPosition).sqrMagnitude < stepdownThreshold)
-				{
-					movePosition = coords;
-					ai_state = AI_STATE.MOVING;
-				}
-				else
+				bool isThereGround = vxe.RayCast (coords, Vector3.down, BIG_STEP, ref fallPosition, ref norm, 0.5f);
+				if(isThereGround)
 				{
 					fallPosition += Vector3.up * vxe.voxel_size * 0.5f;
 					ai_state = AI_STATE.FALLING;
-				}
-
+					return dir;
+				}			
+			}
+			else
+			{
+				movePosition = coords;
+				ai_state = AI_STATE.MOVING;
 				return dir;
 			}
 		}
 		else
 		{
 			bool isThereSurface = vxe.OccupiedRayCast (coords, Vector3.up, BIG_STEP, ref jumpPosition, ref norm);
+			//bool ICannotJump = vxe.CheapRayCast(transform.position,Vector3.up, 5);
+			if(isThereSurface)
+			{
+				jumpPosition -= Vector3.up * vxe.voxel_size * 0.5f;
+				ai_state = AI_STATE.JUMPING;
+				return dir;
+			}
+		}
+		
+		ai_state = AI_STATE.STOPPED;
+		return Vector3.zero;
+	}
+
+
+	Vector3 getNextMove()
+	{
+		Vector3 coords = Vector3.zero;
+		Vector3 norm = Vector3.zero;
+		bool notgrounded = false;
+
+		Vector3 dir = Vector3.ProjectOnPlane((camera.transform.position - transform.position),Vector3.up).normalized;
+		bool hit = vxe.GroundedRayCast (transform.position, dir, STEP, ref coords, ref norm, ref notgrounded, 0.5f);
+
+		if(!hit)
+		{
+			if(notgrounded)
+			{
+				bool isThereGround = vxe.RayCast (coords, Vector3.down, BIG_STEP, ref fallPosition, ref norm, 0.5f);
+				if(isThereGround)
+				{
+					fallPosition += Vector3.up * vxe.voxel_size * 0.5f;
+					ai_state = AI_STATE.FALLING;
+					return dir;
+				}			
+			}
+			else
+			{
+					movePosition = coords;
+					ai_state = AI_STATE.MOVING;
+					return dir;
+			}
+		}
+		else
+		{
+			bool isThereSurface = vxe.OccupiedRayCast (coords, Vector3.up, BIG_STEP, ref jumpPosition, ref norm);
+			//bool ICannotJump = vxe.CheapRayCast(transform.position,Vector3.up, 5);
 			if(isThereSurface)
 			{
 				jumpPosition -= Vector3.up * vxe.voxel_size * 0.5f;
