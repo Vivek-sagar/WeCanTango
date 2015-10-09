@@ -23,7 +23,7 @@ public class Spawner : MonoBehaviour
 	int count = 0;
 	int framecount = 0;
 	public Transform playerTrans;
-	public bool onlyPortal;
+	bool spawningPortal;
 
 	enum DIRECTIONS : int
 	{
@@ -48,7 +48,6 @@ public class Spawner : MonoBehaviour
 
 		if (playerTrans == null)
 			playerTrans = GameObject.FindGameObjectWithTag ("Player").GetComponent<Transform> ();
-		spawnPortal (playerTrans.position, 0.6f);
 		//Debug Test for whether to use ActiveInHiearchy vs ActiveSelf
 		//Debug.Log (string.Format ("Portal Active In Hiearchay {0} , Portal Active Self {1} ", portal.activeInHierarchy, portal.activeSelf));
 
@@ -60,7 +59,9 @@ public class Spawner : MonoBehaviour
 	void Update ()
 	{
 		framecount++;
-		if (framecount % 120 != 0 || (count > 20 && !onlyPortal) || (count > 1 && onlyPortal))
+
+
+		if (framecount % 60 != 0 || (count > 20))
 			return;
 
 		Random.seed = (int)(Time.deltaTime * 1000);
@@ -75,6 +76,10 @@ public class Spawner : MonoBehaviour
 
 		if (vxe.RayCast (startpt, dir, 64, ref pos, ref normal)) {
 
+			if (!portal.activeInHierarchy) {
+				spawnPortal (pos, 0.6f, (framecount > 120));
+			}
+
 			Vec3Int chunkcoord = vxe.ToGrid (pos) / vxe.chunk_size;
 			BIOMES mybiome = biome.biomeMap [chunkcoord.x, chunkcoord.z];
 
@@ -88,12 +93,7 @@ public class Spawner : MonoBehaviour
 
 				//newsphere.GetComponent<GrowScript>().init(pos, normal, (Vector3.Dot (normal,Vector3.up) > 0.999f) );
 				count++;
-			}
-
-			//if (!portal.activeInHierarchy) {
-
-			//}
-		
+			}		
 		}
 
 	}
@@ -104,7 +104,7 @@ public class Spawner : MonoBehaviour
 /// <param name="normalDir">Normal direction.</param>
 /// <param name="chunkCoord">Chunk coordinate.</param>
 /// <param name="threshold">Threshold.</param>
-	void spawnPortal (Vector3 chunkCoord, float threshold =0.6f)
+	void spawnPortal (Vector3 chunkCoord, float threshold =0.6f, bool forceSpawn=false)
 	{
 		DIR normalDir = DIR.DIR_UP;
 		//Chunks chunkCenter = vxe.getChunkFromPt (chunkCoord);
@@ -122,7 +122,7 @@ public class Spawner : MonoBehaviour
 				surfaceCount ++;
 		}	
 
-		if (surfaceCount > 1) {
+		if (surfaceCount > 3 || forceSpawn) {
 			portal.transform.position = chunkCoord;
 			portal.SetActive (true);
 		}
