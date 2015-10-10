@@ -125,9 +125,9 @@ public class Spawner : MonoBehaviour
 		//Vec3Int chunkVxCoord = vxe.getChunkCoords (chunkCoord);
 
 		int surfaceCount = 0;
-		bool[] isChunkSurface = new bool[4];
+		bool[] isChunkSurface = new bool[directions.Length];
 		Chunks chunk; 
-		for (int i=0; i<6; i++) {
+		for (int i=0; i<isChunkSurface.Length; i++) {
 			//chunksAround [i] = vxe.getChunkFromPt (chunkVxCoord + );
 
 			chunk = vxe.getChunkFromPt (chunkCoord + directions [i] * 0.1f);
@@ -139,8 +139,6 @@ public class Spawner : MonoBehaviour
 		if (surfaceCount > 5 || forceSpawn) {
 			portal.transform.position = chunkCoord;
 			portal.SetActive (true);
-			SwapBiomeSets ();
-
 		}
 
 		//vxe.isChunkASurface (normalDir, chunkCenter, threshold);
@@ -150,7 +148,7 @@ public class Spawner : MonoBehaviour
 	/// <summary>
 	/// Swaps the biome sets.
 	/// </summary>
-	void SwapBiomeSets ()
+	public void SwapBiomeSets ()
 	{
 		BiomeSpawn[] tempSet = currentBioSet;
 		currentBioSet = portalBioSet;

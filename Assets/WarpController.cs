@@ -6,6 +6,7 @@ public class WarpController : MonoBehaviour
 	public Vector2 offset; 
 	public ScrollTexture[] scrollTextureList; 
 	public bool portalColored;
+	public Spawner spawner;
 	bool teleporting;
 	Animator myAnim;
 	Color currentColor = Color.black, OnColor = new Color (0, 127f, 1f);
@@ -32,19 +33,20 @@ public class WarpController : MonoBehaviour
 		if (other.CompareTag ("Player") && !teleporting) {
 			myAnim.SetTrigger ("PortalOn");
 			teleporting = true;
+			spawner.SwapBiomeSets ();
 		}
 	}
 
 	void OnTriggerExit (Collider other)
 	{
 		if (other.CompareTag ("Player")) {
-			myAnim.SetTrigger ("StopPortal");
 			ResetTeleporting ();
 		}
 	}
 
 	public void ResetTeleporting ()
 	{
+		myAnim.SetTrigger ("StopPortal");
 		teleporting = false;
 	}
 

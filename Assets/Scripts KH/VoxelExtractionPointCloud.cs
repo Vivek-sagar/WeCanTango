@@ -1165,27 +1165,24 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 
 
 		#if DEBUG_THIS
-		if (fakeData) 
-		{
+		if (fakeData) {
 			debugPtCloud.m_pointsCount = 100;
 
 			Random.seed = (int)(Time.time * 1000) % 10;
 			
-			for(int i=0;i<10;i++)
-			{
-				debugPtCloud.m_points[i] = new Vector3(Random.Range (-1.0f,1.0f), 0, Random.Range (-1.0f,1.0f)) * 0.5f;
+			for (int i=0; i<10; i++) {
+				debugPtCloud.m_points [i] = new Vector3 (Random.Range (-1.0f, 1.0f), 0, Random.Range (-1.0f, 1.0f)) * 0.5f;
 			}
 
 			int count = debugPtCloud.m_pointsCount;
-			for(int i=0; i< count; i++)
-			{
+			for (int i=0; i< count; i++) {
 				
-				Vector3 pt = debugPtCloud.m_points[i];
+				Vector3 pt = debugPtCloud.m_points [i];
 				
-				Vec3Int coords = ToGrid(pt);
-				InstantiateChunkIfNeeded(coords);
+				Vec3Int coords = ToGrid (pt);
+				InstantiateChunkIfNeeded (coords);
 				
-				grid.setVoxel(coords);
+				grid.setVoxel (coords);
 			}
 			
 			renderVoxelGrid ();
