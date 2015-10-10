@@ -1,12 +1,12 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\ItemSpawner.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\JumpingAI.cs">
     <Files>
-      <File FileName="Assets\ItemSpawner.cs" Line="61" Column="5" />
+      <File FileName="Assets\ItemSpawner.cs" Line="18" Column="32" />
       <File FileName="Assets\Scripts KH\Spawner.cs" Line="1" Column="1" />
-      <File FileName="Assets\Scripts KH\VoxelExtractionPointCloud.cs" Line="1" Column="1" />
-      <File FileName="Assets\JumpingAI.cs" Line="1" Column="1" />
-      <File FileName="Assets\TriggerScript.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts KH\VoxelExtractionPointCloud.cs" Line="958" Column="20" />
+      <File FileName="Assets\JumpingAI.cs" Line="128" Column="3" />
+      <File FileName="Assets\TriggerScript.cs" Line="7" Column="9" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

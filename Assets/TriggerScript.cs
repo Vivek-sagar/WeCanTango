@@ -4,7 +4,7 @@ using System.Collections;
 public class TriggerScript : MonoBehaviour {
 	BiomeScript biome;
 	public Material tranformMat;
-	bool triggered = false;
+	public bool triggered = false;
 	public Camera leftcam;
 	public Camera rightcam;
 	public Light light;
@@ -40,25 +40,26 @@ public class TriggerScript : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
+		/*
 		updatePts ();
 		if(!triggered && cubeswitch!=null && 
 		   (vxe.isVoxelThere(fourpts[0]) || vxe.isVoxelThere(fourpts[1]) || vxe.isVoxelThere(fourpts[2]))
 		   )
 		{
 			triggeredEvent();
-		}
+		}*/
 	}
 
 	void OnTriggerEnter(Collider other)
 	{
-		//if (triggered)
-		//	return;
-		//GameObject othergo = other.gameObject;
+		if (triggered)
+			return;
+		GameObject othergo = other.gameObject;
 
-		//if (othergo.tag == "Player") 
-		//{
-		//	triggeredEvent();
-		//}
+		if (othergo.tag == "Pet") 
+		{
+			triggeredEvent();
+		}
 	}
 
 	void triggeredEvent()

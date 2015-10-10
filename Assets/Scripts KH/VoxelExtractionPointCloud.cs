@@ -962,6 +962,11 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 		return isSurface;
 	}
 
+	public bool voxelHasSurface(Voxel vx, VF face)
+	{
+		return vx.getFace (face);
+	}
+
 	public bool isChunkASurface(DIR normal, Chunks chunk, float threshold)
 	{
 		Vector3 norm = VoxelConsts.CardinalV3Dir [(int)normal];

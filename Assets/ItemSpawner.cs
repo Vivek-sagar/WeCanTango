@@ -12,6 +12,9 @@ public class ItemSpawner : Singleton<ItemSpawner> {
 	public Camera camera;
 	public ItemInfo[] items;
 
+	[HideInInspector]
+	public GameObject[] spawneditems;
+
 	VoxelExtractionPointCloud vxe;
 	BiomeScript biome;
 	int currentItemToSpawn = 0;
@@ -21,6 +24,11 @@ public class ItemSpawner : Singleton<ItemSpawner> {
 	const int minSpawnHeightOffFloor = 3;
 
 	void Start () {
+		spawneditems = new GameObject[items.Length];
+
+		for (int i=0; i<items.Length; i++)
+			spawneditems [i] = null;
+
 		vxe = VoxelExtractionPointCloud.Instance;
 		biome = BiomeScript.Instance;
 		StartCoroutine (SpawnItems ());
@@ -75,7 +83,7 @@ public class ItemSpawner : Singleton<ItemSpawner> {
 								for(int y=vxe.chunk_size-1;y>=0;y--)
 						{
 							Voxel vx = chunk.getVoxel(new Vec3Int(x,y,z));
-							if(vx.isOccupied() &&  Vector3.Dot (vxe.getVoxelNormal(vx),Vector3.up) > 0.99f)
+							if(vx.isOccupied() &&  vxe.voxelHasSurface(vx,VF.VX_TOP_SHOWN))
 							{
 								Vector3 voxelCoords = vxe.FromGridUnTrunc(chunkBaseCoords + new Vector3(x,y,z));
 								if(voxelCoords.y <= coords.y + minSpawnHeightOffFloor * vxe.voxel_size)
@@ -83,7 +91,8 @@ public class ItemSpawner : Singleton<ItemSpawner> {
 
 								GameObject newItem = (GameObject)Instantiate (items[currentItemToSpawn].item, voxelCoords + Vector3.up * vxe.voxel_size * 1.0f, Quaternion.identity);
 								newItem.SetActive (true);
-								
+								spawneditems[currentItemToSpawn] = newItem;
+
 								currentItemToSpawn++;
 								spawned = true;
 								goto imout;
