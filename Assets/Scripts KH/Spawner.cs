@@ -31,7 +31,8 @@ public class Spawner : MonoBehaviour
 	public Transform playerTrans;
 	int count = 0;
 	int framecount = 0;
-	
+    List<GameObject> spawnList;
+
 	public int spawnMax;
 	bool isSpawningPortal;
 	Dictionary<BIOMES,BiomeSpawn> spawnTable = new Dictionary<BIOMES, BiomeSpawn> ();
@@ -53,8 +54,9 @@ public class Spawner : MonoBehaviour
 		}*/
 		vxe = VoxelExtractionPointCloud.Instance;
 		biome = BiomeScript.Instance;
+        spawnList = new List<GameObject>();
 
-		if (playerTrans == null)
+        if (playerTrans == null)
 			playerTrans = GameObject.FindGameObjectWithTag ("Player").GetComponent<Transform> ();
 		//Debug Test for whether to use ActiveInHiearchy vs ActiveSelf
 		//Debug.Log (string.Format ("Portal Active In Hiearchay {0} , Portal Active Self {1} ", portal.activeInHierarchy, portal.activeSelf));
@@ -104,9 +106,9 @@ public class Spawner : MonoBehaviour
 				GameObject newsphere = (GameObject)Instantiate (spawnObject, pos + normal * VoxelExtractionPointCloud.Instance.voxel_size * 0.5f, Quaternion.identity);
 				newsphere.SetActive (true);
 				SimpleAI ai = newsphere.GetComponent<SimpleAI> ();
-
-				//newsphere.GetComponent<GrowScript>().init(pos, normal, (Vector3.Dot (normal,Vector3.up) > 0.999f) );
-				count++;
+                spawnList.Add(newsphere);
+                //newsphere.GetComponent<GrowScript>().init(pos, normal, (Vector3.Dot (normal,Vector3.up) > 0.999f) );
+                count++;
 			}		
 		}
 
@@ -150,17 +152,28 @@ public class Spawner : MonoBehaviour
 	/// </summary>
 	public void SwapBiomeSets ()
 	{
-		BiomeSpawn[] tempSet = currentBioSet;
+        BiomeSpawn[] tempSet = currentBioSet;
 		currentBioSet = portalBioSet;
 		portalBioSet = tempSet;
-		spawnTable.Clear ();
-		
+		spawnTable.Clear ();		
 		for (int i =0; i<currentBioSet.Length; i++) {
 			spawnTable.Add (currentBioSet [i].biome, currentBioSet [i]);
 		}
-		biome.swapMaterials ();
+        DestroySpawns();
+        
 	}
 
+    void DestroySpawns()
+    {
+        GameObject temp;
+        for(int i=spawnList.Count - 1; i > -1; i--)
+        {
+            temp = spawnList[i];
+            Destroy(temp);
+        }
+        spawnList.Clear();
+
+    }
 	/*void spawnPortal (Vec3Int chunkVxCoord, float threshold =0.6f)
 	{
 		Vector3 chunkWorldCoord = vxe.getChunkFromPt (chunkVxCoord);

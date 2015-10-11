@@ -7,17 +7,26 @@ public class WarpController : MonoBehaviour
 	public ScrollTexture[] scrollTextureList; 
 	public bool portalColored;
 	public Spawner spawner;
-	bool teleporting;
+
+    public Camera leftcam;
+    public Camera rightcam;
+    bool teleporting;
 	Animator myAnim;
 	Color currentColor = Color.black, OnColor = new Color (0, 127f, 1f);
-	// Use this for initialization
-	void Start ()
+    BiomeScript biome;
+    CameraClearFlags defaultFlag;
+
+    // Use this for initialization
+    void Start ()
 	{
-		myAnim = GetComponent<Animator> ();
-		/*foreach (ScrollTexture sc in scrollTextureList) {
+        defaultFlag = leftcam.clearFlags;
+        biome = BiomeScript.Instance;
+        myAnim = GetComponent<Animator> ();
+        spawner.SwapBiomeSets();
+        /*foreach (ScrollTexture sc in scrollTextureList) {
 			sc.offset = offset;
 		}*/
-	}
+    }
 
 	void Update ()
 	{
@@ -32,9 +41,11 @@ public class WarpController : MonoBehaviour
 	{
 		if (other.CompareTag ("Player") && !teleporting) {
 			myAnim.SetTrigger ("PortalOn");
-			teleporting = true;
+			//teleporting = true;
 			spawner.SwapBiomeSets ();
-		}
+
+            worldWarp();
+        }
 	}
 
 	void OnTriggerExit (Collider other)
@@ -50,5 +61,14 @@ public class WarpController : MonoBehaviour
 		teleporting = false;
 	}
 
+    public void worldWarp(bool reset = false)
+    {
+        biome.swapMaterials();
+        biome.resetBiomes();
+
+        //Add visual effect stuff here later
+        leftcam.clearFlags = CameraClearFlags.Skybox;
+        rightcam.clearFlags = CameraClearFlags.Skybox;
+    }
 
 }

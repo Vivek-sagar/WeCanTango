@@ -38,7 +38,6 @@ public class BiomeScript : Singleton<BiomeScript>
 
 	public Material[] materials, portalMaterials;
 
-	Dictionary<BIOMES,BiomeSet> BiomeTable = new Dictionary<BIOMES, BiomeSet> ();
 	int num_chunks_x;
 	int num_chunks_y;
 	int num_chunks_z;
@@ -47,7 +46,7 @@ public class BiomeScript : Singleton<BiomeScript>
 	{
 		vxe = VoxelExtractionPointCloud.Instance;
 		chunkObjs = vxe.chunkGameObjects;
-
+        
 		num_chunks_x = vxe.num_chunks_x;
 		num_chunks_y = vxe.num_chunks_y;
 		num_chunks_z = vxe.num_chunks_z;
@@ -98,7 +97,8 @@ public class BiomeScript : Singleton<BiomeScript>
 		materials = portalMaterials;
 		portalMaterials = newMats;
 
-		resetBiomes ();
+       //setAllMaterials(materials[0]);
+        //resetBiomes ();
 	}
 
 	public void setAllMaterials (Material mat)
