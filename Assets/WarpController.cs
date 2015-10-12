@@ -8,25 +8,34 @@ public class WarpController : MonoBehaviour
 	public bool portalColored;
 	public Spawner spawner;
 
-    public Camera leftcam;
-    public Camera rightcam;
-    bool teleporting;
+	public Camera leftcam;
+	public Camera rightcam;
+	public AudioClip idle, warp;
+	public PlayerLazer playerScript;
+	bool teleporting, fading;
 	Animator myAnim;
+	AudioSource au_source;
 	Color currentColor = Color.black, OnColor = new Color (0, 127f, 1f);
-    BiomeScript biome;
-    CameraClearFlags defaultFlag;
+	BiomeScript biome;
+	CameraClearFlags defaultFlag;
 
-    // Use this for initialization
-    void Start ()
+	float timerStartFade = 0f;
+	// Use this for initialization
+	void Start ()
 	{
-        defaultFlag = leftcam.clearFlags;
-        biome = BiomeScript.Instance;
-        myAnim = GetComponent<Animator> ();
-        spawner.SwapBiomeSets();
-        /*foreach (ScrollTexture sc in scrollTextureList) {
+		defaultFlag = leftcam.clearFlags;
+		biome = BiomeScript.Instance;
+		myAnim = GetComponent<Animator> ();
+		au_source = GetComponent<AudioSource> ();
+		//playerScript = GameObject.FindGameObjectWithTag ("Player").GetComponent<PlayerLazer> ();
+		/*foreach (ScrollTexture sc in scrollTextureList) {
 			sc.offset = offset;
 		}*/
-    }
+
+		au_source.clip = idle;
+		au_source.loop = true;
+		au_source.Play ();
+	}
 
 	void Update ()
 	{
@@ -37,40 +46,79 @@ public class WarpController : MonoBehaviour
 		}
 	}
 
-    void OnTriggerStay(Collider other)
-    {
-
-        if (other.CompareTag("Player") && !teleporting)
-        {
-            //myAnim.SetTrigger ("PortalOn");
-            //teleporting = true;
-            spawner.SwapBiomeSets();
-
-            worldWarp();
-        }
-    }
-
-    void OnTriggerExit (Collider other)
+	void OnTriggerStay (Collider other)
 	{
+
 		if (other.CompareTag ("Player")) {
-			ResetTeleporting ();
+			//myAnim.SetTrigger ("PortalOn");
+			//teleporting = true;
+			//spawner.SwapBiomeSets ();
+
+
+			if (!fading) {
+
+				if (au_source.clip != warp)
+					playWarpSound ();
+
+				timerStartFade += Time.deltaTime;
+				if (timerStartFade > 1f) {
+					fading = true;
+					StartCoroutine (playerScript.fadeToDeathScreen (new Color (0f, 181 / 255, 1f, 0.95f), 3f));
+					worldWarp ();
+				}
+			}
+
+			//if (!teleporting)
+
 		}
 	}
 
-	public void ResetTeleporting ()
+	void OnTriggerExit (Collider other)
 	{
-		//myAnim.SetTrigger ("StopPortal");
-		teleporting = false;
+		if (other.CompareTag ("Player") && fading) {
+			StartCoroutine (ResetTeleporting ());
+
+			//StartCoroutine (playerScript.resetFade (0.5f));
+		}
 	}
 
-    public void worldWarp(bool reset = false)
-    {
-        biome.swapMaterials();
-        biome.resetBiomes();
+	IEnumerator ResetTeleporting ()
+	{
+		//myAnim.SetTrigger ("StopPortal");
+		//teleporting = false;
+		yield return new WaitForSeconds (1f);
 
-        //Add visual effect stuff here later
-        leftcam.clearFlags = CameraClearFlags.Skybox;
-        rightcam.clearFlags = CameraClearFlags.Skybox;
-    }
+
+		au_source.clip = idle;
+		au_source.loop = true;
+		au_source.Play ();
+		timerStartFade = 0f;
+		fading = false;
+
+	}
+
+	void playWarpSound ()
+	{
+		//Audio play warp
+		au_source.clip = warp;
+		au_source.loop = false;
+		au_source.Play ();
+	}
+
+	public void worldWarp (bool reset = false)
+	{
+		teleporting = true;
+
+
+
+		//
+		spawner.SwapBiomeSets ();
+		biome.swapMaterials ();
+		biome.resetBiomes ();
+
+		//Add visual effect stuff here later
+		leftcam.clearFlags = CameraClearFlags.Skybox;
+		rightcam.clearFlags = CameraClearFlags.Skybox;
+	}
 
 }

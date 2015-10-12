@@ -7,6 +7,7 @@ public class ScrollTexture : MonoBehaviour
 	MeshRenderer myMeshRenderer;
 	public Vector2 offset;
 	public Color beamColor = Color.black;
+	public bool ignoreEmiss;
 	Material myMat;
 	bool fading = false;
 	Vector2 origOffset;
@@ -23,7 +24,8 @@ public class ScrollTexture : MonoBehaviour
 	{
 		origOffset += offset * Time.deltaTime;
 		myMat.SetTextureOffset ("_MainTex", origOffset);
-		myMat.SetColor ("_EmissionColor", beamColor);
+		if (!ignoreEmiss)
+			myMat.SetColor ("_EmissionColor", beamColor);
 	}
 
 	/* _Color
