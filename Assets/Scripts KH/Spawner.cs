@@ -6,11 +6,8 @@ using System.Collections.Generic;
 [System.Serializable]
 public struct BiomeSpawn
 { 
-	//public GameObject[] obj;
-	//Make it so the BIOMES do not have to be in number order to be set
 	public BIOMES biome;
-	public SpawnStuff[] SpawnList;
-	//public bool[] sticksToWalls;
+    public SpawnStuff[] SpawnList;
 }
 
 [System.Serializable]
@@ -26,16 +23,19 @@ public class Spawner : MonoBehaviour
 	VoxelExtractionPointCloud vxe;
 	BiomeScript biome;
 	public GameObject portal;
-	public BiomeSpawn[] currentBioSet, portalBioSet;
+	public BiomeSpawn[] currentBiomeSpawn, portalBiomeSpawn;
 	public Camera backCam;
 	public Transform playerTrans;
-	int count = 0;
+    
 	int framecount = 0;
-    List<GameObject> spawnList;
-
-	public int spawnMax;
-	bool isSpawningPortal;
-	Dictionary<BIOMES,BiomeSpawn> spawnTable = new Dictionary<BIOMES, BiomeSpawn> ();
+    int maxToSpawnInBiome = 4;
+    //List of GameObjects Spawned
+    List<GameObject> thingsSpawned;
+    //Keeps track of spawnCount in each biome, so 1 biome does not overflow with spawns
+    int[] spawnCountInBoime = { 0, 0, 0, 0 };
+    //Make it so the BIOMES do not have to be in number order to be set
+    Dictionary<BIOMES,BiomeSpawn> spawnTable = new Dictionary<BIOMES, BiomeSpawn> ();
+    Vector3 chunkFloorPos=Vector3.zero;
 
 	static Vector3[] directions = {
 		new Vector3 (0, 0, 0),
@@ -49,29 +49,29 @@ public class Spawner : MonoBehaviour
 	// Use this for initialization
 	void Start ()
 	{
-		/*foreach (BiomeSet bm in currentBioSet) {
-			BiomeTable.Add (bm.biome, bm);
-		}*/
+        StartCoroutine(findFloor());
+		foreach (BiomeSpawn bm in currentBiomeSpawn) {
+            spawnTable.Add (bm.biome, bm);
+		}
 		vxe = VoxelExtractionPointCloud.Instance;
 		biome = BiomeScript.Instance;
-        spawnList = new List<GameObject>();
+        thingsSpawned = new List<GameObject>();
 
         if (playerTrans == null)
 			playerTrans = GameObject.FindGameObjectWithTag ("Player").GetComponent<Transform> ();
 		//Debug Test for whether to use ActiveInHiearchy vs ActiveSelf
 		//Debug.Log (string.Format ("Portal Active In Hiearchay {0} , Portal Active Self {1} ", portal.activeInHierarchy, portal.activeSelf));
 
-		//for (int i=0; i<spawnObjects.Length; i++) 
-		//	spawnObjects[i].SetActive (false);
+		
 	}
-	
+
 	// Update is called once per frame
 	void Update ()
 	{
 		framecount++;
 
-
-		if (framecount % 60 != 0 || (count > 20))
+        //
+		if (framecount % 60 != 0 || (thingsSpawned.Count > maxToSpawnInBiome*4))
 			return;
 
 		Random.seed = (int)(Time.deltaTime * 1000);
@@ -97,30 +97,56 @@ public class Spawner : MonoBehaviour
 			//Loads up the BiomeMap through the grid size
 			BIOMES mybiome = biome.biomeMap [chunkcoord.x, chunkcoord.z];
 
-			//randomly chooses an animal to spawn
-			int animalIndex = Random.Range (0, spawnTable [mybiome].SpawnList.Length);
+            //If there are too many spawns in this Biome, do not spawn more
+            if (spawnCountInBoime[(int)mybiome] > maxToSpawnInBiome)
+                return;
+
+            //randomly chooses an animal to spawn
+            int animalIndex = Random.Range (0, spawnTable [mybiome].SpawnList.Length);
 			GameObject spawnObject = spawnTable [mybiome].SpawnList [animalIndex].gameObject;
 
-			//
-			if (spawnTable [mybiome].SpawnList [animalIndex].sticksToWalls || Vector3.Dot (normal, Vector3.up) > 0.999f) {
+            Chunks chunk = vxe.getChunkFromPt(pos);
+            bool isSurface = vxe.isChunkASurface(DIR.DIR_UP, chunk, .65f);
+
+            if (spawnTable [mybiome].SpawnList [animalIndex].sticksToWalls || isSurface ) { // Vector3.Dot (normal, Vector3.up) > 0.999f) {
 				GameObject newsphere = (GameObject)Instantiate (spawnObject, pos + normal * VoxelExtractionPointCloud.Instance.voxel_size * 0.5f, Quaternion.identity);
 				newsphere.SetActive (true);
-				SimpleAI ai = newsphere.GetComponent<SimpleAI> ();
-                spawnList.Add(newsphere);
+				//SimpleAI ai = newsphere.GetComponent<SimpleAI> ();
+                thingsSpawned.Add(newsphere);
                 //newsphere.GetComponent<GrowScript>().init(pos, normal, (Vector3.Dot (normal,Vector3.up) > 0.999f) );
-                count++;
-			}		
+                
+                spawnCountInBoime[(int)mybiome]++;
+            }		
 		}
 
 	}
 
-/// <summary>
-/// Drops in the portal if there is a surface around the chunk World Coordinate.
-/// </summary>
-/// <param name="normalDir">Normal direction.</param>
-/// <param name="chunkCoord">Chunk coordinate.</param>
-/// <param name="threshold">Threshold.</param>
-	void spawnPortal (Vector3 chunkCoord, float threshold =0.6f, bool forceSpawn=false)
+    /// <summary>
+    /// Raycasts to the ground to find the floor
+    /// </summary>
+    /// <returns></returns>
+    IEnumerator findFloor()
+    {
+        //The Direction vector from Camera to start point
+        Vector3 pos = new Vector3(), normal = new Vector3();
+        bool foundFloor = false;
+
+        while (!foundFloor)
+        {
+            foundFloor = (vxe.RayCast(playerTrans.position, Vector3.down, 64, ref pos, ref normal));
+            yield return new WaitForSeconds(1f);
+        }
+        chunkFloorPos = pos;
+        yield return null;
+    }
+
+    /// <summary>
+    /// Drops in the portal if there is a surface around the chunk World Coordinate.
+    /// </summary>
+    /// <param name="normalDir">Normal direction.</param>
+    /// <param name="chunkCoord">Chunk coordinate.</param>
+    /// <param name="threshold">Threshold.</param>
+    void spawnPortal (Vector3 chunkCoord, float threshold =0.6f, bool forceSpawn=false)
 	{
 		DIR normalDir = DIR.DIR_UP;
 		//Chunks chunkCenter = vxe.getChunkFromPt (chunkCoord);
@@ -131,7 +157,6 @@ public class Spawner : MonoBehaviour
 		Chunks chunk; 
 		for (int i=0; i<isChunkSurface.Length; i++) {
 			//chunksAround [i] = vxe.getChunkFromPt (chunkVxCoord + );
-
 			chunk = vxe.getChunkFromPt (chunkCoord + directions [i] * 0.1f);
 			isChunkSurface [i] = vxe.isChunkASurface (normalDir, chunk, threshold);
 			if (isChunkSurface [i])
@@ -142,36 +167,70 @@ public class Spawner : MonoBehaviour
 			portal.transform.position = chunkCoord;
 			portal.SetActive (true);
 		}
-
 		//vxe.isChunkASurface (normalDir, chunkCenter, threshold);
 
 	}
 
-	/// <summary>
-	/// Swaps the biome sets.
-	/// </summary>
-	public void SwapBiomeSets ()
+    /// <summary>
+    /// Drops in the portal if there is a surface around the chunk World Coordinate.
+    /// </summary>
+    /// <param name="normalDir">Normal direction.</param>
+    /// <param name="chunkCoord">Chunk coordinate.</param>
+    /// <param name="threshold">Threshold.</param>
+    IEnumerator spawnPortalThread(Vector3 chunkCoord, float threshold = 0.6f, bool forceSpawn = false)
+    {
+        DIR normalDir = DIR.DIR_UP;
+        //Chunks chunkCenter = vxe.getChunkFromPt (chunkCoord);
+        //Vec3Int chunkVxCoord = vxe.getChunkCoords (chunkCoord);
+
+        int surfaceCount = 0;
+        bool[] isChunkSurface = new bool[directions.Length];
+        Chunks chunk;
+        for (int i = 0; i < isChunkSurface.Length; i++)
+        {
+            //chunksAround [i] = vxe.getChunkFromPt (chunkVxCoord + );
+            chunk = vxe.getChunkFromPt(chunkCoord + directions[i] * 0.1f);
+            isChunkSurface[i] = vxe.isChunkASurface(normalDir, chunk, threshold);
+            if (isChunkSurface[i])
+                surfaceCount++;
+            yield return new WaitForSeconds(0.5f);
+        }
+
+        if (surfaceCount > 5 || forceSpawn)
+        {
+            portal.transform.position = chunkCoord;
+            portal.SetActive(true);
+        }
+        //vxe.isChunkASurface (normalDir, chunkCenter, threshold);
+
+    }
+
+    /// <summary>
+    /// Swaps the biome sets as well as Destroys the GameObjects spawns (resets any counts)
+    /// </summary>
+    public void SwapBiomeSets ()
 	{
-        BiomeSpawn[] tempSet = currentBioSet;
-		currentBioSet = portalBioSet;
-		portalBioSet = tempSet;
+        BiomeSpawn[] tempSet = currentBiomeSpawn;
+		currentBiomeSpawn = portalBiomeSpawn;
+		portalBiomeSpawn = tempSet;
 		spawnTable.Clear ();		
-		for (int i =0; i<currentBioSet.Length; i++) {
-			spawnTable.Add (currentBioSet [i].biome, currentBioSet [i]);
-		}
+		for (int i =0; i<currentBiomeSpawn.Length; i++) {
+			spawnTable.Add (currentBiomeSpawn [i].biome, currentBiomeSpawn [i]);
+            spawnCountInBoime[i] = 0;
+        }
         DestroySpawns();
-        
+      
 	}
 
     void DestroySpawns()
     {
         GameObject temp;
-        for(int i=spawnList.Count - 1; i > -1; i--)
+        for(int i=thingsSpawned.Count - 1; i > -1; i--)
         {
-            temp = spawnList[i];
+            temp = thingsSpawned[i];
             Destroy(temp);
         }
-        spawnList.Clear();
+        thingsSpawned.Clear();
 
     }
 	/*void spawnPortal (Vec3Int chunkVxCoord, float threshold =0.6f)

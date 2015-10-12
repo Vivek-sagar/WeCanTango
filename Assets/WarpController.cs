@@ -37,18 +37,20 @@ public class WarpController : MonoBehaviour
 		}
 	}
 
-	void OnTriggerEnter (Collider other)
-	{
-		if (other.CompareTag ("Player") && !teleporting) {
-			myAnim.SetTrigger ("PortalOn");
-			//teleporting = true;
-			spawner.SwapBiomeSets ();
+    void OnTriggerStay(Collider other)
+    {
+
+        if (other.CompareTag("Player") && !teleporting)
+        {
+            //myAnim.SetTrigger ("PortalOn");
+            //teleporting = true;
+            spawner.SwapBiomeSets();
 
             worldWarp();
         }
-	}
+    }
 
-	void OnTriggerExit (Collider other)
+    void OnTriggerExit (Collider other)
 	{
 		if (other.CompareTag ("Player")) {
 			ResetTeleporting ();
@@ -57,7 +59,7 @@ public class WarpController : MonoBehaviour
 
 	public void ResetTeleporting ()
 	{
-		myAnim.SetTrigger ("StopPortal");
+		//myAnim.SetTrigger ("StopPortal");
 		teleporting = false;
 	}
 

@@ -10,6 +10,7 @@ public class PlayerLazer : MonoBehaviour
 	Material hit_mat;
 	Collider myCollider;
 	bool fading = false;
+    public float timerStartFade = 0f;
 	// Use this for initialization
 	void Start ()
 	{
@@ -18,15 +19,14 @@ public class PlayerLazer : MonoBehaviour
 		myCollider = GetComponent<Collider> ();
 	}
 
-	IEnumerator fadeToDeathScreen ()
+	IEnumerator fadeToDeathScreen (Color color)
 	{
-		hitSound.Play ();
-		Color red = new Color (1f, 0, 0, 0.5f);
+		//hitSound.Play ();
 		float time = 0f;
 		fading = true;
 		while (time <1f) {
 			time += rate * Time.deltaTime;
-			hit_mat.color = Color.Lerp (hit_mat.color, red, time);
+			hit_mat.color = Color.Lerp (hit_mat.color, color, time);
 			yield return new WaitForSeconds (Time.deltaTime);
 		}
 		time = 0f;
@@ -38,22 +38,29 @@ public class PlayerLazer : MonoBehaviour
 			yield return new WaitForSeconds (Time.deltaTime);
 		}
 		fading = false;
-	}
+        timerStartFade = 0f;
+    }
 
 	void OnTriggerStay (Collider other)
 	{
-		if (other.CompareTag ("Bull")) {
+		/*if (other.CompareTag ("Bull")) {
 			if (!fading)
-				StartCoroutine (fadeToDeathScreen ());
+				StartCoroutine (fadeToDeathScreen (new Color(1f, 0, 0, 0.5f)));
 			//hitSound.PlayOneShot (hitSound.clip);
-
-		}
-	}
+		}*/
+        if (other.CompareTag("Portal"))
+        {
+            timerStartFade += Time.deltaTime;
+            if (!fading && timerStartFade>2f)
+                StartCoroutine(fadeToDeathScreen(new Color(0f, 0f, 1f, 0.5f)));
+            //hitSound.PlayOneShot (hitSound.clip);
+        }
+    }
 
 	void OnTriggerExit (Collider other)
 	{
-		if (other.CompareTag ("Bull")) {
+		/*if (other.CompareTag ("Bull")) {
 			hitSound.Stop ();
-		}
-	}
+		}*/
+    }
 }
