@@ -674,6 +674,9 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 	public Material debugMaterial;
 	public Camera camera;
 
+	[HideInInspector]
+	public IndexStack<Vec3Int> occupiedChunks;
+
 	Matrix4x4 MVP = Matrix4x4.identity;
 
 
@@ -714,6 +717,7 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 			}
 
 		ChunkInstance.SetActive (false);
+		occupiedChunks = new IndexStack<Vec3Int> (new Vec3Int[1500]);
 	}
 
 	bool isInFrustum(Vector3 p, ref Matrix4x4 MVP) 
@@ -744,21 +748,23 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 		int timeslice = framecount % VoxelConsts.FRAME_THRES;
 		int del_timeslice = framecount % VoxelConsts.DEL_FRAME_THRES;
 
-		for(int i=0;i<num_chunks_x;i++)
-			for(int j=0;j<num_chunks_y;j++)
-				for(int k=0;k<num_chunks_z;k++)
-			{
-				Chunks chunk = grid.voxelGrid[i,j,k];
+		//for(int i=0;i<num_chunks_x;i++)
+		//	for(int j=0;j<num_chunks_y;j++)
+		//		for(int k=0;k<num_chunks_z;k++)
+		for(int i=0;i<occupiedChunks.getCount();i++)
+		{
+				Vec3Int chunkcoords = occupiedChunks.peek (i);
+				Chunks chunk = grid.voxelGrid[chunkcoords.x,chunkcoords.y,chunkcoords.z];
 			
 				if(chunk == null)
 					continue;
 				if(chunk.isEmpty())
 				{
-					chunkGameObjects [i,j,k].GetComponent<MeshRenderer>().enabled = false;
+					chunkGameObjects [chunkcoords.x,chunkcoords.y,chunkcoords.z].GetComponent<MeshRenderer>().enabled = false;
 					continue;
 				}
 
-				Vec3Int chunkcoords = new Vec3Int(i,j,k);
+				
 
 				chunk.istack.clear ();
 
@@ -771,8 +777,8 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 				{
 					if(chunk.mesh == null)
 					{
-						chunk.init(chunkGameObjects [i,j,k].GetComponent<MeshFilter>().mesh);
-						chunkGameObjects [i,j,k].GetComponent<MeshRenderer>().enabled = true;
+						chunk.init(chunkGameObjects [chunkcoords.x,chunkcoords.y,chunkcoords.z].GetComponent<MeshFilter>().mesh);
+						chunkGameObjects [chunkcoords.x,chunkcoords.y,chunkcoords.z].GetComponent<MeshRenderer>().enabled = true;
 					}
 
 					for(int x=0;x<chunk_size;x++)
@@ -988,7 +994,7 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 				{
 					surfcount++;
 
-					if(Vector3.Dot(getVoxelNormal(voxel),norm) > 0.99f)
+					if(voxelHasSurface(voxel,VF.VX_TOP_SHOWN))
 						normalcount++;
 				}
 			}
@@ -1150,7 +1156,7 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 		Vector3 vend = ToGridUnTrunc (end);
 		Vector3 dir = (vend - vstart).normalized;
 		float mag = (vend - vstart).magnitude;
-		float offset = mag * 0.3f + 1.0f;
+		float offset = 3.0f;
 
 		Vector3 pt = vstart + dir * offset;
 
@@ -1181,6 +1187,7 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 
 		if (grid.voxelGrid [cc.x, cc.y, cc.z] == null) {
 			grid.voxelGrid [cc.x, cc.y, cc.z] = pool.allocNew();
+			occupiedChunks.push (cc);
 		}
 
 	}

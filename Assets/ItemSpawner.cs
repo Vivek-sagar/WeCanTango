@@ -6,6 +6,7 @@ public class ItemInfo
 {
 	public GameObject item;
 	public BIOMES biome;
+	public int minSpawnHeightOffFloor;
 }
 
 public class ItemSpawner : Singleton<ItemSpawner> {
@@ -21,7 +22,6 @@ public class ItemSpawner : Singleton<ItemSpawner> {
 	int floorChunkY = 0;
 
 	const int range = 2;
-	const int minSpawnHeightOffFloor = 3;
 
 	void Start () {
 		spawneditems = new GameObject[items.Length];
@@ -58,8 +58,9 @@ public class ItemSpawner : Singleton<ItemSpawner> {
 
 				while(true)
 				{
-					chunkx = (Random.Range(0,vxe.num_chunks_x) + Random.Range(0,vxe.num_chunks_x) + Random.Range(0,vxe.num_chunks_x)) % vxe.num_chunks_x;
-					chunkz = (Random.Range(0,vxe.num_chunks_z) + Random.Range(0,vxe.num_chunks_z) + Random.Range(0,vxe.num_chunks_z)) % vxe.num_chunks_z;
+					Vec3Int randomCC = vxe.occupiedChunks.peek ( Random.Range (0, vxe.occupiedChunks.getCount() ) );
+					chunkx = randomCC.x;
+					chunkz = randomCC.z;
 
 					BIOMES mybiome = biome.biomeMap[chunkx,chunkz];
 					if(mybiome == items[currentItemToSpawn].biome)
@@ -72,7 +73,7 @@ public class ItemSpawner : Singleton<ItemSpawner> {
 				for(int k=floorChunkY + range; k >= floorChunkY;k--)
 				{
 					chunk = vxe.grid.voxelGrid[chunkx,k,chunkz];
-					if(chunk!=null && chunk.voxel_count > 10 && vxe.isChunkASurface(DIR.DIR_UP,chunk,0.3f))
+					if(chunk!=null && chunk.voxel_count > 10 && vxe.isChunkASurface(DIR.DIR_UP,chunk,0.4f))
 					{
 						vxe.chunkGameObjects[chunkx,k,chunkz].GetComponent<MeshRenderer>().material = vxe.debugMaterial;
 
@@ -86,7 +87,7 @@ public class ItemSpawner : Singleton<ItemSpawner> {
 							if(vx.isOccupied() &&  vxe.voxelHasSurface(vx,VF.VX_TOP_SHOWN))
 							{
 								Vector3 voxelCoords = vxe.FromGridUnTrunc(chunkBaseCoords + new Vector3(x,y,z));
-								if(voxelCoords.y <= coords.y + minSpawnHeightOffFloor * vxe.voxel_size)
+								if(voxelCoords.y <= coords.y + items[currentItemToSpawn].minSpawnHeightOffFloor * vxe.voxel_size)
 										continue;
 
 								GameObject newItem = (GameObject)Instantiate (items[currentItemToSpawn].item, voxelCoords + Vector3.up * vxe.voxel_size * 1.0f, Quaternion.identity);

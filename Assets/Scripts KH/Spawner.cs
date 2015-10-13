@@ -18,7 +18,7 @@ public class Spawner : MonoBehaviour {
 	int count = 0;
 	int framecount = 0;
 	public int spawnLimit = 0;
-	public int spawnInterval = 120;
+	public int spawnInterval = 30;
 	// Use this for initialization
 	void Start () {
 		vxe = VoxelExtractionPointCloud.Instance;
