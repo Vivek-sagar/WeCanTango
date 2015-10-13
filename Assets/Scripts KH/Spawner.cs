@@ -71,7 +71,7 @@ public class Spawner : MonoBehaviour
 		framecount++;
 
 		//
-		if (framecount % 25 != 0 || (thingsSpawned.Count > maxToSpawnInBiome * 4))
+		if ((framecount % 10 != 0 || (thingsSpawned.Count > maxToSpawnInBiome * 4)) && portal.activeInHierarchy)
 			return;
 
 		Random.seed = (int)(Time.deltaTime * 1000);
@@ -86,11 +86,13 @@ public class Spawner : MonoBehaviour
 
 		if (vxe.RayCast (startpt, dir, 64, ref pos, ref normal)) {
 
+			//SPAWN PORTAL:********************************************************************* 
 			//If the portal is not active, try spawning one
 			if (!portal.activeInHierarchy) {
-				spawnPortal (pos, 0.6f);
+				spawnPortal (pos, 0.6f, chunkFloorPos.y);
 			}
 
+			///SPAWNING FOR ANIMALS*********************************************************************
 			//Convert the voxel position into a Chunk World Position
 			Vec3Int chunkcoord = vxe.ToGrid (pos) / vxe.chunk_size;
 
@@ -145,7 +147,7 @@ public class Spawner : MonoBehaviour
 	/// <param name="normalDir">Normal direction.</param>
 	/// <param name="chunkCoord">Chunk coordinate.</param>
 	/// <param name="threshold">Threshold.</param>
-	void spawnPortal (Vector3 chunkCoord, float threshold =0.6f, bool forceSpawn=false)
+	void spawnPortal (Vector3 chunkCoord, float threshold =0.6f, float floorHieght=0f)
 	{
 		DIR normalDir = DIR.DIR_UP;
 		//Chunks chunkCenter = vxe.getChunkFromPt (chunkCoord);
@@ -162,7 +164,9 @@ public class Spawner : MonoBehaviour
 				surfaceCount ++;
 		}	
 
-		if (surfaceCount > 5 || forceSpawn) {
+
+		if (surfaceCount > 5) {
+			Vector3 pos = new Vector3 (chunkCoord.x, floorHieght, chunkCoord.z);
 			portal.transform.position = chunkCoord;
 			portal.SetActive (true);
 		}
