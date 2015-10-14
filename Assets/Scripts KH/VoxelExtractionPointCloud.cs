@@ -16,7 +16,7 @@ public static class VoxelConsts
 	public static int VOXEL_RES = 10;
 	public static int FRAME_THRES = 5;
 	public static int DEL_FRAME_THRES = 10;
-	public static int PT_DEL_THRES = 40;
+	public static int PT_DEL_THRES = 60;
 	public static Vec3Int[] CardinalDir = new Vec3Int[]{ new Vec3Int(0,0,1), new Vec3Int(0,0,-1), new Vec3Int(-1,0,0), new Vec3Int(1,0,0), new Vec3Int(0,1,0), new Vec3Int(0,-1,0) };
 	public static Vector3[] CardinalV3Dir = new Vector3[]{ new Vector3(0,0,1), new Vector3(0,0,-1), new Vector3(-1,0,0), new Vector3(1,0,0), new Vector3(0,1,0), new Vector3(0,-1,0) };
 	public static BitArray surfaceSet = new BitArray (new bool[]{true,true,true,true,true,true,false,false});
@@ -420,7 +420,7 @@ public class Chunks
 		//uvs = null;
 		#endif
 #endif
-		mesh.bounds = new Bounds (new Vector3 (4, 4, 4) * ChunkTemplate.Instance.voxel_size, new Vector3 (8, 8, 8) * ChunkTemplate.Instance.voxel_size);
+	
 	}
 
 	public Vector3 ResizeVertex(Vector3 vert)

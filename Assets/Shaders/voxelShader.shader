@@ -75,7 +75,6 @@
          {
             uint normIndex = (uint)(input.col.a);
 
-
             float2 texuv;
             
             if(normIndex < 4)
