@@ -36,7 +36,7 @@ public class BiomeScript : Singleton<BiomeScript>
 	public BIOMES[,]
 		biomeMap; 
 
-	public Material[] materials, portalMaterials;
+	public Material[] materials;
 
 	int num_chunks_x;
 	int num_chunks_y;
@@ -90,15 +90,28 @@ public class BiomeScript : Singleton<BiomeScript>
 	/// <summary>
 	/// Resets the biomes.
 	/// </summary>
-	/// <param name="newMat">New materials to use.</param>
-	public void swapMaterials ()
+	public IEnumerator resetBiomesThread ()
 	{
-		Material[] newMats = materials;
-		materials = portalMaterials;
-		portalMaterials = newMats;
+		for (int i=0; i<num_chunks_x; i++)
+			for (int j=0; j<num_chunks_z; j++)
+				for (int k=0; k<num_chunks_y; k++) {
+					chunkObjs [i, k, j].GetComponent<MeshRenderer> ().material = materials [(int)biomeMap [i, j]];
+					yield return null;
+				}
+	}
+
+	/// <summary>
+	/// Swaps the materials for the biome with NewMat, and then resets all the biomes materials
+	/// </summary>
+	/// <param name="newMat">New materials to use.</param>
+	public void swapMaterials (ref Material[] newMat)
+	{
+		Material[] tempMat = materials;
+		materials = newMat;
+		newMat = tempMat;
 
 		//setAllMaterials(materials[0]);
-		//resetBiomes ();
+		resetBiomes ();
 	}
 
 	public void setAllMaterials (Material mat)

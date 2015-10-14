@@ -6,7 +6,6 @@ public class WarpController : MonoBehaviour
 	public Vector2 offset; 
 	public ScrollTexture[] scrollTextureList; 
 	public bool portalColored;
-	public ItemSpawner spawner;
 	public ItemsList itemsList;
 	public Camera leftcam;
 	public Camera rightcam;
@@ -18,11 +17,13 @@ public class WarpController : MonoBehaviour
 	AudioSource au_source;
 	Color currentColor = Color.black, OnColor = new Color (0, 127f, 1f);
 	CameraClearFlags defaultFlag;
+	ItemSpawner spawner;
 
 	float timerStartFade = 0f;
 	// Use this for initialization
 	void Start ()
 	{
+		spawner = ItemSpawner.Instance;
 		defaultFlag = leftcam.clearFlags;
 		myAnim = GetComponent<Animator> ();
 		au_source = GetComponent<AudioSource> ();
@@ -48,7 +49,7 @@ public class WarpController : MonoBehaviour
 	void OnTriggerStay (Collider other)
 	{
 
-		if (other.CompareTag ("Player")) {
+		if (other.CompareTag ("PlayerCollider")) {
 			//myAnim.SetTrigger ("PortalOn");
 			//teleporting = true;
 			//spawner.SwapBiomeSets ();
@@ -71,7 +72,7 @@ public class WarpController : MonoBehaviour
 
 	void OnTriggerExit (Collider other)
 	{
-		if (other.CompareTag ("Player") && fading) {
+		if (other.CompareTag ("PlayerCollider") && fading) {
 			StartCoroutine (ResetTeleporting ());
 
 			//StartCoroutine (playerScript.resetFade (0.5f));
@@ -82,7 +83,8 @@ public class WarpController : MonoBehaviour
 	{
 		//myAnim.SetTrigger ("StopPortal");
 		//teleporting = false;
-		yield return new WaitForSeconds (1f);
+		au_source.Stop ();
+		yield return new WaitForSeconds (2f);
 
 
 		au_source.clip = idle;
@@ -109,10 +111,8 @@ public class WarpController : MonoBehaviour
 	{
 		teleporting = true;
 
-
-
-		//
-		spawner.SwapItemLists (ref itemsList);
+		//Swaps the Portals ItemList and Materials
+		spawner.SwapItemLists (ref itemsList.ItemInfoList, ref newWorldMaterial);
 		//biome.swapMaterials ();
 		//biome.resetBiomes ();
 

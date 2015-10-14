@@ -8,7 +8,7 @@ public class ItemsList : MonoBehaviour
 	{
 		public GameObject item;
 		public BIOMES biome;
-		public int minSpawnHeightOffFloor;	
+		public int maxSpawnHeightOffFloor;
 		public bool spawnOnce;
 		public bool DoNotDestroy;
 		[HideInInspector]
@@ -16,5 +16,5 @@ public class ItemsList : MonoBehaviour
 			spawnCount;
 	}
 
-	public ItemInfo[] ItemList;
+	public ItemInfo[] ItemInfoList;
 }

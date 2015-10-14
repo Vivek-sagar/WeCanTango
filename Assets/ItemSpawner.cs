@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-[System.Serializable]
+/*[System.Serializable]
 public class ItemInfo
 {
 	public GameObject item;
@@ -13,14 +13,17 @@ public class ItemInfo
 	[HideInInspector]
 	public int
 		spawnCount;
-}
+}*/
 
 [RequireComponent(typeof(ItemsList))]
 public class ItemSpawner : Singleton<ItemSpawner>
 {
 	public Camera camera;
-	public ItemInfo[] items;
-	public ItemsList itemsList;
+	//public ItemInfo[] items;
+
+	[HideInInspector]
+	public ItemsList
+		myItemList;
 	[HideInInspector]
 	public List<GameObject>
 		spawnedItems, dontDestroySpawnedItems;
@@ -34,6 +37,7 @@ public class ItemSpawner : Singleton<ItemSpawner>
 
 	void Start ()
 	{
+		myItemList = GetComponent<ItemsList> ();
 		spawnedItems = new List<GameObject> ();// new GameObject[items.Length];
 		dontDestroySpawnedItems = new List<GameObject> ();
 
@@ -48,18 +52,18 @@ public class ItemSpawner : Singleton<ItemSpawner>
 	IEnumerator SpawnItems ()
 	{
 		yield return new WaitForSeconds (30.0f);
-		Vector3 coords = Vector3.zero, norm = Vector3.zero;
+		Vector3 floorCoords = Vector3.zero, norm = Vector3.zero;
 
 		bool hitsomething = false;
 		while (!hitsomething) {
-			hitsomething = vxe.RayCast (camera.transform.position, Vector3.down, 64, ref coords, ref norm, 1.0f);
+			hitsomething = vxe.RayCast (camera.transform.position, Vector3.down, 64, ref floorCoords, ref norm, 1.0f);
 			yield return null;
 		}
 
 		//detects the floor chunk and Y coord
-		floorChunkY = vxe.getChunkCoords (coords).y;
+		floorChunkY = vxe.getChunkCoords (floorCoords).y;
 
-		for (int i=0; i<items.Length; i++) {
+		for (int i=0; i<myItemList.ItemInfoList.Length; i++) {
 			bool spawned = false;
 			while (!spawned) {
 				int chunkx;
@@ -72,7 +76,7 @@ public class ItemSpawner : Singleton<ItemSpawner>
 					chunkz = randomCC.z;
 
 					BIOMES mybiome = biome.biomeMap [chunkx, chunkz];
-					if (mybiome == items [currentItemToSpawn].biome)
+					if (mybiome == myItemList.ItemInfoList [currentItemToSpawn].biome)
 						break;
 					yield return null;
 				}
@@ -92,6 +96,7 @@ public class ItemSpawner : Singleton<ItemSpawner>
 						vxe.chunkGameObjects [chunkx, k, chunkz].GetComponent<MeshRenderer> ().material = vxe.debugMaterial;
 
 						Vector3 chunkBaseCoords = new Vector3 (chunkx, k, chunkz) * vxe.chunk_size;
+						bool alreadySpawnOnce;
 
 						//Loop thru each voxel in the chunk
 						for (int x=0; x<vxe.chunk_size; x++)
@@ -102,14 +107,18 @@ public class ItemSpawner : Singleton<ItemSpawner>
 									if (vx.isOccupied () && vxe.voxelHasSurface (vx, VF.VX_TOP_SHOWN)) {
 										Vector3 voxelCoords = vxe.FromGridUnTrunc (chunkBaseCoords + new Vector3 (x, y, z));
 										//simple checks if the item can spawn at this voxel height 	
-										if (voxelCoords.y <= coords.y + items [currentItemToSpawn].minSpawnHeightOffFloor * vxe.voxel_size || (items [currentItemToSpawn].spawnOnce && items [currentItemToSpawn].spawnCount > 0))
+										alreadySpawnOnce = (myItemList.ItemInfoList [currentItemToSpawn].spawnOnce 
+											&& myItemList.ItemInfoList [currentItemToSpawn].spawnCount > 0);
+
+										if (voxelCoords.y <= floorCoords.y + myItemList.ItemInfoList [currentItemToSpawn].maxSpawnHeightOffFloor * vxe.voxel_size 
+											|| alreadySpawnOnce)
 											continue;
 
-										GameObject newItem = (GameObject)Instantiate (items [currentItemToSpawn].item, voxelCoords + Vector3.up * vxe.voxel_size * 1.0f, Quaternion.identity);
-										items [currentItemToSpawn].spawnCount++;
+										GameObject newItem = (GameObject)Instantiate (myItemList.ItemInfoList [currentItemToSpawn].item, voxelCoords + Vector3.up * vxe.voxel_size * 1.0f, Quaternion.identity);
+										myItemList.ItemInfoList [currentItemToSpawn].spawnCount++;
 										newItem.SetActive (true);
 										
-										if (items [currentItemToSpawn].DoNotDestroy)
+										if (myItemList.ItemInfoList [currentItemToSpawn].DoNotDestroy)
 											dontDestroySpawnedItems.Add (newItem);
 										else
 											spawnedItems.Add (newItem);
@@ -135,15 +144,14 @@ public class ItemSpawner : Singleton<ItemSpawner>
 	/// <summary>
 	/// Swaps the biome sets as well as Destroys the GameObjects spawns (resets any counts)
 	/// </summary>
-	public void SwapItemLists (ref ItemsList newList)
+	public void SwapItemLists (ref ItemsList.ItemInfo[] newList, ref Material[] newMat)
 	{
-		ItemsList tempList = itemsList;
-		itemsList = newList;
+		ItemsList.ItemInfo[] tempList = myItemList.ItemInfoList;
+		myItemList.ItemInfoList = newList;
 		newList = tempList;
 		DestroySpawns ();	
 		//give SWAP Materials a parameter for ItemList Materials...or the WarpController Materials
-		biome.swapMaterials ();
-		biome.resetBiomes ();
+		biome.swapMaterials (ref newMat);
 	}
 
 	/// <summary>
