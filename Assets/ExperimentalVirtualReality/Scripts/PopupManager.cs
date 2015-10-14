@@ -79,9 +79,9 @@ public class PopupManager : MonoBehaviour
         tangoServiceTroublePopup.SetActive(((lastUpdateTime - lastApiTime) > 5));
         #endif
 
-        apiChart.Update();
-        renderChart.Update();
-        baselineChart.Update();
+        //apiChart.Update();
+        //renderChart.Update();
+        //baselineChart.Update();
     }
 
     /// <summary>
@@ -146,7 +146,7 @@ public class PopupManager : MonoBehaviour
             GUI.Label(new Rect(textPosition.x, textPosition.y + (textLineSpacing * 2), 1000, 30), "Position: " + transform.position.ToString("F3"));
             GUI.Label(new Rect(textPosition.x, textPosition.y + (textLineSpacing * 3), 1000, 30), "Debug: " + debugText);
         }
-
+		/*
         // TODO(jason): temporarily comment out this part, to do is to move this button to someother debug functionality class.
         if (isShowingDebugButton)
         {
@@ -157,6 +157,6 @@ public class PopupManager : MonoBehaviour
                 renderChart.line.enabled = showPlots;
                 baselineChart.line.enabled = showPlots;
             }
-        }
+        }*/
     }
 }

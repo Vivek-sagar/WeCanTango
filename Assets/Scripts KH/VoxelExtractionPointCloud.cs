@@ -12,11 +12,11 @@ using System.Collections;
 public static class VoxelConsts
 {
 	public static int CHUNK_SIZE = 8;
-	public static int PT_THRES = 20;
+	public static int PT_THRES = 30;
 	public static int VOXEL_RES = 10;
-	public static int FRAME_THRES = 10;
+	public static int FRAME_THRES = 5;
 	public static int DEL_FRAME_THRES = 10;
-	public static int PT_DEL_THRES = 30;
+	public static int PT_DEL_THRES = 40;
 	public static Vec3Int[] CardinalDir = new Vec3Int[]{ new Vec3Int(0,0,1), new Vec3Int(0,0,-1), new Vec3Int(-1,0,0), new Vec3Int(1,0,0), new Vec3Int(0,1,0), new Vec3Int(0,-1,0) };
 	public static Vector3[] CardinalV3Dir = new Vector3[]{ new Vector3(0,0,1), new Vector3(0,0,-1), new Vector3(-1,0,0), new Vector3(1,0,0), new Vector3(0,1,0), new Vector3(0,-1,0) };
 	public static BitArray surfaceSet = new BitArray (new bool[]{true,true,true,true,true,true,false,false});
@@ -252,9 +252,10 @@ public class ChunkTemplate
 	public Vector3[] vertices;
 	
 #if USE_NORMALS
-	public Vector3[] normals;
+	//public Vector3[] normals;
 #if USE_UV
-	public Vector2[] uvs;
+	//public Vector2[] uvs;
+	public Color32[] colors;
 #endif
 #endif
 	public float voxel_size;
@@ -289,9 +290,10 @@ public class ChunkTemplate
 		vertices = new Vector3[vertex_count * 6];
 		
 #if USE_NORMALS
-		normals = new Vector3[vertex_count * 6];
+		//normals = new Vector3[vertex_count * 6];
 #if USE_UV
-		uvs = new Vector2[vertex_count * 6];
+		//uvs = new Vector2[vertex_count * 6];
+		colors = new Color32[vertex_count * 6];
 #endif
 #endif		
 		
@@ -315,7 +317,23 @@ public class ChunkTemplate
 	{
 		return x * vertex_dim * vertex_dim + y * vertex_dim + z;
 	}
-	
+
+	private Vector2 uvPackedInfo(DIR normal, int uv_x, int uv_y)
+	{
+		int packedInt = (uv_y & 0xF) | ((uv_x & 0xF) << 4) | ((((int)(normal))  & 0x7) << 8);
+		return new Vector2( System.BitConverter.ToSingle (System.BitConverter.GetBytes( packedInt ), 0), 0 );
+	}
+
+	private Color32 colorPackedInfo(DIR normal, int uv_x, int uv_y)
+	{
+		Color32 ret = new Color32 ();
+		ret.r = (byte)(((uint)uv_x) & 0xF);
+		ret.g = (byte)(((uint)uv_y) & 0xF);
+		ret.a = (byte)(((uint)normal) & 0xF);
+
+		return ret;
+	}
+
 	private void setVertex(int x, int y, int z, Vector3 vert)
 	{
 		#if USE_NORMALS
@@ -326,19 +344,19 @@ public class ChunkTemplate
 		vertices [getIndex(x,y,z) + getDirOffset(DIR.DIR_BACK)] = vert;
 		vertices [getIndex(x,y,z) + getDirOffset(DIR.DIR_FRONT)] = vert;
 		
-		normals [getIndex(x,y,z) + getDirOffset(DIR.DIR_UP)] = new Vector3(0,1,0);
-		normals [getIndex(x,y,z) + getDirOffset(DIR.DIR_DOWN)] = new Vector3(0,-1,0);
-		normals [getIndex(x,y,z) + getDirOffset(DIR.DIR_LEFT)] = new Vector3(-1,0,0);
-		normals [getIndex(x,y,z) + getDirOffset(DIR.DIR_RIGHT)] = new Vector3(1,0,0);
-		normals [getIndex(x,y,z) + getDirOffset(DIR.DIR_BACK)] = new Vector3(0,0,-1);
-		normals [getIndex(x,y,z) + getDirOffset(DIR.DIR_FRONT)] = new Vector3(0,0,1);
+		//normals [getIndex(x,y,z) + getDirOffset(DIR.DIR_UP)] = new Vector3(0,1,0);
+		//normals [getIndex(x,y,z) + getDirOffset(DIR.DIR_DOWN)] = new Vector3(0,-1,0);
+		//normals [getIndex(x,y,z) + getDirOffset(DIR.DIR_LEFT)] = new Vector3(-1,0,0);
+		//normals [getIndex(x,y,z) + getDirOffset(DIR.DIR_RIGHT)] = new Vector3(1,0,0);
+		//normals [getIndex(x,y,z) + getDirOffset(DIR.DIR_BACK)] = new Vector3(0,0,-1);
+		//normals [getIndex(x,y,z) + getDirOffset(DIR.DIR_FRONT)] = new Vector3(0,0,1);
 		#if USE_UV
-		uvs [getIndex(x,y,z) + getDirOffset(DIR.DIR_UP)] = new Vector2(x,z);
-		uvs [getIndex(x,y,z) + getDirOffset(DIR.DIR_DOWN)] = new Vector2(x,z);
-		uvs [getIndex(x,y,z) + getDirOffset(DIR.DIR_LEFT)] = new Vector2(z,y);
-		uvs [getIndex(x,y,z) + getDirOffset(DIR.DIR_RIGHT)] = new Vector2(z,y);
-		uvs [getIndex(x,y,z) + getDirOffset(DIR.DIR_BACK)] = new Vector2(x,y);
-		uvs [getIndex(x,y,z) + getDirOffset(DIR.DIR_FRONT)] = new Vector2(x,y);
+		colors [getIndex(x,y,z) + getDirOffset(DIR.DIR_UP)] = colorPackedInfo(DIR.DIR_UP,x,z);//new Vector2(x,z);
+		colors [getIndex(x,y,z) + getDirOffset(DIR.DIR_DOWN)] = colorPackedInfo(DIR.DIR_DOWN,x,z);//new Vector2(x,z);
+		colors [getIndex(x,y,z) + getDirOffset(DIR.DIR_LEFT)] = colorPackedInfo(DIR.DIR_LEFT,z,y);//new Vector2(z,y);
+		colors [getIndex(x,y,z) + getDirOffset(DIR.DIR_RIGHT)] = colorPackedInfo(DIR.DIR_RIGHT,z,y);//new Vector2(z,y);
+		colors [getIndex(x,y,z) + getDirOffset(DIR.DIR_BACK)] = colorPackedInfo(DIR.DIR_BACK,x,y);//new Vector2(x,y);
+		colors [getIndex(x,y,z) + getDirOffset(DIR.DIR_FRONT)] = colorPackedInfo(DIR.DIR_FRONT,x,y);//new Vector2(x,y);
 		#endif
 		#else
 		vertices [getIndex(x,y,z)] = vert;
@@ -394,14 +412,15 @@ public class Chunks
 		mesh.vertices = ChunkTemplate.Instance.vertices;
 		//vertices = null;
 #if USE_NORMALS
-		mesh.normals = ChunkTemplate.Instance.normals;
+		//mesh.normals = ChunkTemplate.Instance.normals;
 		//normals = null;
 		#if USE_UV
-		mesh.uv = ChunkTemplate.Instance.uvs;
+		//mesh.uv = ChunkTemplate.Instance.uvs;
+		mesh.colors32 = ChunkTemplate.Instance.colors;
 		//uvs = null;
 		#endif
 #endif
-
+		mesh.bounds = new Bounds (new Vector3 (4, 4, 4) * ChunkTemplate.Instance.voxel_size, new Vector3 (8, 8, 8) * ChunkTemplate.Instance.voxel_size);
 	}
 
 	public Vector3 ResizeVertex(Vector3 vert)
@@ -755,12 +774,12 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 		{
 				Vec3Int chunkcoords = occupiedChunks.peek (i);
 				Chunks chunk = grid.voxelGrid[chunkcoords.x,chunkcoords.y,chunkcoords.z];
-			
+				MeshRenderer meshrend = chunkGameObjects [chunkcoords.x,chunkcoords.y,chunkcoords.z].GetComponent<MeshRenderer>();
 				if(chunk == null)
 					continue;
 				if(chunk.isEmpty())
 				{
-					chunkGameObjects [chunkcoords.x,chunkcoords.y,chunkcoords.z].GetComponent<MeshRenderer>().enabled = false;
+					meshrend.enabled = false;
 					continue;
 				}
 
@@ -778,8 +797,11 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 					if(chunk.mesh == null)
 					{
 						chunk.init(chunkGameObjects [chunkcoords.x,chunkcoords.y,chunkcoords.z].GetComponent<MeshFilter>().mesh);
-						chunkGameObjects [chunkcoords.x,chunkcoords.y,chunkcoords.z].GetComponent<MeshRenderer>().enabled = true;
+						meshrend.enabled = true;
 					}
+
+					if(meshrend.enabled == false)
+						continue;
 
 					for(int x=0;x<chunk_size;x++)
 						for(int y=0;y<chunk_size;y++)
@@ -1243,29 +1265,28 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 		#if USE_CHUNK_FRUSTUM_CULLING
 		MVP = camera.projectionMatrix * camera.worldToCameraMatrix;
 
-		for (int i=0; i<num_chunks_x; i++)
-			for (int j=0; j<num_chunks_y; j++)
-				for (int k=0; k<num_chunks_z; k++) 
-			{
-					Chunks chunk = grid.voxelGrid [i, j, k];
+		for(int i=0;i<occupiedChunks.getCount();i++)
+		{
+			Vec3Int cc = occupiedChunks.peek(i);
+			Chunks chunk = grid.voxelGrid [cc.x, cc.y, cc.z];
 				
-					if (chunk == null)
-						continue;
-					if (chunk.isEmpty ())
-						continue;
+			if (chunk == null)
+				continue;
+			if (chunk.isEmpty ())
+				continue;
 				
-					Vec3Int chunkcoords = new Vec3Int (i, j, k);
+			Vec3Int chunkcoords = new Vec3Int (cc.x, cc.y, cc.z);
 
-					if(isChunkInFrustum(chunkcoords))
-					{
-						chunkGameObjects[i,j,k].GetComponent<MeshRenderer>().enabled = true;
-					}
-					else
-					{
-						chunkGameObjects[i,j,k].GetComponent<MeshRenderer>().enabled = false;
-						continue;
-					}
+			if(isChunkInFrustum(chunkcoords))
+			{
+				chunkGameObjects[cc.x, cc.y, cc.z].GetComponent<MeshRenderer>().enabled = true;
 			}
+			else
+			{
+				chunkGameObjects[cc.x, cc.y, cc.z].GetComponent<MeshRenderer>().enabled = false;
+				continue;
+			}
+		}
 		#endif
 
 

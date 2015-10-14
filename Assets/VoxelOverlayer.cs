@@ -19,8 +19,9 @@ public class VoxelOverlayer : Singleton<VoxelOverlayer> {
 		{
 			Mesh mesh = new Mesh();
 			mesh.vertices = ChunkTemplate.Instance.vertices;
-			mesh.normals = ChunkTemplate.Instance.normals;
-			mesh.uv = ChunkTemplate.Instance.uvs;
+			//mesh.normals = ChunkTemplate.Instance.normals;
+			//mesh.uv = ChunkTemplate.Instance.uvs;
+			mesh.colors32 = ChunkTemplate.Instance.colors;
 
 			overlayInstances [i,j,k] = Instantiate (overlay);
 			overlayInstances [i,j,k].GetComponent<MeshFilter>().mesh = mesh;
