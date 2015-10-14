@@ -6,17 +6,17 @@ public class WarpController : MonoBehaviour
 	public Vector2 offset; 
 	public ScrollTexture[] scrollTextureList; 
 	public bool portalColored;
-	public Spawner_Biomes spawner;
-
+	public ItemSpawner spawner;
+	public ItemsList itemsList;
 	public Camera leftcam;
 	public Camera rightcam;
 	public AudioClip idle, warp;
-	public PlayerLazer playerScript;
+	public PlayerLazer playerScript;	
+	public Material[] newWorldMaterial;	
 	bool teleporting, fading;
 	Animator myAnim;
 	AudioSource au_source;
 	Color currentColor = Color.black, OnColor = new Color (0, 127f, 1f);
-	BiomeScript biome;
 	CameraClearFlags defaultFlag;
 
 	float timerStartFade = 0f;
@@ -24,7 +24,6 @@ public class WarpController : MonoBehaviour
 	void Start ()
 	{
 		defaultFlag = leftcam.clearFlags;
-		biome = BiomeScript.Instance;
 		myAnim = GetComponent<Animator> ();
 		au_source = GetComponent<AudioSource> ();
 		//playerScript = GameObject.FindGameObjectWithTag ("Player").GetComponent<PlayerLazer> ();
@@ -37,14 +36,14 @@ public class WarpController : MonoBehaviour
 		au_source.Play ();
 	}
 
-	void Update ()
+	/*void Update ()
 	{
 		currentColor = portalColored ? OnColor : Color.black;
 		foreach (ScrollTexture sc in scrollTextureList) {
 			sc.offset = offset;
 			sc.beamColor = currentColor;
 		}
-	}
+	}*/
 
 	void OnTriggerStay (Collider other)
 	{
@@ -64,12 +63,9 @@ public class WarpController : MonoBehaviour
 				if (timerStartFade > 1f) {
 					fading = true;
 					StartCoroutine (playerScript.fadeToDeathScreen (new Color (0f, 181 / 255, 1f, 0.95f), 3f));
-					worldWarp ();
+					warpToNewWorld ();
 				}
 			}
-
-			//if (!teleporting)
-
 		}
 	}
 
@@ -105,18 +101,22 @@ public class WarpController : MonoBehaviour
 		au_source.Play ();
 	}
 
-	public void worldWarp (bool reset = false)
+	/// <summary>
+	/// Warps to New World
+	/// </summary>
+	/// <param name="reset">If set to <c>true</c> reset.</param>
+	public void warpToNewWorld (bool reset = false)
 	{
 		teleporting = true;
 
 
 
 		//
-		spawner.SwapBiomeSets ();
-		biome.swapMaterials ();
-		biome.resetBiomes ();
+		spawner.SwapItemLists (ref itemsList);
+		//biome.swapMaterials ();
+		//biome.resetBiomes ();
 
-		//Add visual effect stuff here later
+		//Add visual effect stuff here later********************************************
 		leftcam.clearFlags = CameraClearFlags.Skybox;
 		rightcam.clearFlags = CameraClearFlags.Skybox;
 	}

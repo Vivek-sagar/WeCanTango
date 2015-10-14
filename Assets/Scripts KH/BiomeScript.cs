@@ -97,8 +97,8 @@ public class BiomeScript : Singleton<BiomeScript>
 		materials = portalMaterials;
 		portalMaterials = newMats;
 
-       //setAllMaterials(materials[0]);
-        //resetBiomes ();
+		//setAllMaterials(materials[0]);
+		//resetBiomes ();
 	}
 
 	public void setAllMaterials (Material mat)

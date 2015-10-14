@@ -203,7 +203,7 @@ public class Spawner_Biomes : MonoBehaviour
 			portal.SetActive (true);
 		}
 		//vxe.isChunkASurface (normalDir, chunkCenter, threshold);
-
+	
 	}
 
 	/// <summary>
@@ -231,7 +231,6 @@ public class Spawner_Biomes : MonoBehaviour
 			Destroy (temp);
 		}
 		thingsSpawned.Clear ();
-
 	}
 	/*void spawnPortal (Vec3Int chunkVxCoord, float threshold =0.6f)
 	{
