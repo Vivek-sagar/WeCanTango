@@ -4,6 +4,8 @@ WeCanTango2.sln
 WeCanTango2.userprefs
 WeCanTango2-csharp.sln
 *.apk
+*.csproj
+*.sln
 Assembly-CSharp.csproj
 Assembly-CSharp-Editor.csproj
 Assembly-CSharp-Editor-vs.csproj
