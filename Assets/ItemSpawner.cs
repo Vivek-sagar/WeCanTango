@@ -54,6 +54,7 @@ public class ItemSpawner : Singleton<ItemSpawner>
 		yield return new WaitForSeconds (30.0f);
 		Vector3 floorCoords = Vector3.zero, norm = Vector3.zero;
 
+		//First tries to find the ground by raycasting down
 		bool hitsomething = false;
 		while (!hitsomething) {
 			hitsomething = vxe.RayCast (camera.transform.position, Vector3.down, 64, ref floorCoords, ref norm, 1.0f);
