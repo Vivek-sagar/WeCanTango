@@ -75,8 +75,6 @@ public class ItemSpawner : Singleton<ItemSpawner> {
 					chunk = vxe.grid.voxelGrid[chunkx,k,chunkz];
 					if(chunk!=null && chunk.voxel_count > 10 && vxe.isChunkASurface(DIR.DIR_UP,chunk,0.4f))
 					{
-						vxe.chunkGameObjects[chunkx,k,chunkz].GetComponent<MeshRenderer>().material = vxe.debugMaterial;
-
 						Vector3 chunkBaseCoords = new Vector3(chunkx,k,chunkz) * vxe.chunk_size;
 
 						for(int x=0;x<vxe.chunk_size;x++)
@@ -93,7 +91,7 @@ public class ItemSpawner : Singleton<ItemSpawner> {
 								GameObject newItem = (GameObject)Instantiate (items[currentItemToSpawn].item, voxelCoords + Vector3.up * vxe.voxel_size * 1.0f, Quaternion.identity);
 								newItem.SetActive (true);
 								spawneditems[currentItemToSpawn] = newItem;
-
+								vxe.chunkGameObjects[chunkx,k,chunkz].GetComponent<MeshRenderer>().material = vxe.debugMaterial;
 								currentItemToSpawn++;
 								spawned = true;
 								goto imout;

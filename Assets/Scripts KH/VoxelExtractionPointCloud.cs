@@ -16,7 +16,7 @@ public static class VoxelConsts
 	public static int VOXEL_RES = 10;
 	public static int FRAME_THRES = 5;
 	public static int DEL_FRAME_THRES = 10;
-	public static int PT_DEL_THRES = 60;
+	public static int PT_DEL_THRES = 50;
 	public static Vec3Int[] CardinalDir = new Vec3Int[]{ new Vec3Int(0,0,1), new Vec3Int(0,0,-1), new Vec3Int(-1,0,0), new Vec3Int(1,0,0), new Vec3Int(0,1,0), new Vec3Int(0,-1,0) };
 	public static Vector3[] CardinalV3Dir = new Vector3[]{ new Vector3(0,0,1), new Vector3(0,0,-1), new Vector3(-1,0,0), new Vector3(1,0,0), new Vector3(0,1,0), new Vector3(0,-1,0) };
 	public static BitArray surfaceSet = new BitArray (new bool[]{true,true,true,true,true,true,false,false});
@@ -324,11 +324,11 @@ public class ChunkTemplate
 		return new Vector2( System.BitConverter.ToSingle (System.BitConverter.GetBytes( packedInt ), 0), 0 );
 	}
 
-	private Color32 colorPackedInfo(DIR normal, int uv_x, int uv_y)
+	private Color32 colorPackedInfo(DIR normal)
 	{
 		Color32 ret = new Color32 ();
-		ret.r = (byte)(((uint)uv_x) & 0xF);
-		ret.g = (byte)(((uint)uv_y) & 0xF);
+		//ret.r = (byte)(((uint)uv_x) & 0xF);
+		//ret.g = (byte)(((uint)uv_y) & 0xF);
 		ret.a = (byte)(((uint)normal) & 0xF);
 
 		return ret;
@@ -351,12 +351,12 @@ public class ChunkTemplate
 		//normals [getIndex(x,y,z) + getDirOffset(DIR.DIR_BACK)] = new Vector3(0,0,-1);
 		//normals [getIndex(x,y,z) + getDirOffset(DIR.DIR_FRONT)] = new Vector3(0,0,1);
 		#if USE_UV
-		colors [getIndex(x,y,z) + getDirOffset(DIR.DIR_UP)] = colorPackedInfo(DIR.DIR_UP,x,z);//new Vector2(x,z);
-		colors [getIndex(x,y,z) + getDirOffset(DIR.DIR_DOWN)] = colorPackedInfo(DIR.DIR_DOWN,x,z);//new Vector2(x,z);
-		colors [getIndex(x,y,z) + getDirOffset(DIR.DIR_LEFT)] = colorPackedInfo(DIR.DIR_LEFT,z,y);//new Vector2(z,y);
-		colors [getIndex(x,y,z) + getDirOffset(DIR.DIR_RIGHT)] = colorPackedInfo(DIR.DIR_RIGHT,z,y);//new Vector2(z,y);
-		colors [getIndex(x,y,z) + getDirOffset(DIR.DIR_BACK)] = colorPackedInfo(DIR.DIR_BACK,x,y);//new Vector2(x,y);
-		colors [getIndex(x,y,z) + getDirOffset(DIR.DIR_FRONT)] = colorPackedInfo(DIR.DIR_FRONT,x,y);//new Vector2(x,y);
+		colors [getIndex(x,y,z) + getDirOffset(DIR.DIR_UP)] = colorPackedInfo(DIR.DIR_UP);//new Vector2(x,z);
+		colors [getIndex(x,y,z) + getDirOffset(DIR.DIR_DOWN)] = colorPackedInfo(DIR.DIR_DOWN);//new Vector2(x,z);
+		colors [getIndex(x,y,z) + getDirOffset(DIR.DIR_LEFT)] = colorPackedInfo(DIR.DIR_LEFT);//new Vector2(z,y);
+		colors [getIndex(x,y,z) + getDirOffset(DIR.DIR_RIGHT)] = colorPackedInfo(DIR.DIR_RIGHT);//new Vector2(z,y);
+		colors [getIndex(x,y,z) + getDirOffset(DIR.DIR_BACK)] = colorPackedInfo(DIR.DIR_BACK);//new Vector2(x,y);
+		colors [getIndex(x,y,z) + getDirOffset(DIR.DIR_FRONT)] = colorPackedInfo(DIR.DIR_FRONT);//new Vector2(x,y);
 		#endif
 		#else
 		vertices [getIndex(x,y,z)] = vert;
