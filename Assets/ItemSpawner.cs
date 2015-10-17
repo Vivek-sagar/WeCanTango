@@ -118,6 +118,9 @@ public class ItemSpawner : Singleton<ItemSpawner>
 											|| alreadySpawnOnce)
 											continue;
 
+										if (myItemList.ItemInfoList [currentItemToSpawn].maxSpawnHeightOffFloor == 0)
+											voxelCoords = new Vector3 (voxelCoords.x, floorCoords.y, voxelCoords.z);
+
 										GameObject newItem = (GameObject)Instantiate (myItemList.ItemInfoList [currentItemToSpawn].item, voxelCoords + Vector3.up * vxe.voxel_size * 1.0f, Quaternion.identity);
 										myItemList.ItemInfoList [currentItemToSpawn].spawnCount++;
 										newItem.SetActive (true);
