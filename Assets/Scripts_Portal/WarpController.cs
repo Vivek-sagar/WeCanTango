@@ -46,6 +46,11 @@ public class WarpController : MonoBehaviour
 		}
 	}*/
 
+	void Update ()
+	{
+
+	}
+
 	void OnTriggerStay (Collider other)
 	{
 

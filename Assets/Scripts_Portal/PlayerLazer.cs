@@ -10,7 +10,6 @@ public class PlayerLazer : MonoBehaviour
 	Material hit_mat;
 	Collider myCollider;
 	bool fading = false;
-	public float timerStartFade = 0f;
 	// Use this for initialization
 	void Start ()
 	{

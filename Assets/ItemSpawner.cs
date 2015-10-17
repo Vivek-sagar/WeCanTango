@@ -26,21 +26,23 @@ public class ItemSpawner : Singleton<ItemSpawner>
 		myItemList;
 	[HideInInspector]
 	public List<GameObject>
-		spawnedItems, dontDestroySpawnedItems;
+		spawnedItems;
 
+	List<GameObject> dontDestroySpawnedItems;
 	VoxelExtractionPointCloud vxe;
 	BiomeScript biome;
 	int currentItemToSpawn = 0;
 	int floorChunkY = 0;
+	Transform playerTrans;
 
 	const int range = 2;
-
+	
 	void Start ()
 	{
 		myItemList = GetComponent<ItemsList> ();
 		spawnedItems = new List<GameObject> ();// new GameObject[items.Length];
 		dontDestroySpawnedItems = new List<GameObject> ();
-
+		playerTrans = GameObject.FindGameObjectWithTag ("Player").GetComponent<Transform> ();
 		/*for (int i=0; i<items.Length; i++)
 			spawnedItems [i] = null;
 */
@@ -61,6 +63,7 @@ public class ItemSpawner : Singleton<ItemSpawner>
 			yield return null;
 		}
 
+		SpawnItems:
 		//detects the floor chunk and Y coord
 		floorChunkY = vxe.getChunkCoords (floorCoords).y;
 
@@ -85,10 +88,10 @@ public class ItemSpawner : Singleton<ItemSpawner>
 				Chunks chunk = null;
 				//
 				/*Search from top of cuhnk down, for the top face appearing. 
-*Spawns one item a time
-*spawns on surfaces only
-*can easily be modified to spawn on sides
-*
+					*Spawns one item a time
+					*spawns on surfaces only
+					*can easily be modified to spawn on sides
+					*
 				 */
 				for (int k=floorChunkY + range; k >= floorChunkY; k--) {
 					chunk = vxe.grid.voxelGrid [chunkx, k, chunkz];
@@ -140,6 +143,22 @@ public class ItemSpawner : Singleton<ItemSpawner>
 				yield return new WaitForSeconds (1.0f);
 			}
 		}
+		goto SpawnItems;
+	}
+
+	IEnumerator SpawnEnvironmentItems ()
+	{
+		yield return new WaitForSeconds (30.0f);
+
+	}
+
+	/// <summary>
+	/// Stops the Spawn Coroutines and restarts spawning Items
+	/// </summary>
+	void RestartSpawn ()
+	{
+		StopCoroutine (SpawnItems ());
+		StartCoroutine (SpawnItems ());
 	}
 
 	/// <summary>
@@ -153,6 +172,7 @@ public class ItemSpawner : Singleton<ItemSpawner>
 		DestroySpawns ();	
 		//give SWAP Materials a parameter for ItemList Materials...or the WarpController Materials
 		biome.swapMaterials (ref newMat);
+		RestartSpawn ();
 	}
 
 	/// <summary>
