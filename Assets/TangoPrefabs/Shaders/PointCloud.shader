@@ -1,24 +1,18 @@
 ﻿Shader "Tango/PointCloud" {
   SubShader {
-  	 Tags { "Queue"="Transparent" "IgnoreProjector"="True" "RenderType"="Transparent" }
-     Lighting Off
-     Blend One Zero
-     ZWrite Off
-     ZTest Always
-     
      Pass {
-  
         GLSLPROGRAM
 
         #ifdef VERTEX
+        uniform mat4 depthCameraTUnityWorld;
         varying vec4 v_color;
         void main()
         {   
-           gl_PointSize = 30.0;
+           gl_PointSize = 5.0;
            gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
            
            // Color should be based on pose relative info
-           v_color = vec4(0.0,1.0,1.0,1.0);
+           v_color = depthCameraTUnityWorld * gl_Vertex;
         }
         #endif
 

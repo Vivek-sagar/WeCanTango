@@ -4,21 +4,20 @@ using System.Collections.Generic;
 
 public class PlayerManager : MonoBehaviour
 {
-
-
 	Vector3[] directions = {
-		new Vector3 (0, 0, 0),
-		new Vector3 (-1, 0, 0),
-		new Vector3 (1, 0, 0),
-		new Vector3 (0, 0, -1),
-		new Vector3 (0, 0, 1),
-		new Vector3 (-1, 0, 1),
-		new Vector3 (1, 0, 1),
-		new Vector3 (-1, 0, -1),
-		new Vector3 (1, 0, -1),
+		new Vector3(0, 0, 0),
+		new Vector3(-1, 0, 0),
+		new Vector3(1, 0, 0),
+		new Vector3(0, 0, -1),
+		new Vector3(0, 0, 1),
+		new Vector3(-1, 0, 1),
+		new Vector3(1, 0, 1),
+		new Vector3(-1, 0, -1),
+		new Vector3(1, 0, -1),
 	};
 
 	public int spawnInterval = 30;
+	public List<GameObject> desertEnvironment;
 	VoxelExtractionPointCloud vxe;
 	BiomeScript biome;
 	Transform playerTrans;
@@ -26,22 +25,35 @@ public class PlayerManager : MonoBehaviour
 
 	List<Chunks> occupiedNearMe;
 	// Use this for initialization
-	void Start ()
+	void Start()
 	{
 		vxe = VoxelExtractionPointCloud.Instance;
 		biome = BiomeScript.Instance;
-		occupiedNearMe = new List<Chunks> ();
+		occupiedNearMe = new List<Chunks>();
+		desertEnvironment = new List<GameObject>();
 	}
 	
 	// Update is called once per frame
-	void Update ()
+	void Update()
 	{
 		framecount++;
-		if (framecount % spawnInterval != 0)
+		if (framecount % spawnInterval != 0) {
 			return;
+		}
 	}
 
-	void SpawnNearPlayer ()
+	void PullSpawnObject(Vector3 position)
+	{
+		if (desertEnvironment.Count > 0) {
+			GameObject gbj = desertEnvironment [0];
+			gbj.GetComponent<Transform>().position = position;
+			gbj.SetActive(true);
+			desertEnvironment.RemoveAt(0);
+
+
+		}
+	}
+	void SpawnNearPlayer()
 	{
 		int chunkx, chunkz;
 		Chunks chunk;
@@ -49,11 +61,11 @@ public class PlayerManager : MonoBehaviour
 		bool isSurface;
 		while (true) {
 			//Random Chunk Coord
-			randomCC = vxe.getChunkCoords (playerTrans.position);
+			randomCC = vxe.getChunkCoords(playerTrans.position);
 			chunkx = randomCC.x;
 			chunkz = randomCC.z;
-			chunk = vxe.getChunkFromPt (playerTrans.position);
-			isSurface = vxe.isChunkASurface (DIR.DIR_UP, chunk, 0.55f);
+			chunk = vxe.getChunkFromPt(playerTrans.position);
+			isSurface = vxe.isChunkASurface(DIR.DIR_UP, chunk, 0.55f);
 			
 			BIOMES mybiome = biome.biomeMap [chunkx, chunkz];
 			//if (mybiome == myItemList.ItemInfoList [currentItemToSpawn].biome)
