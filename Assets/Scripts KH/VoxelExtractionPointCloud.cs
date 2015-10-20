@@ -761,6 +761,126 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 	}
 #endif
 
+	internal class Quad
+	{
+		public int x, y, w, h;
+		public Quad(int _x, int _y, int _w, int _h)
+		{
+			x = _x;
+			y = _y;
+			w = _w;
+			h = _h;
+		}
+
+		public bool mergeRight(Quad b)
+		{
+			if(y == b.y && h == b.h && x + w == b.x)
+			{
+				w += b.w;
+				return true;
+			}
+			return false;
+		}
+
+		public bool mergeUp(Quad b)
+		{
+			if(x == b.x && w == b.w && y + h == b.y)
+			{
+				y += b.y;
+				return true;
+			}
+			return false;
+		}
+	}
+
+	void buildLayer(Chunks chunk, VF dir, int layer, IndexStack<Quad> stack)
+	{
+		int offset = (int)dir / 2;
+		Quad[,] quadgrid = new Quad[chunk_size, chunk_size];
+
+		for(int x=0;x<chunk_size;x++)
+			for(int y=0;y<chunk_size;y++)
+		{
+			int[] coords = new int[3];
+			coords[ (0 + offset) % 3 ] = x;
+			coords[ (1 + offset) % 3 ] = y;
+			coords[ (2 + offset) % 3 ] = layer;
+
+			Voxel vx = chunk.getVoxel(new Vec3Int(coords[0], coords[1], coords[2]));
+
+			if(vx.isOccupied() && vx.getFace(dir))
+			{
+				quadgrid[x,y] = new Quad(x,y,1,1);
+			}
+			else
+			{
+				quadgrid[x,y] = null;
+			}
+		}
+
+		//merge x
+		Quad currquad = null;
+		for(int x=0;x<chunk_size;x++)
+			for(int y=0;y<chunk_size;y++)
+		{
+			if(currquad == null)
+			{
+				if(quadgrid[x,y] == null)
+					continue;
+				else
+					currquad = quadgrid[x,y];
+			}
+			else
+			{
+				if(quadgrid[x,y] == null)
+				{
+					currquad = null;
+				}
+				else
+				{
+					currquad.mergeRight(quadgrid[x,y]);
+					quadgrid[x,y] = null;
+				}
+			}
+		}
+
+
+		//merge y
+		currquad = null;
+		for(int y=0;y<chunk_size;y++)
+			for(int x=0;x<chunk_size;x++)
+		{
+			if(currquad == null)
+			{
+				if(quadgrid[x,y] == null)
+					continue;
+				else
+					currquad = quadgrid[x,y];
+			}
+			else
+			{
+				if(quadgrid[x,y] == null)
+				{
+					currquad = null;
+				}
+				else
+				{
+					currquad.mergeUp(quadgrid[x,y]);
+					quadgrid[x,y] = null;
+				}
+			}
+		}
+
+		for(int x=0;x<chunk_size;x++)
+			for(int y=0;y<chunk_size;y++)
+		{
+			if(quadgrid[x,y] != null)
+			{
+				stack.push(quadgrid[x,y]);
+			}
+		}
+	}
+
 	void renderVoxelGrid()
 	{
 		
