@@ -1,72 +1,81 @@
-#line 8 ""
+#line 14 ""
 #ifdef DUMMY_PREPROCESSOR_TO_WORK_AROUND_HLSL_COMPILER_LINE_HANDLING
 #endif
 
 #include "HLSLSupport.cginc"
 #include "UnityShaderVariables.cginc"
-#line 8 ""
+#line 14 ""
 #ifdef DUMMY_PREPROCESSOR_TO_WORK_AROUND_HLSL_COMPILER_LINE_HANDLING
 #endif
 
- 
          // #pragma vertex vert  
          // #pragma fragment frag 
- 
-         #include "UnityCG.cginc"
- 
+
          uniform float4 _LightColor0; 
 
- 
-         uniform float4 _Color;
+         uniform half	_TexTiling;
+         uniform half	_OffsetX;
+         uniform half	_OffsetY;
+         uniform half	_SideOffsetX;
+         uniform half	_SideOffsetY;
          uniform sampler2D _MainTex;
+         uniform float4 _MainTex_ST;
 
-         static float3 normArray[6] = 
+         static half3 normArray[6] = 
          {
-         	float3(0,0,1), float3(0,0,-1), float3(-1,0,0), float3(1,0,0), float3(0,1,0), float3(0,-1,0)
+         	half3(0,0,1), half3(0,0,-1), half3(-1,0,0), half3(1,0,0), half3(0,1,0), half3(0,-1,0)
          };
 
  
          struct vertexInput {
             float4 vertex : POSITION;
-            float2 uv	  : TEXCOORD0;
+            half4 col	  : COLOR0;
          };
          struct vertexOutput {
             float4 pos : SV_POSITION;
-            float4 col : COLOR;
-            float2 uv  : TEXCOORD0;
+            half4 col : COLOR;
+            half2 uv  : TEXCOORD0;
          };
  
          vertexOutput vert(vertexInput input) 
          {
             vertexOutput output;
  
-            float4x4 modelMatrix = _Object2World;
-            float4x4 modelMatrixInverse = _World2Object;
- 
- 			uint packedInfo =  floatBitsToUint( input.uv.x );
- 			float uv_y = (uint)(packedInfo & 0xF);
-			float uv_x = (uint)((packedInfo >> 4) & 0xF);
-			output.uv = float2(uv_x, uv_y);
+ 			half4 params = input.col * 255;
+			uint normIndex = (uint)(params.w);
 			
-			
-			uint normIndex = (uint)((packedInfo >> 8) & 0x7);
+ 			output.uv = normIndex < 2 ?  input.vertex.xy : normIndex < 4 ? input.vertex.zy : input.vertex.xz;
+			//HACK HACK HACK 10 is my voxel res
+			output.uv = output.uv * 10 * _MainTex_ST.xy + _MainTex_ST.zw;
+
  
-            float3 normalDirection = normalize(
-               mul(float4(normArray[ normIndex ], 0.0), modelMatrixInverse).xyz);
-            float3 lightDirection = normalize(_WorldSpaceLightPos0.xyz);
+            half3 normalDirection = normArray[ normIndex ];
+            half3 lightDirection = normalize(_WorldSpaceLightPos0.xyz);
  
-            float3 diffuseReflection = _LightColor0.rgb
-               * max(0.0, dot(normalDirection, lightDirection));
+            half3 diffuseReflection = _LightColor0.rgb
+               * max(0.0, dot(normalDirection, lightDirection)) + UNITY_LIGHTMODEL_AMBIENT;
  
-            output.col = float4(diffuseReflection, 1.0);
-            output.pos = mul(UNITY_MATRIX_MVP, input.vertex);
+ 			diffuseReflection = min(diffuseReflection, 1.0);
+ 
+            output.col = half4(diffuseReflection, params.w + 0.01);
+            output.pos = mul(UNITY_MATRIX_MVP);
             return output;
          }
  
-         float4 frag(vertexOutput input) : COLOR
+         half4 frag(vertexOutput input) : COLOR
          {
-         	float4 c = tex2D(_MainTex, input.uv);
-            return input.col * c;
+            uint normIndex = (uint)(input.col.a);
+
+            half2 texuv = fmod(input.uv * _TexTiling,_TexTiling);
+            
+            if(normIndex < 4)
+            	texuv += half2(_SideOffsetX,_SideOffsetY);
+            else
+            	texuv += half2(_OffsetX,_OffsetY);
+            	
+         	half4 c = tex2D(_MainTex, texuv);
+         	
+            return half4(input.col.rgb,1.0) * c;
          }
  
          

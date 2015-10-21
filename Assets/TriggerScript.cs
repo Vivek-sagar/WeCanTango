@@ -2,12 +2,8 @@
 using System.Collections;
 
 public class TriggerScript : MonoBehaviour {
-	BiomeScript biome;
-	public Material tranformMat;
+
 	public bool triggered = false;
-	public Camera leftcam;
-	public Camera rightcam;
-	public Light light;
 	public ParticleSystem partsys;
 	public GameObject obj;
 	public BoxCollider cubeswitch;
@@ -19,35 +15,39 @@ public class TriggerScript : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		vxe = VoxelExtractionPointCloud.Instance;
-		biome = BiomeScript.Instance;
-		defaultFlag = leftcam.clearFlags;
-		defaultLightIntensity = light.intensity;
-		fourpts = new Vector3[3];
-
-		if(cubeswitch != null)
-		{
-			updatePts();
-		}
+		cubeswitch.gameObject.SetActive (false);
 	}
 
-	void updatePts()
+
+	bool checkForVoxelsInCollider()
 	{
-		fourpts [0] = cubeswitch.gameObject.transform.position + cubeswitch.bounds.extents;
-		fourpts [1] = cubeswitch.gameObject.transform.position - cubeswitch.bounds.extents;
-		fourpts [2] = cubeswitch.gameObject.transform.position;
+		Vector3 max = cubeswitch.gameObject.transform.position + cubeswitch.bounds.extents;
+		Vector3 min = cubeswitch.gameObject.transform.position - cubeswitch.bounds.extents;
+
+		for(float i=min.x;i<=max.x;i+= vxe.voxel_size)
+			for(float j=min.y;j<=max.y;j+= vxe.voxel_size)
+				for(float k=min.z;k<=max.z;k+= vxe.voxel_size)
+			{
+				if(vxe.isVoxelThere(new Vector3(i,j,k)))
+				   return true;
+			}
+		
+		return false;
 	}
 
 
 	// Update is called once per frame
-	void Update () {
-		/*
-		updatePts ();
-		if(!triggered && cubeswitch!=null && 
-		   (vxe.isVoxelThere(fourpts[0]) || vxe.isVoxelThere(fourpts[1]) || vxe.isVoxelThere(fourpts[2]))
-		   )
+	void Update () 
+	{
+		if(!triggered && cubeswitch.gameObject.activeSelf && checkForVoxelsInCollider())
 		{
 			triggeredEvent();
-		}*/
+		}
+
+		if(vxe.isVoxelThere(obj.transform.position))
+		{
+			transform.position += Vector3.up * vxe.voxel_size;
+		}
 	}
 
 	void OnTriggerEnter(Collider other)
@@ -58,7 +58,9 @@ public class TriggerScript : MonoBehaviour {
 
 		if (othergo.tag == "Pet") 
 		{
-			triggeredEvent();
+			//triggeredEvent();
+			partsys.Emit (100);
+			cubeswitch.gameObject.SetActive(true);
 		}
 	}
 
@@ -72,25 +74,15 @@ public class TriggerScript : MonoBehaviour {
 		partsys.Clear ();
 		partsys.Stop ();
 		partsys.Emit (500);
-		obj.SetActive (false);
-		if (cubeswitch != null)
-			cubeswitch.gameObject.SetActive (false);
-		
-		StartCoroutine (worldTransform ());
-		triggered = true;
-	}
 
-	IEnumerator worldTransform()
-	{
-		biome.setAllMaterials (tranformMat);
-		leftcam.clearFlags = CameraClearFlags.Skybox;
-		rightcam.clearFlags = CameraClearFlags.Skybox;
-		light.intensity = 1.0f;
-		yield return new WaitForSeconds(10.0f);
-		leftcam.clearFlags = defaultFlag;
-		rightcam.clearFlags = defaultFlag;
-		light.intensity = defaultLightIntensity;
-		biome.resetBiomes ();
+		GetComponent<JumpingAI> ().init ();
+
+
+		PetMessage.Instance.setThankYou ();
+		cubeswitch.gameObject.GetComponent<MeshRenderer> ().enabled = false;
+		cubeswitch.gameObject.SetActive (false);
+
+		triggered = true;
 	}
 
 }

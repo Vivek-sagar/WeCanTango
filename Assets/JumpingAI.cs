@@ -14,6 +14,7 @@ public class JumpingAI : MonoBehaviour {
 	const int STEP = 5;
 	const int BIG_STEP = 64;
 	float stepdownThreshold;
+	int stopcount = 0;
 
 
 	const int MAX_JUMP_HEIGHT = 3;
@@ -26,7 +27,7 @@ public class JumpingAI : MonoBehaviour {
 		lastposition = new Vector3 ();
 		stepdownThreshold = vxe.voxel_size * 2;
 		stepdownThreshold = stepdownThreshold * stepdownThreshold;
-		init ();
+		//init ();
 	}
 
 	bool checkForJumpPositions(Vector3 dir, out Vector3 out_minAngleDir)
@@ -73,19 +74,19 @@ public class JumpingAI : MonoBehaviour {
 	{
 		Vector3 targetPosition = camera.transform.position;
 
-		for(int i=0;i<itemspawn.items.Length;i++)
+		if (tag == "Pet") 
 		{
-			if(itemspawn.spawneditems[i] == null || itemspawn.spawneditems[i].GetComponent<TriggerScript>().triggered)
-				continue;
+			for (int i=0; i<itemspawn.items.Length; i++) {
+				if (itemspawn.spawneditems [i] == null || itemspawn.spawneditems [i].GetComponent<TriggerScript> ().triggered)
+					continue;
 
-			float groundLength = (itemspawn.spawneditems[i].transform.position - transform.position).magnitude;
-			if( groundLength < vxe.voxel_size * 20 )
-			{
-				targetPosition = itemspawn.spawneditems[i].transform.position;
-				break;
+				float groundLength = (itemspawn.spawneditems [i].transform.position - transform.position).magnitude;
+				if (groundLength < vxe.voxel_size * 15) {
+					targetPosition = itemspawn.spawneditems [i].transform.position;
+					break;
+				}
 			}
 		}
-
 
 		Vector3 dir = Vector3.ProjectOnPlane((targetPosition - transform.position),Vector3.up).normalized;
 
@@ -202,6 +203,19 @@ public class JumpingAI : MonoBehaviour {
 		yield return new WaitForSeconds(1.0f);
 		while(true)
 		{	
+			if(stopcount > 200)
+			{
+				Vector3 coords = Vector3.zero, norm = Vector3.zero;
+				bool hitsomething = false;
+				while(!hitsomething)
+				{
+					hitsomething = vxe.RayCast(camera.transform.position,Vector3.down,64,ref coords,ref norm,1.0f);
+					yield return null;
+				}
+
+				transform.position = coords + Vector3.up * vxe.voxel_size;
+			}
+
 			Vector3 dir = getNextMoveLimited ();
 			transform.forward = dir;
 			Vector3 currentPosition = transform.position;
@@ -209,6 +223,7 @@ public class JumpingAI : MonoBehaviour {
 			switch(ai_state)
 			{
 			case AI_STATE.MOVING:
+				stopcount=0;
 				for(float i=0; i< 1.0f; i+=Time.deltaTime * 0.5f)
 				{
 					transform.position = Vector3.Lerp(currentPosition,movePosition,i);
@@ -219,6 +234,7 @@ public class JumpingAI : MonoBehaviour {
 				break;
 			case AI_STATE.JUMPING:
 				{
+					stopcount=0;
 					Vector3 highpt = (currentPosition + jumpPosition) * 0.5f;
 					highpt.y += vxe.voxel_size * 7.0f;
 					for(float i=0; i< 1.0f; i+=Time.deltaTime * 0.75f)
@@ -232,6 +248,7 @@ public class JumpingAI : MonoBehaviour {
 				break;
 			case AI_STATE.FALLING:
 				{
+					stopcount=0;
 					Vector3 highpt = (currentPosition + fallPosition) * 0.5f;
 					highpt.y += vxe.voxel_size * 5.0f;
 					for(float i=0; i< 1.0f; i+=Time.deltaTime * 0.75f)
@@ -245,6 +262,7 @@ public class JumpingAI : MonoBehaviour {
 				break;
 			case AI_STATE.STOPPED:
 			default:
+				stopcount++;
 				yield return new WaitForSeconds(0.5f);
 				break;
 			}

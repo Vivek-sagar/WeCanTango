@@ -35,12 +35,9 @@ public class Spawner : MonoBehaviour {
 
 		Random.seed = (int)(Time.deltaTime * 1000);
 
-		Vector3 ranPt = new Vector3 (Random.Range(0.0f,1.0f), Random.Range(0.0f,1.0f), camera.nearClipPlane); 
-		Vector3 startpt = camera.ViewportToWorldPoint (ranPt);
-		Vector3 dir = startpt - camera.transform.position;
 		Vector3 pos = new Vector3 (), normal = new Vector3 ();
 
-		if (vxe.RayCast (startpt, dir, 64, ref pos, ref normal)) {
+		if (vxe.RayCast (camera.transform.position, camera.transform.forward, 64, ref pos, ref normal)) {
 
 			Vec3Int chunkcoord = vxe.ToGrid(pos) / vxe.chunk_size;
 			BIOMES mybiome = biome.biomeMap[chunkcoord.x,chunkcoord.z];

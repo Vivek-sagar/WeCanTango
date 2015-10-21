@@ -15,8 +15,8 @@ public static class VoxelConsts
 	public static int PT_THRES = 30;
 	public static int VOXEL_RES = 10;
 	public static int FRAME_THRES = 5;
-	public static int DEL_FRAME_THRES = 10;
-	public static int PT_DEL_THRES = 50;
+	public static int DEL_FRAME_THRES = 5;
+	public static int PT_DEL_THRES = 20;
 	public static Vec3Int[] CardinalDir = new Vec3Int[]{ new Vec3Int(0,0,1), new Vec3Int(0,0,-1), new Vec3Int(-1,0,0), new Vec3Int(1,0,0), new Vec3Int(0,1,0), new Vec3Int(0,-1,0) };
 	public static Vector3[] CardinalV3Dir = new Vector3[]{ new Vector3(0,0,1), new Vector3(0,0,-1), new Vector3(-1,0,0), new Vector3(1,0,0), new Vector3(0,1,0), new Vector3(0,-1,0) };
 	public static BitArray surfaceSet = new BitArray (new bool[]{true,true,true,true,true,true,false,false});
@@ -68,6 +68,38 @@ public class IndexStack<T>
 	public void clear()
 	{
 		count = 0;
+	}
+}
+
+public class Quad
+{
+	public int x, y, w, h;
+	public Quad(int _x, int _y, int _w, int _h)
+	{
+		x = _x;
+		y = _y;
+		w = _w;
+		h = _h;
+	}
+	
+	public bool mergeRight(Quad b)
+	{
+		if(y == b.y && h == b.h && x + w == b.x)
+		{
+			w += b.w;
+			return true;
+		}
+		return false;
+	}
+	
+	public bool mergeUp(Quad b)
+	{
+		if(x == b.x && w == b.w && y + h == b.y)
+		{
+			y += b.y;
+			return true;
+		}
+		return false;
 	}
 }
 
@@ -724,7 +756,7 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 		grid = new VoxelGrid (num_chunks_x, num_chunks_y, num_chunks_z);
 		chunkGameObjects = new GameObject[num_chunks_x, num_chunks_y, num_chunks_z];
 
-		pool = new ChunkPool (1500);
+		pool = new ChunkPool (2000);
 
 		for(int x=0;x<num_chunks_x;x++)
 			for(int y=0;y<num_chunks_y;y++)
@@ -760,39 +792,7 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 		return false;
 	}
 #endif
-
-	internal class Quad
-	{
-		public int x, y, w, h;
-		public Quad(int _x, int _y, int _w, int _h)
-		{
-			x = _x;
-			y = _y;
-			w = _w;
-			h = _h;
-		}
-
-		public bool mergeRight(Quad b)
-		{
-			if(y == b.y && h == b.h && x + w == b.x)
-			{
-				w += b.w;
-				return true;
-			}
-			return false;
-		}
-
-		public bool mergeUp(Quad b)
-		{
-			if(x == b.x && w == b.w && y + h == b.y)
-			{
-				y += b.y;
-				return true;
-			}
-			return false;
-		}
-	}
-
+/*
 	void buildLayer(Chunks chunk, VF dir, int layer, IndexStack<Quad> stack)
 	{
 		int offset = (int)dir / 2;
@@ -880,7 +880,7 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 			}
 		}
 	}
-
+*/
 	void renderVoxelGrid()
 	{
 		
@@ -1350,7 +1350,7 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 	public void addAndRender (TangoPointCloud pointCloud) 
 	{
 		int count = pointCloud.m_pointsCount;
-		int numrays = Mathf.FloorToInt((float)count * 0.03f);
+		int numrays = 250;
 		
 		#if VOXEL_DELETION
 		Random.seed = framecount % 20;
@@ -1444,7 +1444,7 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 
 	void OnGUI()
 	{
-		//GUI.Label (new Rect (10,500,1000,500), "PlanePts: " + depthPlanePts [0] + " " + depthPlanePts [1] + " " + depthPlanePts [2] + " " + depthPlanePts [3]  );
+		GUI.Label (new Rect (10,200,200,200), "Num chunks allocated: " + pool.getNumAlloced()  );
 	}
 
 	#if VOXEL_DELETION_PREV

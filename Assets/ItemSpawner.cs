@@ -36,7 +36,7 @@ public class ItemSpawner : Singleton<ItemSpawner> {
 
 	IEnumerator SpawnItems()
 	{
-		yield return new WaitForSeconds(30.0f);
+		yield return new WaitForSeconds(10.0f);
 		Vector3 coords = Vector3.zero, norm = Vector3.zero;
 
 		bool hitsomething = false;
@@ -73,7 +73,7 @@ public class ItemSpawner : Singleton<ItemSpawner> {
 				for(int k=floorChunkY + range; k >= floorChunkY;k--)
 				{
 					chunk = vxe.grid.voxelGrid[chunkx,k,chunkz];
-					if(chunk!=null && chunk.voxel_count > 10 && vxe.isChunkASurface(DIR.DIR_UP,chunk,0.4f))
+					if(chunk!=null && chunk.voxel_count > 20)
 					{
 						Vector3 chunkBaseCoords = new Vector3(chunkx,k,chunkz) * vxe.chunk_size;
 

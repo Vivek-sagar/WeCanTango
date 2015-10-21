@@ -38,7 +38,7 @@
             half4 col	  : COLOR0;
          };
          struct vertexOutput {
-            half4 pos : SV_POSITION;
+            float4 pos : SV_POSITION;
             half4 col : COLOR;
             half2 uv  : TEXCOORD0;
          };
