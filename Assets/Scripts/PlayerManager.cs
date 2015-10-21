@@ -40,6 +40,9 @@ public class PlayerManager : MonoBehaviour
 		//desertEnvironment = new List<GameObject> ();
 		if (playerTrans == null)
 			playerTrans = GameObject.FindWithTag ("Player").GetComponent<Transform> ();
+
+		foreach (GameObject obj in desertEnvironment)
+			obj.SetActive (false);
 	}
 	
 	// Update is called once per frame
