@@ -1,4 +1,4 @@
-//#define DEBUG_THIS
+#define DEBUG_THIS
 //#define JITTER
 #define USE_NORMALS
 #define USE_UV

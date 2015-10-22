@@ -21,9 +21,10 @@ public class PlayerManager : MonoBehaviour
 	VoxelExtractionPointCloud vxe;
 	BiomeScript biome;
 	public Transform playerTrans;
+	public GameObject listParent;
 	int framecount = 0;
 	Chunks chunk;
-	bool isSurface, isInTable;
+	bool isSurface, inHashTable;
 	List<Chunks> occupiedNearMe;
 	Vec3Int playerCC;
 	int chunkx, chunkz;
@@ -41,8 +42,16 @@ public class PlayerManager : MonoBehaviour
 		if (playerTrans == null)
 			playerTrans = GameObject.FindWithTag ("Player").GetComponent<Transform> ();
 
-		foreach (GameObject obj in desertEnvironment)
-			obj.SetActive (false);
+		if (listParent == null)
+			listParent = GameObject.FindGameObjectWithTag ("Respawn");
+		Transform[] children = listParent.GetComponentsInChildren<Transform> ();
+		Transform listParentTrans = listParent.transform;
+
+		desertEnvironment.Clear ();
+		foreach (Transform obj in children) {
+			if (!obj.Equals (listParentTrans))
+				desertEnvironment.Add (obj.gameObject);
+		}
 	}
 	
 	// Update is called once per frame
@@ -114,35 +123,40 @@ public class PlayerManager : MonoBehaviour
 			if (chunk == null)
 				continue;
 			isSurface = vxe.isChunkASurface (DIR.DIR_UP, chunk, 0.55f);
-			isInTable = desertTable.ContainsKey (chunkVXCoords);
+			inHashTable = desertTable.ContainsKey (chunkVXCoords);
 
 			//If the chunk is a surface and is not in the HashTable, do Spawning code
-			if (isSurface && !isInTable) {
+			if (isSurface && !inHashTable) {
 				//PullSpawnObject (playerTrans.position + directions [i], chunkVXCoords, chunk);
 				//Vector3 chunkWorldCoord = vxe.FromGrid (chunkVXCoords) / vxe.chunk_size;
 				GameObject gbj = desertEnvironment [0];
 				//LOOP thru each voxel in the chunk*******************************
-				for (int x=0; x<vxe.chunk_size; x++)
+				/*Taking out loop thru each voxel
+				 * for (int x=0; x<vxe.chunk_size; x++)
 					for (int z=0; z<vxe.chunk_size; z++) {
 						for (int y=vxe.chunk_size-1; y>=0; y--) {
 							Voxel vx = chunk.getVoxel (new Vec3Int (x, y, z));
 							//if vx is occ and has a sruface, spawn on top
-							if (vx.isOccupied () && vxe.voxelHasSurface (vx, VF.VX_TOP_SHOWN)) {
+							if (vx.isOccupied () && vxe.voxelHasSurface (vx, VF.VX_TOP_SHOWN)) {*/
 								
-								//Vector3 voxelCoords = chunkBaseCoords + new Vector3 (x, y, z) / vxe.voxel_size;
-								Vector3 voxelCoords = chunkBaseCoords + new Vector3 (x, y, z) * vxe.voxel_size;//vxe.FromGrid (new Vec3Int (x, y, z));
-								gbj.GetComponent<Transform> ().position = voxelCoords;
-								gbj.SetActive (true);
-								desertEnvironment.RemoveAt (0);
-								desertTable.Add (chunkVXCoords, gbj);
-								//Debug.Log (string.Format ("ChunkWorldCoord {4} VoxelGridCoord ({1} ,{2}, {3} VoxelWorldCoord {0}  )", voxelCoords, x, y, z, chunkWorldCoord));
+				//Vector3 voxelCoords = chunkBaseCoords + new Vector3 (x, y, z) / vxe.voxel_size;
+				Vector3 voxelCoords = chunkBaseCoords;
+				//WANT it to spawn at ChunkBase
+				// + new Vector3 (x, y, z) * vxe.voxel_size;
+				gbj.GetComponent<Transform> ().position = voxelCoords;
+				gbj.SetActive (true);
+				desertEnvironment.RemoveAt (0);
+				desertTable.Add (chunkVXCoords, gbj);
+				//Debug.Log (string.Format ("ChunkWorldCoord {4} VoxelGridCoord ({1} ,{2}, {3} VoxelWorldCoord {0}  )", voxelCoords, x, y, z, chunkWorldCoord));
 								
-								//Keep THIS here so less Loops each frame
-								goto doneSpawn;
+				//Keep THIS here so less Loops each frame
+
+				/*Taking out loop thru each voxel
+				 * goto doneSpawn;
 							}
 						}
 						yield return new WaitForEndOfFrame ();
-					}
+					}*/
 
 			}
 		}

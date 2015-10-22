@@ -1,6 +1,6 @@
 fileFormatVersion: 2
-guid: 6f371b8ea8c9bb94a9e7ac25f8339755
-timeCreated: 1445033619
+guid: 4ba300719549a464d983669499b6c20e
+timeCreated: 1445392920
 licenseType: Pro
 ModelImporter:
   serializedVersion: 18
@@ -31,13 +31,13 @@ ModelImporter:
     animationWrapMode: 0
     extraExposedTransformPaths: []
     clipAnimations: []
-    isReadable: 1
+    isReadable: 0
   meshes:
     lODScreenPercentages: []
     globalScale: 1
     meshCompression: 0
     addColliders: 0
-    importBlendShapes: 1
+    importBlendShapes: 0
     swapUVChannels: 0
     generateSecondaryUV: 0
     useFileUnits: 1
@@ -53,7 +53,7 @@ ModelImporter:
     normalSmoothAngle: 60
     splitTangentsAcrossUV: 1
     normalImportMode: 0
-    tangentImportMode: 1
+    tangentImportMode: 0
   importAnimation: 1
   copyAvatar: 0
   humanDescription:
