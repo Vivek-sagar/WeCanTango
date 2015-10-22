@@ -139,7 +139,11 @@ public class EnvironmentSpawner: MonoBehaviour
 			if (isSurface && !inHashTable) {
 				//PullSpawnObject (playerTrans.position + directions [i], chunkVXCoords, chunk);
 				//Vector3 chunkWorldCoord = vxe.FromGrid (chunkVXCoords) / vxe.chunk_size;
+
+
 				GameObject gbj = desertAssets [0];
+				
+				desertAssets.RemoveAt (0);
 				//LOOP thru each voxel in the chunk*******************************
 				/*Taking out loop thru each voxel
 				 * for (int x=0; x<vxe.chunk_size; x++)
@@ -155,7 +159,6 @@ public class EnvironmentSpawner: MonoBehaviour
 				// + new Vector3 (x, y, z) * vxe.voxel_size;
 				gbj.GetComponent<Transform> ().position = voxelCoords;
 				gbj.SetActive (true);
-				desertAssets.RemoveAt (0);
 				assetChunkTable.Add (chunkVXCoords, gbj);
 				//Debug.Log (string.Format ("ChunkWorldCoord {4} VoxelGridCoord ({1} ,{2}, {3} VoxelWorldCoord {0}  )", voxelCoords, x, y, z, chunkWorldCoord));
 								
