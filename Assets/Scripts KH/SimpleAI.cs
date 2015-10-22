@@ -21,24 +21,29 @@ public enum DIRECTIONS : int
 
 
 
-public class SimpleAI : MonoBehaviour {
+public class SimpleAI : MonoBehaviour
+{
 	VoxelExtractionPointCloud vxe;
-	AI_STATE ai_state;
-	Vector3 lastposition;
-	static Vector3[] directions = { new Vector3(0,0,1),new Vector3(0,0,-1),new Vector3(1,0,0),new Vector3(-1,0,0),new Vector3(0,1,0),new Vector3(0,-1,0) };
+	static Vector3[] directions = {
+		new Vector3(0, 0, 1),
+		new Vector3(0, 0, -1),
+		new Vector3(1, 0, 0),
+		new Vector3(-1, 0, 0),
+		new Vector3(0, 1, 0),
+		new Vector3(0, -1, 0)
+	};
 	const int STEP = 5;
 	// Use this for initialization
-	void Start () {
-		ai_state = AI_STATE.STOPPED;
+	void Start()
+	{
 		vxe = VoxelExtractionPointCloud.Instance;
-		lastposition = new Vector3 ();
-		init ();
+		init();
 	}
 
 	Vector3 getRandomDir()
 	{
-		DIRECTIONS dir = (DIRECTIONS)Random.Range (0, 4);
-		return directions[(int)dir];
+		DIRECTIONS dir = (DIRECTIONS)Random.Range(0, 4);
+		return directions [(int)dir];
 	}
 
 	Vector3 getNextMove()
@@ -46,20 +51,16 @@ public class SimpleAI : MonoBehaviour {
 		Vector3 coords = Vector3.zero;
 		Vector3 norm = Vector3.zero;
 
-		for(int i=0;i<4;i++)
-		{
+		for (int i=0; i<4; i++) {
 			Vector3 dir = getRandomDir();
-			if(!vxe.RayCast(transform.position,dir,STEP,ref coords,ref norm))
-			{
+			if (!vxe.RayCast(transform.position, dir, STEP, ref coords, ref norm)) {
 				return dir;
 			}
 		}
 
-		for(int i=0;i<4;i++)
-		{
-			Vector3 dir = directions[i];
-			if(!vxe.RayCast(transform.position,dir,STEP,ref coords,ref norm))
-			{
+		for (int i=0; i<4; i++) {
+			Vector3 dir = directions [i];
+			if (!vxe.RayCast(transform.position, dir, STEP, ref coords, ref norm)) {
 				return dir;
 			}
 		}
@@ -72,12 +73,10 @@ public class SimpleAI : MonoBehaviour {
 
 	IEnumerator startMoving()
 	{
-		while(true)
-		{
-			Vector3 dir = getNextMove ();
+		while (true) {
+			Vector3 dir = getNextMove();
 			transform.forward = dir;
-			for(float i=0; i< vxe.voxel_size * STEP; i+=Time.deltaTime * 0.2f)
-			{
+			for (float i=0; i< vxe.voxel_size * STEP; i+=Time.deltaTime * 0.2f) {
 				transform.position += dir * vxe.voxel_size * STEP * Time.deltaTime * 0.2f;
 				yield return null;
 			}
@@ -86,11 +85,12 @@ public class SimpleAI : MonoBehaviour {
 
 	public void init()
 	{
-		StartCoroutine (startMoving ());
+		StartCoroutine(startMoving());
 	}
 
 	// Update is called once per frame
-	void Update () {
+	void Update()
+	{
 	
 	}
 }
