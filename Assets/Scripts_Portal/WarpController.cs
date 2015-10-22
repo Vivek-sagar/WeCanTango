@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 
 public class WarpController : MonoBehaviour
@@ -17,17 +17,17 @@ public class WarpController : MonoBehaviour
 	AudioSource au_source;
 	Color currentColor = Color.black, OnColor = new Color (0, 127f, 1f);
 	CameraClearFlags defaultFlag;
-	ItemSpawner spawner;
+	ImportantSpawner spawner;
 
 	float timerStartFade = 0f;
 	// Use this for initialization
 	void Start ()
 	{
-		spawner = ItemSpawner.Instance;
+		spawner = ImportantSpawner.Instance;
 		defaultFlag = leftcam.clearFlags;
 		myAnim = GetComponent<Animator> ();
 		au_source = GetComponent<AudioSource> ();
-		//playerScript = GameObject.FindGameObjectWithTag ("Player").GetComponent<PlayerLazer> ();
+		playerScript = GameObject.FindGameObjectWithTag ("Player").GetComponent<PlayerLazer> ();
 		/*foreach (ScrollTexture sc in scrollTextureList) {
 			sc.offset = offset;
 		}*/

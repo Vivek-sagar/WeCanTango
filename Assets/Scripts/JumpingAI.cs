@@ -10,7 +10,7 @@ public class JumpingAI : MonoBehaviour
 	Vector3 fallPosition;
 	Vector3 movePosition;
 	public Camera camera;
-	ItemSpawner itemspawn;
+	ImportantSpawner itemspawn;
 	static Vector3[] directions = {
 		new Vector3 (0, 0, 1),
 		new Vector3 (0, 0, -1),
@@ -31,7 +31,7 @@ public class JumpingAI : MonoBehaviour
 	{
 		ai_state = AI_STATE.STOPPED;
 		vxe = VoxelExtractionPointCloud.Instance;
-		itemspawn = ItemSpawner.Instance;
+		itemspawn = ImportantSpawner.Instance;
 		lastposition = new Vector3 ();
 		stepdownThreshold = vxe.voxel_size * 2;
 		stepdownThreshold = stepdownThreshold * stepdownThreshold;
