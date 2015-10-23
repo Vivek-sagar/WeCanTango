@@ -13,8 +13,6 @@ public class BGM_Manager : MonoBehaviour
 	public AudioClip grassAudio, marshAudio, sandAudio, iceAudio;
 	AudioSource au_source;
 
-	const int spawnInterval = 180;
-	int framecount = 0;
 	// Use this for initialization
 	void Start ()
 	{
@@ -49,11 +47,6 @@ public class BGM_Manager : MonoBehaviour
 	// Update is called once per frame
 	void Update ()
 	{
-		framecount++;
-		if (framecount % spawnInterval != 0 || biome.biomeMap == null) {
-			return;
-		}
-
 		if (checkChangeBiome ()) {
 			prevBiome = mybiome;
 			switchBiomeAudio (mybiome);
@@ -66,8 +59,6 @@ public class BGM_Manager : MonoBehaviour
 	/// <returns><c>true</c>, if biome was changed, <c>false</c> otherwise.</returns>
 	bool checkChangeBiome ()
 	{
-		if (biome.biomeMap == null)
-			return false;
 		playerCC = vxe.getChunkCoords (playerTrans.position);
 		mybiome = biome.biomeMap [playerCC.x, playerCC.z];
 

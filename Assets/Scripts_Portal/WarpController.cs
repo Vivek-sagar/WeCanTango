@@ -3,31 +3,28 @@ using System.Collections;
 
 public class WarpController : MonoBehaviour
 {
-	public Vector2 offset; 
-	public ScrollTexture[] scrollTextureList; 
-	public bool portalColored;
-	public ItemsList itemsList;
-	public Camera leftcam;
-	public Camera rightcam;
+	Vector2 offset; 
+	ScrollTexture[] scrollTextureList; 
+	bool portalColored;
+	ItemsList itemsList;
 	public AudioClip idle, warp;
 	public PlayerLazer playerScript;	
 	public Material[] newWorldMaterial;	
+	public EnvironmentSpawner spawner;
+	public GameObject[] portalEnvironmentList;
 	bool teleporting, fading;
 	Animator myAnim;
 	AudioSource au_source;
 	Color currentColor = Color.black, OnColor = new Color (0, 127f, 1f);
 	CameraClearFlags defaultFlag;
-	ImportantSpawner spawner;
 
 	float timerStartFade = 0f;
 	// Use this for initialization
 	void Start ()
 	{
-		spawner = ImportantSpawner.Instance;
-		defaultFlag = leftcam.clearFlags;
 		myAnim = GetComponent<Animator> ();
 		au_source = GetComponent<AudioSource> ();
-		playerScript = GameObject.FindGameObjectWithTag ("Player").GetComponent<PlayerLazer> ();
+		playerScript = GameObject.FindGameObjectWithTag ("PlayerCollider").GetComponent<PlayerLazer> ();
 		/*foreach (ScrollTexture sc in scrollTextureList) {
 			sc.offset = offset;
 		}*/
@@ -117,13 +114,10 @@ public class WarpController : MonoBehaviour
 		teleporting = true;
 
 		//Swaps the Portals ItemList and Materials
-		spawner.SwapItemLists (ref itemsList.ItemInfoList, ref newWorldMaterial);
+		spawner.SwapEnvironments (ref newWorldMaterial, ref portalEnvironmentList);
 		//biome.swapMaterials ();
 		//biome.resetBiomes ();
 
-		//Add visual effect stuff here later********************************************
-		leftcam.clearFlags = CameraClearFlags.Skybox;
-		rightcam.clearFlags = CameraClearFlags.Skybox;
 	}
 
 }

@@ -165,7 +165,7 @@ public class ImportantSpawner : Singleton<ImportantSpawner>
 	}
 
 	/// <summary>
-	/// Swaps the biome sets as well as Destroys the GameObjects spawns (resets any counts)
+	/// Obselete Swaps the biome sets as well as Destroys the GameObjects spawns (resets any counts)
 	/// </summary>
 	public void SwapItemLists (ref ItemsList.ItemInfo[] newList, ref Material[] newMat)
 	{

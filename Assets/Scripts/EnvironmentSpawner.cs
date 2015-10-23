@@ -2,6 +2,14 @@
 using System.Collections;
 using System.Collections.Generic;
 
+public struct Environment
+{
+	GameObject[] gameObjects;
+	Dictionary<Vec3Int,GameObject> table;
+}
+
+
+
 public class EnvironmentSpawner: MonoBehaviour
 {
 	Vector3[] directions = {
@@ -18,7 +26,8 @@ public class EnvironmentSpawner: MonoBehaviour
 	public int spawnInterval = 30;
 	public Transform playerTrans;
 	public GameObject desertGameObjects, grassGameObjects, IceGameObjects, marshGameObjects;
-
+	//May want to use public string tags
+	string desertTag, grassTag, IceTag, marshTag;
 	
 	VoxelExtractionPointCloud vxe;
 	BiomeScript biome;
@@ -153,12 +162,12 @@ public class EnvironmentSpawner: MonoBehaviour
 
 			if (chunk == null)
 				continue;
-			isSurface = vxe.isChunkASurface (DIR.DIR_UP, chunk, 0.65f);
+			isSurface = vxe.isChunkASurface (DIR.DIR_UP, chunk, 0.52f);
 			inHashTable = assetChunkTable.ContainsKey (chunkVXCoords);
 
 			//If the chunk is a surface and is not in the HashTable, do Spawning code
-			if (isSurface && !inHashTable) {
-				GameObject gbj = assetList [0];	
+			if (isSurface && !inHashTable && chunk.voxel_count > 20) {
+				GameObject gbj = assetList [0];
 				Vector3 pos = onVoxelPosition (chunk, chunkVXCoords);
 
 
@@ -203,28 +212,57 @@ public class EnvironmentSpawner: MonoBehaviour
 	/// <param name="range">Range.</param>
 	/// <param name="chunk">Chunk.</param>
 	/// <param name="chunkBaseCoords">Chunk base coords.</param>
-	Vector3 onVoxelPosition (Chunks chunk, Vec3Int chunkGridCoord, int floorChunkY=0, int range=1)
+	Vector3 onVoxelPosition (Chunks chunk, Vec3Int chunkGridCoord)
 	{
-		Vector3 result = Vector3.zero;
-
-		if (chunk != null && chunk.voxel_count > 20) {
-			Vector3 chunkBCoords = new Vector3 (chunkGridCoord.x, chunkGridCoord.y, chunkGridCoord.z) * vxe.chunk_size;
+		Vector3 chunkBCoords = new Vector3 (chunkGridCoord.x, chunkGridCoord.y, chunkGridCoord.z) * vxe.chunk_size;
 				
-			for (int x=0; x<vxe.chunk_size; x++)
-				for (int z=0; z<vxe.chunk_size; z++)
-					for (int y=vxe.chunk_size-1; y>=0; y--) {
-						Voxel vx = chunk.getVoxel (new Vec3Int (x, y, z));
-						if (vx.isOccupied () && vxe.voxelHasSurface (vx, VF.VX_TOP_SHOWN)) {
-							Vector3 voxelCoords = vxe.FromGridUnTrunc (chunkBCoords + new Vector3 (x, y, z));
-							//if (voxelCoords.y <= coords.y + items [currentItemToSpawn].minSpawnHeightOffFloor * vxe.voxel_size)
-							//	continue;
-							result = voxelCoords + Vector3.up * vxe.voxel_size * 1.0f;
-							//GameObject newItem = (GameObject)Instantiate (items [currentItemToSpawn].item, , Quaternion.identity);
-							break;
-						}
+		for (int x=0; x<vxe.chunk_size; x++)
+			for (int z=0; z<vxe.chunk_size; z++)
+				for (int y=vxe.chunk_size-1; y>=0; y--) {
+					Voxel vx = chunk.getVoxel (new Vec3Int (x, y, z));
+					if (vx.isOccupied () && vxe.voxelHasSurface (vx, VF.VX_TOP_SHOWN)) {
+						Vector3 voxelCoords = vxe.FromGridUnTrunc (chunkBCoords + new Vector3 (x, y, z) * vxe.voxel_size);
+						//if (voxelCoords.y <= coords.y + items [currentItemToSpawn].minSpawnHeightOffFloor * vxe.voxel_size)
+						//	continue;
+						return voxelCoords + Vector3.up * vxe.voxel_size * 1.0f;
+						//GameObject newItem = (GameObject)Instantiate (items [currentItemToSpawn].item, , Quaternion.identity);
+						break;
 					}
-		}
-		return result;
+				}
+
+		return chunkBCoords;
+	}
+
+	/// <summary>
+	/// Swaps the biome sets as well as Destroys the GameObjects spawns (resets any counts)
+	/// </summary>
+	public void SwapEnvironments (ref Material[] newMat, ref GameObject[] list)
+	{
+		biome.swapMaterials (ref newMat);
+		SetActive (false);
+
+		Swap (ref desertGameObjects, ref list [0]);
+		Swap (ref grassGameObjects, ref list [1]);
+		Swap (ref IceGameObjects, ref list [2]);
+		Swap (ref marshGameObjects, ref list [3]);
+		//give SWAP Materials a parameter for ItemList Materials...or the WarpController Materials
+
+		SetActive (true);
+	}
+
+	void Swap (ref GameObject a, ref GameObject b)
+	{
+		GameObject temp = a;
+		a = b;
+		b = temp;
 	}
 	
+	/// <summary>
+	/// Destroys the spawns, except those marked as Do Not Destroy
+	/// </summary>
+	void DestroySpawns ()
+	{
+	
+	}
+
 }
