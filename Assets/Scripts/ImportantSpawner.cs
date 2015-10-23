@@ -95,7 +95,7 @@ public class ImportantSpawner : Singleton<ImportantSpawner>
 				 */
 				for (int k=floorChunkY + range; k >= floorChunkY; k--) {
 					chunk = vxe.grid.voxelGrid [chunkx, k, chunkz];
-					if (chunk != null && chunk.voxel_count > 10 && vxe.isChunkASurface (DIR.DIR_UP, chunk, 0.4f)) {
+					if (chunk != null && chunk.voxel_count > 20 && vxe.isChunkASurface (DIR.DIR_UP, chunk, 0.7f)) {
 						//The sushi mat to see if detecting right chunk
 						vxe.chunkGameObjects [chunkx, k, chunkz].GetComponent<MeshRenderer> ().material = vxe.debugMaterial;
 

@@ -39,6 +39,7 @@ public class EnvironmentSpawner: MonoBehaviour
 	{
 		vxe = VoxelExtractionPointCloud.Instance;
 		biome = BiomeScript.Instance;
+		mybiome = biome.biomeArea [0].biome;
 		occupiedNearMe = new List<Chunks> ();
 		assetChunkTable = new Dictionary<Vec3Int, GameObject> ();
 		//desertEnvironment = new List<GameObject> ();

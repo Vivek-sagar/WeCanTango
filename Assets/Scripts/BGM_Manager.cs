@@ -13,7 +13,7 @@ public class BGM_Manager : MonoBehaviour
 	public AudioClip grassAudio, marshAudio, sandAudio, iceAudio;
 	AudioSource au_source;
 
-	const int spawnInterval = 300;
+	const int spawnInterval = 180;
 	int framecount = 0;
 	// Use this for initialization
 	void Start ()
@@ -21,6 +21,7 @@ public class BGM_Manager : MonoBehaviour
 		//Initialize VBariables
 		biome = BiomeScript.Instance;	
 		vxe = VoxelExtractionPointCloud.Instance;
+		mybiome = biome.biomeArea [0].biome;
 		au_source = GetComponent<AudioSource> ();
 		if (playerTrans == null)
 			playerTrans = GameObject.FindWithTag ("Player").GetComponent<Transform> ();
