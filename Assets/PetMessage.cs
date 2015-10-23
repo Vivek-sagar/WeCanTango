@@ -43,7 +43,7 @@ public class PetMessage : Singleton<PetMessage> {
 			{
 				for(int i=0;i<itemspawn.items.Length;i++)
 				{
-					if(itemspawn.spawneditems[i] == null || itemspawn.spawneditems[i].GetComponent<TriggerScript>().triggered)
+					if(itemspawn.spawneditems[i] == null || itemspawn.spawneditems[i].GetComponent<TriggerScript>().triggered || itemspawn.spawneditems[i].CompareTag("Portal"))
 						continue;
 					
 					float groundLength = (itemspawn.spawneditems[i].transform.position - transform.position).magnitude;

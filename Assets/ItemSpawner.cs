@@ -51,7 +51,11 @@ public class ItemSpawner : Singleton<ItemSpawner>
 		floorChunkY = vxe.getChunkCoords (coords).y;
 
 		for (int i=0; i<items.Length; i++) {
-			bool spawned = false;
+
+            if(items[i].item.CompareTag("Portal"))
+                yield return new WaitForSeconds(10.0f);
+
+            bool spawned = false;
 			while (!spawned) {
 				int chunkx;
 				int chunkz;
