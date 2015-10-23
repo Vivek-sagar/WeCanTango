@@ -13,6 +13,7 @@ public class PlayerLazer : MonoBehaviour
 	// Use this for initialization
 	void Start ()
 	{
+		hitMeshRenderer.enabled = false;
 		hit_mat = hitMeshRenderer.material;
 		hitSound = GetComponent<AudioSource> ();
 		myCollider = GetComponent<Collider> ();
@@ -23,7 +24,7 @@ public class PlayerLazer : MonoBehaviour
 
 		//hitSound.Play ();
 		float time = 0f;
-
+		hitMeshRenderer.enabled = true;
 		while (time <fadeTime) {
 			time += rate * Time.deltaTime;
 			hit_mat.color = Color.Lerp (hit_mat.color, color, time / fadeTime);
@@ -36,6 +37,7 @@ public class PlayerLazer : MonoBehaviour
 			hit_mat.color = Color.Lerp (hit_mat.color, blank, time / fadeTime);
 			yield return new WaitForSeconds (Time.deltaTime);
 		}
+		hitMeshRenderer.enabled = false;
 	}
 
 	public IEnumerator resetFade (float fadeTime =1f)
@@ -48,6 +50,7 @@ public class PlayerLazer : MonoBehaviour
 			hit_mat.color = Color.Lerp (hit_mat.color, blank, time / fadeTime);
 			yield return new WaitForSeconds (Time.deltaTime);
 		}
+		hitMeshRenderer.enabled = false;
 	}
 
 	/*void OnTriggerStay (Collider other)

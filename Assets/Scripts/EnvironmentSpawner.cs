@@ -83,6 +83,16 @@ public class EnvironmentSpawner: MonoBehaviour
 			assetList.Add (myTrans.GetChild (i).gameObject);
 			assetList [i].SetActive (false);
 		}
+	
+	}
+
+	IEnumerator waitToInitialize ()
+	{
+		while (biome.biomeMap == null) {
+			yield return new WaitForEndOfFrame ();
+		}
+		playerCC = vxe.getChunkCoords (playerTrans.position);
+		mybiome = biome.biomeMap [playerCC.x, playerCC.z];
 	}
 	
 	// Update is called once per frame
@@ -96,6 +106,10 @@ public class EnvironmentSpawner: MonoBehaviour
 		StartCoroutine (FullPullSpawn ());
 	}
 
+	/// <summary>
+	/// Sets the active.
+	/// </summary>
+	/// <param name="active">If set to <c>true</c> active.</param>
 	void SetActive (bool active)
 	{
 		desertGameObjects.SetActive (active);
@@ -109,12 +123,15 @@ public class EnvironmentSpawner: MonoBehaviour
 	/// <returns>The pull spawn.</returns>
 	IEnumerator FullPullSpawn ()
 	{
-		
+		Vector3 chunkBaseCoords;
+		List<GameObject> assetList;
+
 		playerCC = vxe.getChunkCoords (playerTrans.position);
 		chunkx = playerCC.x;
 		chunkz = playerCC.z;
 		
 		mybiome = biome.biomeMap [chunkx, chunkz];
+		assetList = getNextEnvironmentGameObject (mybiome);
 		/*if (mybiome != BIOMES.sand)
 			return;*/
 		
@@ -122,9 +139,9 @@ public class EnvironmentSpawner: MonoBehaviour
 		 Mergesort
 		 quicksort
 		 COME ON MAN!!*/
-		Vector3 chunkBaseCoords;
+
 		//LOOP through List of Environment Objects***********************************
-		for (int i =directions.Length-1; i>-1 && desertAssets.Count > 0; i--) {
+		for (int i =directions.Length-1; i>-1 && assetList.Count > 0; i--) {
 
 			//Gets the Chunk at my position
 			chunk = vxe.getChunkFromPt (playerTrans.position + directions [i]);
@@ -132,6 +149,7 @@ public class EnvironmentSpawner: MonoBehaviour
 
 			//Chunks World Coords
 			chunkBaseCoords = vxe.FromGrid (chunkVXCoords * vxe.chunk_size);
+
 			if (chunk == null)
 				continue;
 			isSurface = vxe.isChunkASurface (DIR.DIR_UP, chunk, 0.65f);
@@ -139,62 +157,64 @@ public class EnvironmentSpawner: MonoBehaviour
 
 			//If the chunk is a surface and is not in the HashTable, do Spawning code
 			if (isSurface && !inHashTable) {
-				//PullSpawnObject (playerTrans.position + directions [i], chunkVXCoords, chunk);
-				//Vector3 chunkWorldCoord = vxe.FromGrid (chunkVXCoords) / vxe.chunk_size;
+				GameObject gbj = assetList [0];	
+				Vector3 pos = onVoxelPosition (chunk, chunkVXCoords);
 
 
-				GameObject gbj = desertAssets [0];
-				
-				desertAssets.RemoveAt (0);
-				//LOOP thru each voxel in the chunk*******************************
-				/*Taking out loop thru each voxel
-				 * for (int x=0; x<vxe.chunk_size; x++)
-					for (int z=0; z<vxe.chunk_size; z++) {
-						for (int y=vxe.chunk_size-1; y>=0; y--) {
-							Voxel vx = chunk.getVoxel (new Vec3Int (x, y, z));
-							//if vx is occ and has a sruface, spawn on top
-							if (vx.isOccupied () && vxe.voxelHasSurface (vx, VF.VX_TOP_SHOWN)) {*/
-								
-				//Vector3 voxelCoords = chunkBaseCoords + new Vector3 (x, y, z) / vxe.voxel_size;
-				Vector3 voxelCoords = chunkBaseCoords;
-				//WANT it to spawn at ChunkBase
-				// + new Vector3 (x, y, z) * vxe.voxel_size;
-				//gbj.GetComponent<Transform> ().position = voxelCoords;
-				gbj.GetComponent<Transform> ().position = onVoxelPosition ();
+				gbj.GetComponent<Transform> ().position = pos;
 				gbj.SetActive (true);
 				assetChunkTable.Add (chunkVXCoords, gbj);
-				//Debug.Log (string.Format ("ChunkWorldCoord {4} VoxelGridCoord ({1} ,{2}, {3} VoxelWorldCoord {0}  )", voxelCoords, x, y, z, chunkWorldCoord));
-								
-				//Keep THIS here so less Loops each frame
-
-				/*Taking out loop thru each voxel
-				 * goto doneSpawn;
-							}
-						}
-						yield return new WaitForEndOfFrame ();
-					}*/
-
+				assetList.RemoveAt (0);
+				goto doneSpawn;
 			}
+			yield return null;
 		}
-		yield return new WaitForEndOfFrame ();
+		doneSpawn:
+		yield return new WaitForSeconds (1.0f);
 		isSpawning = false;
 
 	}
 
+	/// <summary>
+	/// Gets the next environment game object.
+	/// </summary>
+	/// <returns>The next environment game object.</returns>
+	/// <param name="newBiome">New biome.</param>
+	List<GameObject> getNextEnvironmentGameObject (BIOMES newBiome)
+	{
+		switch (newBiome) {
+		case BIOMES.grass:
+			return	grassAssets;
+		case BIOMES.sand:
+			return desertAssets;
+		case BIOMES.ice:
+			return iceAssets;
+		default: //marsh
+			return marshAssets;
+		}
+	}
 
-	Vector3 onVoxelPosition (int floorChunkY, int range, Chunks chunk, Vector3 chunkBaseCoords)
+	/// <summary>
+	/// Ons the voxel position.
+	/// </summary>
+	/// <returns>The voxel position.</returns>
+	/// <param name="floorChunkY">Floor chunk y.</param>
+	/// <param name="range">Range.</param>
+	/// <param name="chunk">Chunk.</param>
+	/// <param name="chunkBaseCoords">Chunk base coords.</param>
+	Vector3 onVoxelPosition (Chunks chunk, Vec3Int chunkGridCoord, int floorChunkY=0, int range=1)
 	{
 		Vector3 result = Vector3.zero;
 
 		if (chunk != null && chunk.voxel_count > 20) {
-//			Vector3 chunkBaseCoords = new Vector3 (chunkx, k, chunkz) * vxe.chunk_size;
+			Vector3 chunkBCoords = new Vector3 (chunkGridCoord.x, chunkGridCoord.y, chunkGridCoord.z) * vxe.chunk_size;
 				
 			for (int x=0; x<vxe.chunk_size; x++)
 				for (int z=0; z<vxe.chunk_size; z++)
 					for (int y=vxe.chunk_size-1; y>=0; y--) {
 						Voxel vx = chunk.getVoxel (new Vec3Int (x, y, z));
 						if (vx.isOccupied () && vxe.voxelHasSurface (vx, VF.VX_TOP_SHOWN)) {
-							Vector3 voxelCoords = vxe.FromGridUnTrunc (chunkBaseCoords + new Vector3 (x, y, z));
+							Vector3 voxelCoords = vxe.FromGridUnTrunc (chunkBCoords + new Vector3 (x, y, z));
 							//if (voxelCoords.y <= coords.y + items [currentItemToSpawn].minSpawnHeightOffFloor * vxe.voxel_size)
 							//	continue;
 							result = voxelCoords + Vector3.up * vxe.voxel_size * 1.0f;
