@@ -162,11 +162,11 @@ public class EnvironmentSpawner: MonoBehaviour
 
 			if (chunk == null)
 				continue;
-			isSurface = vxe.isChunkASurface (DIR.DIR_UP, chunk, 0.52f);
+			isSurface = vxe.isChunkASurface (DIR.DIR_UP, chunk, 0.4f);
 			inHashTable = assetChunkTable.ContainsKey (chunkVXCoords);
 
 			//If the chunk is a surface and is not in the HashTable, do Spawning code
-			if (isSurface && !inHashTable && chunk.voxel_count > 20) {
+			if (isSurface && !inHashTable && chunk.voxel_count > 10) {
 				GameObject gbj = assetList [0];
 				Vector3 pos = onVoxelPosition (chunk, chunkVXCoords);
 
