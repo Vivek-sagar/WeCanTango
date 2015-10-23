@@ -127,6 +127,17 @@ public class EnvironmentSpawner: MonoBehaviour
 		marshGameObjects.SetActive (active);
 		grassGameObjects.SetActive (active);
 	}
+
+	List<GameObject> SetEnvironmentListBasedOnBiome (Vector3 Pos)
+	{
+		playerCC = vxe.getChunkCoords (Pos);
+		chunkx = playerCC.x;
+		chunkz = playerCC.z;
+		
+		mybiome = biome.biomeMap [chunkx, chunkz];
+		return getNextEnvironmentGameObject (mybiome);
+	}
+
 	/// <summary>
 	/// Does a the whole pull spawn process in one place.
 	/// </summary>
@@ -136,12 +147,7 @@ public class EnvironmentSpawner: MonoBehaviour
 		Vector3 chunkBaseCoords;
 		List<GameObject> assetList;
 
-		playerCC = vxe.getChunkCoords (playerTrans.position);
-		chunkx = playerCC.x;
-		chunkz = playerCC.z;
-		
-		mybiome = biome.biomeMap [chunkx, chunkz];
-		assetList = getNextEnvironmentGameObject (mybiome);
+
 		/*if (mybiome != BIOMES.sand)
 			return;*/
 		
@@ -151,8 +157,9 @@ public class EnvironmentSpawner: MonoBehaviour
 		 COME ON MAN!!*/
 
 		//LOOP through List of Environment Objects***********************************
-		for (int i =directions.Length-1; i>-1 && assetList.Count > 0; i--) {
+		for (int i =directions.Length-1; i>-1; i--) {
 
+			assetList = SetEnvironmentListBasedOnBiome (playerTrans.position + directions [i]);
 			//Gets the Chunk at my position
 			chunk = vxe.getChunkFromPt (playerTrans.position + directions [i]);
 			Vec3Int chunkVXCoords = vxe.getChunkCoords (playerTrans.position + directions [i]);
@@ -160,7 +167,7 @@ public class EnvironmentSpawner: MonoBehaviour
 			//Chunks World Coords
 			chunkBaseCoords = vxe.FromGrid (chunkVXCoords * vxe.chunk_size);
 
-			if (chunk == null)
+			if (chunk == null || assetList.Count == 0)
 				continue;
 			isSurface = vxe.isChunkASurface (DIR.DIR_UP, chunk, 0.4f);
 			inHashTable = assetChunkTable.ContainsKey (chunkVXCoords);
