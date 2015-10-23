@@ -5,7 +5,6 @@ using System.Collections.Generic;
 public class EnvironmentSpawner: MonoBehaviour
 {
 	Vector3[] directions = {
-		new Vector3 (0, 0, 0),
 		new Vector3 (-1, 0, 0),
 		new Vector3 (1, 0, 0),
 		new Vector3 (0, 0, -1),
@@ -17,20 +16,23 @@ public class EnvironmentSpawner: MonoBehaviour
 	};
 
 	public int spawnInterval = 30;
+	public Transform playerTrans;
+	public GameObject desertGameObjects, grassGameObjects, IceGameObjects, marshGameObjects;
+
+	
 	VoxelExtractionPointCloud vxe;
 	BiomeScript biome;
-	public Transform playerTrans;
-	public GameObject desertGameObjects, grassGameObjects, waterGameObjects, marshGameObjects;
-	
-	List<GameObject> desertAssets, grassAssets, waterAssets, marshAssets;
+	BIOMES mybiome;
+
+	List<GameObject> desertAssets, grassAssets, iceAssets, marshAssets;
+	Dictionary<Vec3Int,GameObject> assetChunkTable;
+
 	int framecount = 0;
 	Chunks chunk;
 	bool isSurface, inHashTable;
 	List<Chunks> occupiedNearMe;
 	Vec3Int playerCC;
 	int chunkx, chunkz;
-	BIOMES mybiome;
-	Dictionary<Vec3Int,GameObject> assetChunkTable;
 	bool isSpawning = false;
 	// Use this for initialization
 	void Start ()
@@ -58,7 +60,7 @@ public class EnvironmentSpawner: MonoBehaviour
 
 		InitializeEnvironmentBiome (ref desertGameObjects, "DesertAssets", ref desertAssets);
 		InitializeEnvironmentBiome (ref grassGameObjects, "GrassAssets", ref grassAssets);
-		InitializeEnvironmentBiome (ref waterGameObjects, "WaterAssets", ref waterAssets);
+		InitializeEnvironmentBiome (ref IceGameObjects, "IceAssets", ref iceAssets);
 		InitializeEnvironmentBiome (ref marshGameObjects, "MarshAssets", ref marshAssets);
 	}
 
@@ -68,14 +70,14 @@ public class EnvironmentSpawner: MonoBehaviour
 	/// <param name="biome">Biome.</param>
 	/// <param name="tag">Tag.</param>
 	/// <param name="assetList">Asset list.</param>
-	void InitializeEnvironmentBiome (ref GameObject biome, string tag, ref List<GameObject> assetList)
+	void InitializeEnvironmentBiome (ref GameObject environmentGameObj, string tag, ref List<GameObject> assetList)
 	{
-		if (biome == null)
-			biome = GameObject.FindGameObjectWithTag (tag);
+		if (environmentGameObj == null)
+			environmentGameObj = GameObject.FindGameObjectWithTag (tag);
 		if (assetList == null)
 			assetList = new List<GameObject> ();
 
-		Transform myTrans = biome.GetComponent<Transform> ();
+		Transform myTrans = environmentGameObj.GetComponent<Transform> ();
 		for (int i=0; i<myTrans.childCount; i++) {
 			//if (!childList [i].CompareTag (biome.tag)) {
 			assetList.Add (myTrans.GetChild (i).gameObject);
@@ -97,7 +99,7 @@ public class EnvironmentSpawner: MonoBehaviour
 	void SetActive (bool active)
 	{
 		desertGameObjects.SetActive (active);
-		waterGameObjects.SetActive (active);
+		IceGameObjects.SetActive (active);
 		marshGameObjects.SetActive (active);
 		grassGameObjects.SetActive (active);
 	}
@@ -157,7 +159,8 @@ public class EnvironmentSpawner: MonoBehaviour
 				Vector3 voxelCoords = chunkBaseCoords;
 				//WANT it to spawn at ChunkBase
 				// + new Vector3 (x, y, z) * vxe.voxel_size;
-				gbj.GetComponent<Transform> ().position = voxelCoords;
+				//gbj.GetComponent<Transform> ().position = voxelCoords;
+				gbj.GetComponent<Transform> ().position = onVoxelPosition ();
 				gbj.SetActive (true);
 				assetChunkTable.Add (chunkVXCoords, gbj);
 				//Debug.Log (string.Format ("ChunkWorldCoord {4} VoxelGridCoord ({1} ,{2}, {3} VoxelWorldCoord {0}  )", voxelCoords, x, y, z, chunkWorldCoord));
@@ -178,43 +181,29 @@ public class EnvironmentSpawner: MonoBehaviour
 
 	}
 
-	void SpawnNearPlayer ()
+
+	Vector3 onVoxelPosition (int floorChunkY, int range, Chunks chunk, Vector3 chunkBaseCoords)
 	{
-		int chunkx, chunkz;
-		Chunks chunk;
-		Vec3Int playerCC;
-		bool isSurface;
-		BIOMES mybiome;
-		while (true) {
-			//Player Chunk Coord
-			playerCC = vxe.getChunkCoords (playerTrans.position);
-			chunkx = playerCC.x;
-			chunkz = playerCC.z;
+		Vector3 result = Vector3.zero;
 
-			
-			/*mybiome = biome.biomeMap [chunkx, chunkz];
-
-			for (int i =0; i<directions.Length; i++) {
-				chunk = vxe.getChunkFromPt (playerTrans.position + directions [i]);
-				isSurface = vxe.isChunkASurface (DIR.DIR_UP, chunk, 0.55f);
-				if (isSurface) {
-					PullSpawnObject (playerTrans.position + directions [i]);
-					break;
-				}
-			}*/
-
-			//if (mybiome == myItemList.ItemInfoList [currentItemToSpawn].biome)
-			//break;
-			//yield return null;
-			
-			/*Scan through for all chunks that are surfaces 1st, also remember their biome,
-			 * If they are a surface spawn something from that Biome
-			 * I should have a list for each Biome...
-			 * So if I find a surface, spawn something randomly from that BiomeList??
-			 * Also try spawning certain things based on their height too
-			 * Later may be an issue with over spawning, but will get to that later
-				*/
+		if (chunk != null && chunk.voxel_count > 20) {
+//			Vector3 chunkBaseCoords = new Vector3 (chunkx, k, chunkz) * vxe.chunk_size;
+				
+			for (int x=0; x<vxe.chunk_size; x++)
+				for (int z=0; z<vxe.chunk_size; z++)
+					for (int y=vxe.chunk_size-1; y>=0; y--) {
+						Voxel vx = chunk.getVoxel (new Vec3Int (x, y, z));
+						if (vx.isOccupied () && vxe.voxelHasSurface (vx, VF.VX_TOP_SHOWN)) {
+							Vector3 voxelCoords = vxe.FromGridUnTrunc (chunkBaseCoords + new Vector3 (x, y, z));
+							//if (voxelCoords.y <= coords.y + items [currentItemToSpawn].minSpawnHeightOffFloor * vxe.voxel_size)
+							//	continue;
+							result = voxelCoords + Vector3.up * vxe.voxel_size * 1.0f;
+							//GameObject newItem = (GameObject)Instantiate (items [currentItemToSpawn].item, , Quaternion.identity);
+							break;
+						}
+					}
 		}
+		return result;
 	}
 	
 }
