@@ -7,6 +7,7 @@ public class TriggerScript : MonoBehaviour {
 	public ParticleSystem partsys;
 	public GameObject obj;
 	public BoxCollider cubeswitch;
+    private bool isSleeping = true;
 	Vector3[] fourpts;
 	VoxelExtractionPointCloud vxe;
 
@@ -61,6 +62,12 @@ public class TriggerScript : MonoBehaviour {
 			//triggeredEvent();
 			partsys.Emit (100);
 			cubeswitch.gameObject.SetActive(true);
+            if (isSleeping)
+            {
+                //obj.transform.Translate(new Vector3(-0.06f, -0.06f, 0f));
+                obj.transform.Rotate(new Vector3(-90, 0, 0));
+                isSleeping = false;
+            }
 		}
 	}
 
