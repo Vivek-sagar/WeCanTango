@@ -147,16 +147,13 @@ public class EnvironmentSpawner: MonoBehaviour
 		Vector3 chunkBaseCoords;
 		List<GameObject> assetList;
 
-
-		/*if (mybiome != BIOMES.sand)
-			return;*/
-		
 		/*OPTIMIZE THIS LATER, make it nlog(n) at least !!!!!!!!!!!!!!!
 		 Mergesort
 		 quicksort
 		 COME ON MAN!!*/
 
 		//LOOP through List of Environment Objects***********************************
+		//Consider Looping just through the List of Occupied Chunks
 		for (int i =directions.Length-1; i>-1; i--) {
 
 			assetList = SetEnvironmentListBasedOnBiome (playerTrans.position + directions [i]);
