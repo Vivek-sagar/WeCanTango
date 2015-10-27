@@ -7,6 +7,7 @@ public class ItemInfo
 	public GameObject item;
 	public BIOMES biome;
 	public int minSpawnHeightOffFloor;
+	public bool isPortal;
 }
 
 public class ItemSpawner : Singleton<ItemSpawner>
@@ -52,10 +53,10 @@ public class ItemSpawner : Singleton<ItemSpawner>
 
 		for (int i=0; i<items.Length; i++) {
 
-            if(items[i].item.CompareTag("Portal"))
-                yield return new WaitForSeconds(10.0f);
+			if (items [i].item.CompareTag ("Portal"))
+				yield return new WaitForSeconds (10.0f);
 
-            bool spawned = false;
+			bool spawned = false;
 			while (!spawned) {
 				int chunkx;
 				int chunkz;
