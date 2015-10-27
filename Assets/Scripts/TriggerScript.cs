@@ -10,6 +10,8 @@ public class TriggerScript : MonoBehaviour
 	public BoxCollider cubeswitch;
 	public PetCounter petcounter;
 	private bool isSleeping = true;
+
+    public AudioSource audioSource;
 	Vector3[] fourpts;
 	VoxelExtractionPointCloud vxe;
 
@@ -65,6 +67,7 @@ public class TriggerScript : MonoBehaviour
 				//obj.transform.Translate(new Vector3(-0.06f, -0.06f, 0f));
 				obj.transform.Rotate (new Vector3 (-90, 0, 0));
 				isSleeping = false;
+                audioSource.Stop();
 			}
 		}
 	}

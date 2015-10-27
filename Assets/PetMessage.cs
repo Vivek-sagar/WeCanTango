@@ -16,6 +16,9 @@ public class PetMessage : Singleton<PetMessage> {
 	public Texture2D thankyou;
 	public Texture2D isclose;
 	public Texture2D sleeping;
+    public AudioSource audioSource;
+    public AudioClip doubleBeep;
+    public AudioClip happyRobot;
 	ItemSpawner itemspawn;
 	VoxelExtractionPointCloud vxe;
 	public Camera camera;
@@ -51,10 +54,16 @@ public class PetMessage : Singleton<PetMessage> {
 					{
 						XZBillboard.Instance.show ();
 						state = MessageState.ISCLOSE;
+                        if (!audioSource.isPlaying)
+                        {
+                            audioSource.clip = doubleBeep;
+                            audioSource.Play();
+                        }
 						XZBillboard.Instance.changeTexture (isclose);
 						yield return new WaitForSeconds(10.0f);
 						XZBillboard.Instance.hide ();
 						state = MessageState.NOTHING;
+                        audioSource.Stop();
 						break;
 					}
 				}
@@ -62,6 +71,8 @@ public class PetMessage : Singleton<PetMessage> {
 
 			if(state == MessageState.THANKYOU)
 			{
+                //audioSource.clip = happyRobot;
+                audioSource.PlayOneShot(happyRobot);
 				yield return new WaitForSeconds(5.0f);
 				XZBillboard.Instance.hide ();
 				state = MessageState.NOTHING;
@@ -80,6 +91,6 @@ public class PetMessage : Singleton<PetMessage> {
 
 	// Update is called once per frame
 	void Update () {
-	
+	    
 	}
 }
