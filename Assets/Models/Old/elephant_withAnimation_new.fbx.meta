@@ -1,6 +1,6 @@
 fileFormatVersion: 2
-guid: b527a6e527c5ab94ba4cc34cd5aefd2c
-timeCreated: 1443574086
+guid: 2c31bb6787b47b34e81c353ce355e8c3
+timeCreated: 1443734737
 licenseType: Pro
 ModelImporter:
   serializedVersion: 18
@@ -38,6 +38,7 @@ ModelImporter:
     4300008: ear_l
     4300010: tooth_l
     7400000: Take 001
+    7400002: Take 0010
     9500000: //RootNode
   materials:
     importMaterials: 1
@@ -58,7 +59,87 @@ ModelImporter:
     animationScaleError: .5
     animationWrapMode: 0
     extraExposedTransformPaths: []
-    clipAnimations: []
+    clipAnimations:
+    - serializedVersion: 16
+      name: Take 001
+      takeName: Take 001
+      firstFrame: 1
+      lastFrame: 42
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: body
+        weight: 1
+      - path: ear_l
+        weight: 1
+      - path: ear_r
+        weight: 1
+      - path: tail
+        weight: 1
+      - path: tooth_l
+        weight: 1
+      - path: tooth_r
+        weight: 1
+      maskType: 0
+      maskSource: {instanceID: 0}
+    - serializedVersion: 16
+      name: Take 0010
+      takeName: Take 001
+      firstFrame: 1
+      lastFrame: 128
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: body
+        weight: 1
+      - path: ear_l
+        weight: 1
+      - path: ear_r
+        weight: 1
+      - path: tail
+        weight: 1
+      - path: tooth_l
+        weight: 1
+      - path: tooth_r
+        weight: 1
+      maskType: 0
+      maskSource: {instanceID: 0}
     isReadable: 1
   meshes:
     lODScreenPercentages: []
