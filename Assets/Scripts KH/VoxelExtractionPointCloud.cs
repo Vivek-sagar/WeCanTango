@@ -1376,12 +1376,12 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 
 		#if DEBUG_THIS
 		if (fakeData) {
-			debugPtCloud.m_pointsCount = 100;
+			debugPtCloud.m_pointsCount = 1000;
 
 			Random.seed = (int)(Time.time * 1000) % 10;
 			
-			for (int i=0; i<10; i++) {
-				debugPtCloud.m_points [i] = new Vector3 (Random.Range (-100.0f, 100.0f), Random.Range (-15.0f, 15.0f), Random.Range (-100.0f, 100.0f)) * 0.005f;
+			for (int i=0; i<100; i++) {
+				debugPtCloud.m_points [i] = new Vector3 (Random.Range (-200.0f, 200.0f), Random.Range (-15.0f, 15.0f), Random.Range (-200.0f, 200.0f)) * 0.005f;
 			}
 
 			int count = debugPtCloud.m_pointsCount;
