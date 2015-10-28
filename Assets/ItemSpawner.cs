@@ -7,6 +7,7 @@ public class ItemInfo
 	public GameObject item;
 	public BIOMES biome;
 	public int minSpawnHeightOffFloor;
+	public float maxSpawnHeightOffFloor;
 	public bool isPortal;
 }
 
@@ -85,7 +86,7 @@ public class ItemSpawner : Singleton<ItemSpawner>
 									Voxel vx = chunk.getVoxel (new Vec3Int (x, y, z));
 									if (vx.isOccupied () && vxe.voxelHasSurface (vx, VF.VX_TOP_SHOWN)) {
 										Vector3 voxelCoords = vxe.FromGridUnTrunc (chunkBaseCoords + new Vector3 (x, y, z));
-										if (voxelCoords.y <= coords.y + items [currentItemToSpawn].minSpawnHeightOffFloor * vxe.voxel_size)
+										if (voxelCoords.y < coords.y + items [currentItemToSpawn].minSpawnHeightOffFloor * vxe.voxel_size || voxelCoords.y > coords.y + items [currentItemToSpawn].maxSpawnHeightOffFloor * vxe.voxel_size)
 											continue;
 
 										GameObject newItem = (GameObject)Instantiate (items [currentItemToSpawn].item, voxelCoords + Vector3.up * vxe.voxel_size * 1.0f, Quaternion.identity);

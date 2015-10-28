@@ -1373,7 +1373,7 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 
 
 
-
+#if UNITY_EDITOR
 		#if DEBUG_THIS
 		if (fakeData) {
 			debugPtCloud.m_pointsCount = 1000;
@@ -1397,6 +1397,7 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 			
 			renderVoxelGrid ();
 		}
+		#endif
 		#endif
 	}
 
