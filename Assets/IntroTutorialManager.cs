@@ -8,45 +8,63 @@ public class IntroTutorialManager : MonoBehaviour
 	{
 		Wait,
 		PocketWatchSwing,
-		SheepPopOut,
 		SheepGaze,
 		OpenPortal,
 		Finish,
 	};
+	TutorialPhase tutorialPhase = TutorialPhase.Wait;
 	public TutorialGaze playerGazeScript;
 	public TutorialSheep sheepScript;
-	public GameObject pocketWatch, sheepHolder, gazeTutorialGameObject;
+	public GameObject pocketWatch, tutorialSheep, gazeTutorialGameObjects;
 	public Transform[] gazeTargets; //Need the places the sheep moves to for the player to gaze
-	TutorialPhase tutorialPhase = TutorialPhase.Wait;
+
 	Animator myAnim;
 	int gazeCount = 0;
 	// Use this for initialization
 	void Start ()
 	{
-		tutorialPhase = TutorialPhase.PocketWatchSwing;
-		sheepScript.ChangeTarget (gazeTargets [gazeCount]);
-		pocketWatch.SetActive (false);
-		sheepHolder.SetActive (false);
-		gazeTutorialGameObject.SetActive (false);
-
 		myAnim = GetComponent<Animator> ();
-		myAnim.enabled = pocketWatch.activeSelf;
+	
 		playerGazeScript = GameObject.FindGameObjectWithTag ("Player").GetComponent<TutorialGaze> ();
 	}
 	
 	// Update is called once per frame
 	void FixedUpdate ()
 	{
+		if (gazeCount > 2)
+			tutorialPhase = TutorialPhase.OpenPortal;
+		  
 		switch (tutorialPhase) {
 		case TutorialPhase.Wait:	
 			break;
 		case TutorialPhase.PocketWatchSwing:
+
+			//Disable PocketWatch
+			pocketWatch.SetActive (false);
+
+			//After Pocket Watch Swing is done, allow the TutorialSheep and TutorialGaze 
+			//script to start doing stuff
+			sheepScript.waitForAnimationEnd = false;
+			sheepScript.ChangeTarget (gazeTargets [gazeCount]);
+			playerGazeScript.waitForAnimationEnd = false;
+			gazeTutorialGameObjects.SetActive (true);
+			tutorialPhase = TutorialPhase.SheepGaze;
 			break;
 		case TutorialPhase.SheepGaze:			
 			WaitForGaze ();
 			break;
+		case TutorialPhase.OpenPortal:
+			tutorialPhase = TutorialPhase.Finish;
+			break;
+		case TutorialPhase.Finish:
+			break;
 		}
 
+	}
+
+	public void SetTutorialPhase (TutorialPhase phase)
+	{
+		tutorialPhase = phase;
 	}
 
 	public void WaitForGaze ()
@@ -62,8 +80,8 @@ public class IntroTutorialManager : MonoBehaviour
 			if (playerGazeScript.gotHit) {
 				gazeCount++;
 
-				if (gazeCount < 3)
-					sheepScript.ChangeTarget (gazeTargets [gazeCount]);
+				//if (gazeCount < 3)
+				sheepScript.ChangeTarget (gazeTargets [gazeCount]);
 			}
 		}
 	}

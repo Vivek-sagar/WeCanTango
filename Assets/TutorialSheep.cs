@@ -6,7 +6,7 @@ public class TutorialSheep : MonoBehaviour
 
 	public Transform target; 
 	public float speed;
-	public bool atGazeTarget;
+	public bool waitForAnimationEnd, atGazeTarget;
 	AudioSource au_source;
 	Transform myTrans;
 	// Use this for initialization
@@ -14,11 +14,17 @@ public class TutorialSheep : MonoBehaviour
 	{
 		myTrans = GetComponent<Transform> ();
 		au_source = GetComponent<AudioSource> ();
+		//DO NOT REMOVE 
+		//Code must not run until Animation Ends
+		waitForAnimationEnd = true;
 	}
 	
 	// Update is called once per frame
 	void Update ()
 	{
+		if (waitForAnimationEnd)
+			return;
+
 		//If you are at the GazeTarget do not move
 		if (atGazeTarget) {
 			DoGetAttention ();
