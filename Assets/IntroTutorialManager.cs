@@ -9,34 +9,49 @@ public class IntroTutorialManager : MonoBehaviour
 		Wait,
 		PocketWatchSwing,
 		SheepPopOut,
-		SheepGazeLeft,
-		SheepGazeRight,
-		SheepGazeDown,
+		SheepGaze,
 		OpenPortal,
 		Finish,
 	};
-	public Transform[] gazeTargets; //Need the places the sheep moves to for the player to gaze
-	public TutorialGaze gazeScript;
+	public TutorialGaze playerGazeScript;
 	public TutorialSheep sheepScript;
+	public GameObject pocketWatch, sheepHolder, gazeTutorialGameObject;
+	public Transform[] gazeTargets; //Need the places the sheep moves to for the player to gaze
 	TutorialPhase tutorialPhase = TutorialPhase.Wait;
+	Animator myAnim;
 	int gazeCount = 0;
 	// Use this for initialization
 	void Start ()
 	{
-		tutorialPhase = TutorialPhase.SheepGazeLeft;
+		tutorialPhase = TutorialPhase.PocketWatchSwing;
 		sheepScript.ChangeTarget (gazeTargets [gazeCount]);
+		pocketWatch.SetActive (false);
+		sheepHolder.SetActive (false);
+		gazeTutorialGameObject.SetActive (false);
+
+		myAnim = GetComponent<Animator> ();
+		myAnim.enabled = pocketWatch.activeSelf;
+		playerGazeScript = GameObject.FindGameObjectWithTag ("Player").GetComponent<TutorialGaze> ();
 	}
 	
 	// Update is called once per frame
 	void FixedUpdate ()
 	{
-		WaitForGaze ();
+		switch (tutorialPhase) {
+		case TutorialPhase.Wait:	
+			break;
+		case TutorialPhase.PocketWatchSwing:
+			break;
+		case TutorialPhase.SheepGaze:			
+			WaitForGaze ();
+			break;
+		}
 
 	}
 
 	public void WaitForGaze ()
 	{
-		gazeScript.runGaze = sheepScript.atGazeTarget;
+		playerGazeScript.runGaze = sheepScript.atGazeTarget;
 
 		//If the sheep is not at the target, then do Nothing
 		if (!sheepScript.atGazeTarget) {
@@ -44,7 +59,7 @@ public class IntroTutorialManager : MonoBehaviour
 		} 
 		//If the sheep is at the target, check to see if the Player Gazed at it
 		else if (sheepScript.atGazeTarget) {
-			if (gazeScript.gotHit) {
+			if (playerGazeScript.gotHit) {
 				gazeCount++;
 
 				if (gazeCount < 3)
