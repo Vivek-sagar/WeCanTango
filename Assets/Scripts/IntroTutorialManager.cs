@@ -12,19 +12,16 @@ public class IntroTutorialManager : MonoBehaviour
 		OpenPortal,
 		Finish,
 	};
-	TutorialPhase tutorialPhase = TutorialPhase.Wait;
+	public TutorialPhase tutorialPhase;
 	public TutorialGaze playerGazeScript;
 	public TutorialSheep sheepScript;
 	public GameObject pocketWatch, tutorialSheep, gazeTutorialGameObjects;
 	public Transform[] gazeTargets; //Need the places the sheep moves to for the player to gaze
-
-	Animator myAnim;
 	int gazeCount = 0;
 	// Use this for initialization
 	void Start ()
 	{
-		myAnim = GetComponent<Animator> ();
-	
+		tutorialPhase = TutorialPhase.Wait;
 		playerGazeScript = GameObject.FindGameObjectWithTag ("Player").GetComponent<TutorialGaze> ();
 	}
 	
