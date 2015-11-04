@@ -13,10 +13,29 @@ public class WarningScreenInputScript : MonoBehaviour {
 	
 	}
 
-    IEnumerator ChangeScene(int count)
+    IEnumerator ChangeScene(GameObject screen)
     {
+        while (screen.transform.position.x < 2.8f)
+        {
+            screen.transform.Translate(0.1f, 0, 0);
+            yield return new WaitForSeconds(0.01f);
+        }
+    }
+
+    IEnumerator ResetScene(GameObject screen)
+    {
+        while (screen.transform.position.x < -0.1f)
+        {
+            screen.transform.Translate(0.1f, 0, 0);
+            yield return new WaitForSeconds(0.01f);
+        }
+        screen.transform.position = new Vector3(0, screen.transform.position.y, screen.transform.position.z);
+    }
+	
+	// Update is called once per frame
+	void Update () {
         GameObject screen;
-        switch (count)
+        switch (screenCount)
         {
             case 0:
                 screen = screen1;
@@ -31,26 +50,29 @@ public class WarningScreenInputScript : MonoBehaviour {
                 screen = screen1;
                 break;
         }
-        while (screen.transform.position.x < 2.8f)
-        {
-            screen.transform.Translate(0.1f, 0, 0);
-            yield return new WaitForSeconds(0.01f);
-        }
-    }
-	
-	// Update is called once per frame
-	void Update () {
-
         if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Moved)
         {
             Vector2 touchDelta = Input.GetTouch(0).deltaPosition;
-            if (touchDelta.x > 0)
-                screen1.transform.Translate(touchDelta.x*0.01f, 0, 0);
+            if (touchDelta.x < 0 && screen.transform.position.x <= 0f)
+                screen.transform.position = new Vector3(0, screen.transform.position.y, screen.transform.position.z);
+            else
+                screen.transform.Translate(touchDelta.x * 0.01f, 0, 0);
         }
         if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Ended)
         {
-            StartCoroutine("ChangeScene", screenCount);
-            screenCount++;
+            if (screen.transform.position.x > 0)
+            {
+                StartCoroutine("ChangeScene", screen);
+                screenCount++;
+            }
+            else
+                StartCoroutine("ResetScene", screen);
+            
         }
 	}
+
+    public void Skip()
+    {
+        Debug.Log("Skipped");
+    }
 }
