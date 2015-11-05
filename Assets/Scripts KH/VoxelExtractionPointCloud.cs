@@ -428,13 +428,17 @@ public class Chunks
 
 	//int[] indices;
 
-	public bool dirty;
+
 #if GREEDY_MESHING
 	public bool optimized;
 #endif
 	public uint voxel_count = 0;
 	public Vector3 wrldCoords;
 	public Vec3Int chunkCoords;
+	public bool dirty;
+
+	public bool spawnPopulated = false;
+
 
 	public Chunks() 
 	{
@@ -803,8 +807,10 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 	public bool fakeData;
 	//public TangoPointCloud debugPtCloud;
 #endif
+
+
 	// Use this for initialization
-	void Start () 
+	void Awake() 
 	{
 		chunk_size = (int)VoxelConsts.CHUNK_SIZE;
 
@@ -1404,6 +1410,11 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 		return Random.Range (-100.0f, 100.0f);
 	}
 
+	float f(float x, float y)
+	{
+		return (Mathf.Sin (x * 0.1f) + Mathf.Sin (y * 0.1f)) * 4 - 10;
+	}
+
 	void makeTestPlane()
 	{
 		for(int i=0; i< num_voxels_x; i++)
@@ -1415,12 +1426,49 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 			if(  (x * x + y * y) < 10000)
 			{
 				//Debug.Log (x + " " + y);
-				Vec3Int coords = new Vec3Int(i,num_voxels_y / 2,j);
-				InstantiateChunkIfNeeded(coords);
-				
-				grid.setVoxelImmediate(coords);
+				float f1 = f (x,y);
+				float f2 = f (x,y+1);
+				float f3 = f (x+1,y);
+				for(float k=0;k<=1.0f;k+=0.02f)
+				{
+					int h = Mathf.FloorToInt(Mathf.Lerp(f1,f2,k));
+					Vec3Int coords = new Vec3Int(i,num_voxels_y / 2 + h,j);
+					InstantiateChunkIfNeeded(coords);
+					
+					grid.setVoxelImmediate(coords);
+				}
+
+				for(float k=0;k<=1.0f;k+=0.02f)
+				{
+					int h = Mathf.FloorToInt(Mathf.Lerp(f1,f3,k));
+					Vec3Int coords = new Vec3Int(i,num_voxels_y / 2 + h,j);
+					InstantiateChunkIfNeeded(coords);
+					
+					grid.setVoxelImmediate(coords);
+				}
 			}
 		}
+
+		/*
+		for(int i=0; i< num_voxels_x; i++)
+			for(int j=0; j< num_voxels_z; j++)
+		{
+			int x = i - num_voxels_x / 2;
+			int y = j - num_voxels_z / 2;
+			
+			if(  (x * x + y * y) > 2500 && (x * x + y * y) < 3600)
+			{
+				for(int k=0; k< 3; k++)
+				{
+					//Debug.Log (x + " " + y);
+					Vec3Int coords = new Vec3Int(i,num_voxels_y / 2 + k + 1,j);
+					InstantiateChunkIfNeeded(coords);
+					
+					grid.setVoxelImmediate(coords);
+				}
+			}
+		}*/
+
 	}
 
 	void Update()
