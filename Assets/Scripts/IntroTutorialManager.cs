@@ -39,7 +39,7 @@ public class IntroTutorialManager : MonoBehaviour
             return;
         }
 		else if(tutorialPhase==  TutorialPhase.PocketWatchSwing){
-
+           // Debug.LogError("AT PocketWatchSwing !!!");
             //Disable PocketWatch
             SetMeshRenderersInChildren(pocketWatch, false);
 
@@ -79,6 +79,7 @@ public class IntroTutorialManager : MonoBehaviour
     public void SetSheepOn()
     {
         SetMeshRenderersInChildren(tutorialSheep, true);
+        sheepScript.DoSheepFeedback();
     }
 
     public void SetMeshRenderersInChildren(GameObject parent, bool state)

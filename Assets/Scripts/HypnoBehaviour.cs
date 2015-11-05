@@ -19,7 +19,9 @@ public class HypnoBehaviour : StateMachineBehaviour {
 
         if (tutManager != null)
         {
+           
             tutManager.SetTutorialPhase(IntroTutorialManager.TutorialPhase.PocketWatchSwing);
+            //Debug.LogError("PocketWatchSwing state set");
         }
 	}
 
