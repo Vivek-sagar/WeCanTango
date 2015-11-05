@@ -72,7 +72,7 @@ public class JumpingAI : MonoBehaviour {
 
 	Vector3 getNextMoveLimited()
 	{
-		Vector3 targetPosition = camera.transform.position;
+        Vector3 targetPosition = camera.transform.position - Vector3.Normalize(camera.transform.position - transform.position);
 
 		if (tag == "Pet") 
 		{
@@ -91,6 +91,12 @@ public class JumpingAI : MonoBehaviour {
 
 		Vector3 dir = Vector3.ProjectOnPlane((targetPosition - transform.position),Vector3.up).normalized;
 
+        if (Vector3.Distance(transform.position, targetPosition) < 0.5f)
+        {
+            ai_state = AI_STATE.STOPPED;
+            return dir;
+        }
+
 		Vector3 coords = Vector3.zero;
 		Vector3 norm = Vector3.zero;
 		bool notgrounded = false;
@@ -103,6 +109,7 @@ public class JumpingAI : MonoBehaviour {
 		float jumpPositionToTarget = (jumpPosition - targetPosition).sqrMagnitude;
 		float movePositionToTarget = (coords - targetPosition).sqrMagnitude;
 
+       
 		if(canJump && jumpPositionToTarget < movePositionToTarget)
 		{
 			ai_state = AI_STATE.JUMPING;
@@ -139,7 +146,7 @@ public class JumpingAI : MonoBehaviour {
 				return dir;
 			}
 		}
-
+        
 		ai_state = AI_STATE.STOPPED;
 		return dir;
 
