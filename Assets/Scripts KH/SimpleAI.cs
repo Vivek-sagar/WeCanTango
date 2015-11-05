@@ -6,7 +6,8 @@ public enum AI_STATE
 	MOVING = 0,
 	STOPPED = 1,
 	JUMPING = 2,
-	FALLING = 3
+	FALLING = 3,
+    CHASING = 4
 }
 
 public enum DIRECTIONS : int

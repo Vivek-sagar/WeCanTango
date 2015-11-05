@@ -83,6 +83,7 @@ public class JumpingAI : MonoBehaviour {
 				float groundLength = (itemspawn.spawneditems [i].transform.position - transform.position).magnitude;
 				if (groundLength < vxe.voxel_size * 15) {
 					targetPosition = itemspawn.spawneditems [i].transform.position;
+                    ai_state = AI_STATE.CHASING;
 					break;
 				}
 			}
@@ -243,7 +244,7 @@ public class JumpingAI : MonoBehaviour {
 						yield return null;
 					}
 					transform.position = jumpPosition;
-					yield return new WaitForSeconds(1.0f);
+					yield return new WaitForSeconds(0.5f);
 				}
 				break;
 			case AI_STATE.FALLING:
@@ -257,7 +258,7 @@ public class JumpingAI : MonoBehaviour {
 						yield return null;
 					}
 					transform.position = fallPosition;
-					yield return new WaitForSeconds(1.0f);
+					yield return new WaitForSeconds(0.5f);
 				}
 				break;
 			case AI_STATE.STOPPED:
@@ -301,6 +302,10 @@ public class JumpingAI : MonoBehaviour {
 			GUI.Label (new Rect (1000,10,100,100),"STOPPED");
 			//Debug.Log ("STOPPED");
 			break;
+        case AI_STATE.CHASING:
+            GUI.Label(new Rect(1000, 10, 100, 100), "CHASING");
+            //Debug.Log ("STOPPED");
+            break;
 		default:
 			break;
 			
