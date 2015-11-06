@@ -8,6 +8,7 @@ public class TutorialSheep : MonoBehaviour
 	public float speed;
 	public bool waitForAnimationEnd, atGazeTarget;
 	public Vector3 direction;
+
 	AudioSource au_source;
 	Transform myTrans;
 	// Use this for initialization
@@ -36,11 +37,20 @@ public class TutorialSheep : MonoBehaviour
 		myTrans.position += direction;
 	}
 
-	void OnTriggerEnter (Collider other)
+	void OnTriggerStay (Collider other)
 	{
-		//If this is a Gaze Target and is my correct Gaze Target
+		//If this is a Gaze Target and is my target Gaze Target
 		if (other.CompareTag ("GazeTarget") && target.position == other.gameObject.transform.position) {
 			atGazeTarget = true;
+			//Debug.LogError ("Sheep At GazeTarget");
+		}
+	}
+
+	void OnTriggerExit (Collider other)
+	{
+		//If this is a Gaze Target and is my target Gaze Target
+		if (other.CompareTag ("GazeTarget") && target.position == other.gameObject.transform.position) {
+			atGazeTarget = false;
 			//Debug.LogError ("Sheep At GazeTarget");
 		}
 	}

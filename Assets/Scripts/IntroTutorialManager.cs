@@ -55,6 +55,7 @@ public class IntroTutorialManager : MonoBehaviour
 			sheepScript.waitForAnimationEnd = false;
 			playerGazeScript.waitForAnimationEnd = false;
 			SetMeshRenderersInChildren (gazeTutorialGameObjects, true);
+			SetMeshRenderersInChildren (pocketWatch, false);
 
 			//Set the Sheep's Gaze Target
 			sheepScript.ChangeTarget (gazeTargets [gazeCount]);
@@ -118,8 +119,12 @@ public class IntroTutorialManager : MonoBehaviour
 			if (playerGazeScript.gotHit) {
 				gazeCount++;
 
-				//if (gazeCount < 3)
-				sheepScript.ChangeTarget (gazeTargets [gazeCount]);
+				if (gazeCount > 2) {
+					SetMeshRenderersInChildren (gazeTutorialGameObjects, false);
+
+					tutorialPhase = TutorialPhase.Finish;
+				} else
+					sheepScript.ChangeTarget (gazeTargets [gazeCount]);
 			}
 		}
 	}
