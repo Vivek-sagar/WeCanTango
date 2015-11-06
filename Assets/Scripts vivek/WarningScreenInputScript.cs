@@ -6,6 +6,7 @@ public class WarningScreenInputScript : MonoBehaviour {
     public GameObject screen1;
     public GameObject screen2;
     public GameObject screen3;
+    GameObject screen;
     private int screenCount = 0;
 
 	// Use this for initialization
@@ -34,7 +35,7 @@ public class WarningScreenInputScript : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        GameObject screen;
+        
         switch (screenCount)
         {
             case 0:
@@ -74,5 +75,15 @@ public class WarningScreenInputScript : MonoBehaviour {
     public void Skip()
     {
         Debug.Log("Skipped");
+    }
+
+    public void Next()
+    {
+        screenCount++;
+        if (screenCount > 2)
+        {
+            Skip();
+        }
+        StartCoroutine("ChangeScene", screen);
     }
 }
