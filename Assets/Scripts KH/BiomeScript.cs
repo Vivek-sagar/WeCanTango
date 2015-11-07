@@ -42,7 +42,7 @@ public class BiomeScript : Singleton<BiomeScript>
 	int num_chunks_y;
 	int num_chunks_z;
 	// Use this for initialization
-	void Start ()
+	void Awake ()
 	{
 		vxe = VoxelExtractionPointCloud.Instance;
 		chunkObjs = vxe.chunkGameObjects;
