@@ -7,8 +7,7 @@ public class PokeDector : MonoBehaviour
 	public bool triggered = false;
 	public BoxCollider cubeswitch;
 	private bool isSleeping = true;
-	
-	public AudioSource audioSource;
+	public Transform playerTrans;
 	VoxelExtractionPointCloud vxe;
 	Transform myTrans;
 
@@ -42,9 +41,9 @@ public class PokeDector : MonoBehaviour
 	// Update is called once per frame
 	void Update ()
 	{
+
 		if (!triggered && cubeswitch.gameObject.activeSelf && checkForVoxelsInCollider ()) {
 			triggered = true;
-			audioSource.Play ();
 		}
 		
 		if (vxe.isVoxelThere (myTrans.position)) {

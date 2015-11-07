@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿//#define GazeTut
+using UnityEngine;
 using System.Collections;
 
 public class IntroTutorialManager : MonoBehaviour
@@ -8,7 +9,7 @@ public class IntroTutorialManager : MonoBehaviour
 	{
 		Wait,
 		PocketWatchSwing,
-		PreGaze,
+		SheepAppear,
 		SheepGaze,
 		DoneSwing,
 		OpenPortal,
@@ -24,48 +25,55 @@ public class IntroTutorialManager : MonoBehaviour
 	public Animator myAnim;
 	public AudioSource auSource;
 	public GameObject player;
-	public Vector3 lightON;
-	public Transform mainLightTrans;
-	public GameObject textObj;
+	public GameObject mainLight;
+	public GameObject textObj, PetSpawner, ItemSpawner, EnvironmentSpawner;
+	public BiomeScript biome;
+	public Camera backCam;
 	// Use this for initialization
 	void Start ()
 	{
-		this.transform.position = new Vector3 (0, player.transform.position.y, 3f);
+		this.transform.position = new Vector3 (0, player.transform.position.y, -1.75f);
+		auSource.pitch = 0.8f;
+	
+
 		tutorialPhase = TutorialPhase.Wait;
 		playerGazeScript = GameObject.FindGameObjectWithTag ("Player").GetComponent<TutorialGaze> ();
 		SetMeshRenderersInChildren (tutorialSheep, false);
 		SetMeshRenderersInChildren (gazeTutorialGameObjects, false);
+		PetSpawner.SetActive (false);
+		ItemSpawner.SetActive (false);
+		mainLight.SetActive (false);
+		EnvironmentSpawner.SetActive (false);
 	}
-	
+
+	void Update ()
+	{
+		if (Input.GetKeyDown (KeyCode.Space))
+			tutorialPhase = TutorialPhase.PocketWatchSwing;
+
+	}
+
 	// Update is called once per frame
 	void FixedUpdate ()
 	{
+
 		if (tutorialPhase == TutorialPhase.Wait && pokeScript.triggered) {
+			pocketWatch.transform.LookAt (player.transform.position);
 			tutorialPhase = TutorialPhase.PocketWatchSwing;
 		} else if (tutorialPhase == TutorialPhase.PocketWatchSwing) {
 			// Debug.LogError("AT PocketWatchSwing !!!");
 			//Disable PocketWatch SetMeshRenderersInChildren (pocketWatch, false);
+			auSource.pitch = 1f;
 			myAnim.SetTrigger ("OpenPocketWatch");
 			textObj.SetActive (false);
 
-			tutorialPhase = TutorialPhase.PreGaze;
+			tutorialPhase = TutorialPhase.SheepAppear;
 		} else if (tutorialPhase == TutorialPhase.DoneSwing) {
-			//After Pocket Watch Swing is done, allow the TutorialSheep and TutorialGaze 
-			//script to start doing stuff
-			sheepScript.waitForAnimationEnd = false;
-			playerGazeScript.waitForAnimationEnd = false;
-			SetMeshRenderersInChildren (gazeTutorialGameObjects, true);
-			SetMeshRenderersInChildren (pocketWatch, false);
-
-			//Set the Sheep's Gaze Target
-			sheepScript.ChangeTarget (gazeTargets [gazeCount]);
-			mainLightTrans.rotation = Quaternion.Euler (lightON);
-			tutorialPhase = TutorialPhase.SheepGaze;
+			DonePocketWatchSwing ();
+			tutorialPhase = TutorialPhase.Finish;
 		} else if (tutorialPhase == TutorialPhase.SheepGaze) {
 			WaitForGaze ();
-		} else if (tutorialPhase == TutorialPhase.Finish) {	
-			return;
-		}
+		} 
 		
 	}
 
@@ -89,11 +97,19 @@ public class IntroTutorialManager : MonoBehaviour
 	/// </summary>
 	public void SetSheepOn ()
 	{
+#if GazeTut
+		//Disabling Sheep for now
 		SetMeshRenderersInChildren (tutorialSheep, true);
+#endif
 		auSource.Stop ();
 		tutorialPhase = TutorialPhase.DoneSwing;
 	}
 
+	/// <summary>
+	/// Sets the mesh renderers in children.
+	/// </summary>
+	/// <param name="parent">Parent.</param>
+	/// <param name="state">If set to <c>true</c> state.</param>
 	public void SetMeshRenderersInChildren (GameObject parent, bool state)
 	{
 		MeshRenderer[] renders = parent.GetComponentsInChildren<MeshRenderer> ();
@@ -120,12 +136,45 @@ public class IntroTutorialManager : MonoBehaviour
 				gazeCount++;
 
 				if (gazeCount > 2) {
-					SetMeshRenderersInChildren (gazeTutorialGameObjects, false);
-
-					tutorialPhase = TutorialPhase.Finish;
+					FinishGaze ();
 				} else
 					sheepScript.ChangeTarget (gazeTargets [gazeCount]);
 			}
 		}
+	}
+
+	/// <summary>
+	/// Done the pocket watch swing.
+	/// </summary>
+	void DonePocketWatchSwing ()
+	{
+		SetMeshRenderersInChildren (pocketWatch, false);
+
+#if GazeTut
+		//After Pocket Watch Swing is done, allow the TutorialSheep and TutorialGaze 
+		//script to start doing stuff
+		sheepScript.waitForAnimationEnd = false;
+		playerGazeScript.waitForAnimationEnd = false;
+
+		//Set the Sheep's Gaze Target
+		sheepScript.ChangeTarget (gazeTargets [gazeCount]);
+		//Now Start the Sheep Gaze 
+		tutorialPhase = TutorialPhase.SheepGaze;
+#endif
+		mainLight.SetActive (true);
+		mainLight.transform.rotation = Quaternion.Euler (386f, 71f, 126f);
+		biome.resetBiomes ();
+	}
+
+	/// <summary>
+	/// Finishs the gaze.
+	/// </summary>
+	void FinishGaze ()
+	{
+		PetSpawner.SetActive (true);
+		ItemSpawner.SetActive (true);
+		EnvironmentSpawner.SetActive (true);
+		sheepScript.DeActivate ();
+		tutorialPhase = TutorialPhase.Finish;
 	}
 }

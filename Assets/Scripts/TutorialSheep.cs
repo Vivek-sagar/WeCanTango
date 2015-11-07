@@ -59,6 +59,12 @@ public class TutorialSheep : MonoBehaviour
 	{
 
 	}
+
+	public void DeActivate ()
+	{
+
+		this.gameObject.SetActive (false);
+	}
 	/// <summary>
 	/// Changes the target.
 	/// </summary>
