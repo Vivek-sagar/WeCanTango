@@ -12,6 +12,8 @@ public class TutorialGaze : MonoBehaviour
 	// Use this for initialization
 	void Start ()
 	{
+		if (Application.loadedLevelName != "Nigel-Halves")
+			this.enabled = (false);
 		//DO NOT REMOVE 
 		//Code must not run until Animation Ends
 		waitForAnimationEnd = true;

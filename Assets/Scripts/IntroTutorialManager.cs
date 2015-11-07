@@ -26,7 +26,9 @@ public class IntroTutorialManager : MonoBehaviour
 	public AudioSource auSource;
 	public GameObject player;
 	public GameObject mainLight;
-	public GameObject textObj, PetSpawner, ItemSpawner, EnvironmentSpawner;
+	public GameObject textObj, ThePet;
+	public Transform watchTrans;
+	public GameObject ItemSpawner, EnvironmentSpawner;
 	public BiomeScript biome;
 	public Camera backCam;
 	public Material[] voxelMats;
@@ -35,17 +37,22 @@ public class IntroTutorialManager : MonoBehaviour
 	void Start ()
 	{
 		this.transform.position = new Vector3 (0, player.transform.position.y, -1.75f);
-		auSource.pitch = 0.8f;
-	
+		auSource.pitch = 0.75f;
+		ThePet.transform.position = watchTrans.position;
 
 		tutorialPhase = TutorialPhase.Wait;
 		playerGazeScript = GameObject.FindGameObjectWithTag ("Player").GetComponent<TutorialGaze> ();
 		SetMeshRenderersInChildren (tutorialSheep, false);
 		SetMeshRenderersInChildren (gazeTutorialGameObjects, false);
-		PetSpawner.SetActive (false);
-		ItemSpawner.SetActive (false);
-		mainLight.SetActive (false);
-		EnvironmentSpawner.SetActive (false);
+		SetMainGameObjects (false);
+	}
+
+	void SetMainGameObjects (bool state)
+	{
+		ThePet.SetActive (state);
+		ItemSpawner.SetActive (state);
+		mainLight.SetActive (state);
+		EnvironmentSpawner.SetActive (state);
 	}
 
 	void Update ()
@@ -65,13 +72,17 @@ public class IntroTutorialManager : MonoBehaviour
 		} else if (tutorialPhase == TutorialPhase.PocketWatchSwing) {
 			// Debug.LogError("AT PocketWatchSwing !!!");
 			//Disable PocketWatch SetMeshRenderersInChildren (pocketWatch, false);
-			auSource.pitch = 1f;
+			//auSource.pitch = 1f;
 			myAnim.SetTrigger ("OpenPocketWatch");
 			textObj.SetActive (false);
 
 			tutorialPhase = TutorialPhase.SheepAppear;
 		} else if (tutorialPhase == TutorialPhase.DoneSwing) {
 			DonePocketWatchSwing ();
+
+			//REMOVE THIS LATER
+			//Enviroment Spawner should be setActive true in Finish Gaze function
+			SetMainGameObjects (true);
 			tutorialPhase = TutorialPhase.Finish;
 		} else if (tutorialPhase == TutorialPhase.SheepGaze) {
 			WaitForGaze ();
@@ -174,7 +185,7 @@ public class IntroTutorialManager : MonoBehaviour
 	/// </summary>
 	void FinishGaze ()
 	{
-		PetSpawner.SetActive (true);
+		ThePet.SetActive (true);
 		ItemSpawner.SetActive (true);
 		EnvironmentSpawner.SetActive (true);
 		sheepScript.DeActivate ();
