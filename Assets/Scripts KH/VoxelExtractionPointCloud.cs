@@ -18,8 +18,22 @@ public static class VoxelConsts
 	public static int FRAME_THRES = 5;
 	public static int DEL_FRAME_THRES = 5;
 	public static int PT_DEL_THRES = 20;
-	public static Vec3Int[] CardinalDir = new Vec3Int[]{ new Vec3Int(0,0,1), new Vec3Int(0,0,-1), new Vec3Int(-1,0,0), new Vec3Int(1,0,0), new Vec3Int(0,1,0), new Vec3Int(0,-1,0) };
-	public static Vector3[] CardinalV3Dir = new Vector3[]{ new Vector3(0,0,1), new Vector3(0,0,-1), new Vector3(-1,0,0), new Vector3(1,0,0), new Vector3(0,1,0), new Vector3(0,-1,0) };
+	public static Vec3Int[] CardinalDir = new Vec3Int[] {
+		new Vec3Int (0, 0, 1),
+		new Vec3Int (0, 0, -1),
+		new Vec3Int (-1, 0, 0),
+		new Vec3Int (1, 0, 0),
+		new Vec3Int (0, 1, 0),
+		new Vec3Int (0, -1, 0)
+	};
+	public static Vector3[] CardinalV3Dir = new Vector3[] {
+		new Vector3 (0, 0, 1),
+		new Vector3 (0, 0, -1),
+		new Vector3 (-1, 0, 0),
+		new Vector3 (1, 0, 0),
+		new Vector3 (0, 1, 0),
+		new Vector3 (0, -1, 0)
+	};
 	public static BitArray surfaceSet = new BitArray (new bool[]{true,true,true,true,true,true,false,false});
 }
 
@@ -29,44 +43,44 @@ public class IndexStack<T>
 	int size;
 	int count;
 	
-	public IndexStack(T[] _array)
+	public IndexStack (T[] _array)
 	{
 		size = _array.Length;
 		array = _array;
 		count = 0;
 	}
 	
-	public void push(T v)
+	public void push (T v)
 	{
 		array [count++] = v;
 	}
 	
-	public T pop()
+	public T pop ()
 	{
-		return array[--count];
+		return array [--count];
 	}
 	
-	public T peek(int index)
+	public T peek (int index)
 	{
 		return array [index];
 	}
 	
-	public bool isEmpty()
+	public bool isEmpty ()
 	{
 		return count == 0;
 	}
 	
-	public int getCount()
+	public int getCount ()
 	{
 		return count;
 	}
 	
-	public T[] getArray()
+	public T[] getArray ()
 	{
 		return array;
 	}
 	
-	public void clear()
+	public void clear ()
 	{
 		count = 0;
 	}
@@ -75,7 +89,7 @@ public class IndexStack<T>
 public class Quad
 {
 	public int x, y, w, h;
-	public Quad()
+	public Quad ()
 	{
 		x = 0;
 		y = 0;
@@ -83,7 +97,7 @@ public class Quad
 		h = 0;
 	}
 
-	public void init(int _x, int _y, int _w, int _h)
+	public void init (int _x, int _y, int _w, int _h)
 	{
 		x = _x;
 		y = _y;
@@ -91,20 +105,18 @@ public class Quad
 		h = _h;
 	}
 	
-	public bool mergeRight(Quad b)
+	public bool mergeRight (Quad b)
 	{
-		if(y == b.y && h == b.h && x + w == b.x)
-		{
+		if (y == b.y && h == b.h && x + w == b.x) {
 			w += b.w;
 			return true;
 		}
 		return false;
 	}
 	
-	public bool mergeUp(Quad b)
+	public bool mergeUp (Quad b)
 	{
-		if(x == b.x && w == b.w && y + h == b.y)
-		{
+		if (x == b.x && w == b.w && y + h == b.y) {
 			h += b.h;
 			return true;
 		}
@@ -114,64 +126,64 @@ public class Quad
 
 public struct Vec3Int
 {
-	public int x,y,z;
-	public Vec3Int(int _x, int _y, int _z)
+	public int x, y, z;
+	public Vec3Int (int _x, int _y, int _z)
 	{
 		x = _x;
 		y = _y;
 		z = _z;
 	}
 
-	public Vec3Int(Vector3 v)
+	public Vec3Int (Vector3 v)
 	{
 		x = Mathf.FloorToInt (v.x);
 		y = Mathf.FloorToInt (v.y);
 		z = Mathf.FloorToInt (v.z);
 	}
 
-	public Vector3 ToVec3()
+	public Vector3 ToVec3 ()
 	{
 		return new Vector3 (x, y, z);
 	}
 
-	public static Vec3Int operator+(Vec3Int a, Vec3Int b)
+	public static Vec3Int operator+ (Vec3Int a, Vec3Int b)
 	{
-		return new Vec3Int(a.x + b.x, a.y + b.y, a.z + b.z); 
+		return new Vec3Int (a.x + b.x, a.y + b.y, a.z + b.z); 
 	}
 
-	public static Vec3Int operator-(Vec3Int a, Vec3Int b)
+	public static Vec3Int operator- (Vec3Int a, Vec3Int b)
 	{
-		return new Vec3Int(a.x - b.x, a.y - b.y, a.z - b.z); 
+		return new Vec3Int (a.x - b.x, a.y - b.y, a.z - b.z); 
 	}
 
-	public static Vec3Int operator*(Vec3Int a, Vec3Int b)
+	public static Vec3Int operator* (Vec3Int a, Vec3Int b)
 	{
-		return new Vec3Int(a.x * b.x, a.y * b.y, a.z * b.z); 
+		return new Vec3Int (a.x * b.x, a.y * b.y, a.z * b.z); 
 	}
 
-	public static Vec3Int operator*(Vec3Int a, int b)
+	public static Vec3Int operator* (Vec3Int a, int b)
 	{
-		return new Vec3Int(a.x * b, a.y * b, a.z * b); 
+		return new Vec3Int (a.x * b, a.y * b, a.z * b); 
 	}
 
-	public static Vec3Int operator/(Vec3Int a, Vec3Int b)
+	public static Vec3Int operator/ (Vec3Int a, Vec3Int b)
 	{
-		return new Vec3Int(a.x / b.x, a.y / b.y, a.z / b.z); 
+		return new Vec3Int (a.x / b.x, a.y / b.y, a.z / b.z); 
 	}
 
-	public static Vec3Int operator/(Vec3Int a, int b)
+	public static Vec3Int operator/ (Vec3Int a, int b)
 	{
-		return new Vec3Int(a.x / b, a.y / b, a.z / b); 
+		return new Vec3Int (a.x / b, a.y / b, a.z / b); 
 	}
 
-	public static Vec3Int operator%(Vec3Int a, Vec3Int b)
+	public static Vec3Int operator% (Vec3Int a, Vec3Int b)
 	{
-		return new Vec3Int(a.x % b.x, a.y % b.y, a.z % b.z); 
+		return new Vec3Int (a.x % b.x, a.y % b.y, a.z % b.z); 
 	}
 	
-	public static Vec3Int operator%(Vec3Int a, int b)
+	public static Vec3Int operator% (Vec3Int a, int b)
 	{
-		return new Vec3Int(a.x % b, a.y % b, a.z % b); 
+		return new Vec3Int (a.x % b, a.y % b, a.z % b); 
 	}
 
 	public static bool operator== (Vec3Int a, Vec3Int b)
@@ -228,67 +240,65 @@ public class Voxel
 #endif
 	public BitArray flags = new BitArray (8, false);
 
-	public Voxel()
+	public Voxel ()
 	{
 	}
 
-	public bool isOccupied()
+	public bool isOccupied ()
 	{
-		return flags.Get((int)VF.VX_OCCUPIED);
+		return flags.Get ((int)VF.VX_OCCUPIED);
 	}
 
-	public void insertPoint()
+	public void insertPoint ()
 	{
-		if (isOccupied())
+		if (isOccupied ())
 			return;
 
 		pcount++;
 
-		if(pcount > VoxelConsts.PT_THRES)
-		{
+		if (pcount > VoxelConsts.PT_THRES) {
 			flags.Set ((int)VF.VX_OCCUPIED, true);
 		}
 	}
 #if VOXEL_DELETION
-	public void removePoint()
+	public void removePoint ()
 	{
-		if (!isOccupied())
+		if (!isOccupied ())
 			return;
 		
 		dcount++;
 		
-		if(dcount > VoxelConsts.PT_DEL_THRES)
-		{
+		if (dcount > VoxelConsts.PT_DEL_THRES) {
 			flags.Set ((int)VF.VX_OCCUPIED, false);
 		}
 	}
 #endif
-	public void setUnOccupied()
+	public void setUnOccupied ()
 	{
 		flags.Set ((int)VF.VX_OCCUPIED, false);
 	}
 
-	public void setOccupied()
+	public void setOccupied ()
 	{
 		flags.Set ((int)VF.VX_OCCUPIED, true);
 	}
 
-	public void setFace(VF flag, bool visible)
+	public void setFace (VF flag, bool visible)
 	{
 		flags.Set ((int)flag, visible);
 	}
 
-	public bool getFace(VF flag)
+	public bool getFace (VF flag)
 	{
 		return flags.Get ((int)flag);
 	}
 
-	public void setInvalid()
+	public void setInvalid ()
 	{
-		setUnOccupied();
+		setUnOccupied ();
 	}
 
-	public void setReserved(bool val)
+	public void setReserved (bool val)
 	{
 		flags.Set ((int)VF.VX_RESERVED, val);
 	}
@@ -311,19 +321,16 @@ public class ChunkTemplate
 
 	private static ChunkTemplate instance;
 
-	public static ChunkTemplate Instance
-	{
-		get 
-		{
-			if (instance == null)
-			{
-				instance = new ChunkTemplate();
+	public static ChunkTemplate Instance {
+		get {
+			if (instance == null) {
+				instance = new ChunkTemplate ();
 			}
 			return instance;
 		}
 	}
 	
-	private ChunkTemplate()
+	private ChunkTemplate ()
 	{
 		int chunk_size = (int)VoxelConsts.CHUNK_SIZE;
 
@@ -343,34 +350,33 @@ public class ChunkTemplate
 #endif
 #endif		
 		
-		for(int i=0;i<vertex_dim;i++)
-			for(int j=0;j<vertex_dim;j++)
-				for(int k=0;k<vertex_dim;k++)
-			{
-				Vector3 vert = ResizeVertex(new Vector3(i, j, k));
-				setVertex(i,j,k,vert);
-			}
+		for (int i=0; i<vertex_dim; i++)
+			for (int j=0; j<vertex_dim; j++)
+				for (int k=0; k<vertex_dim; k++) {
+					Vector3 vert = ResizeVertex (new Vector3 (i, j, k));
+					setVertex (i, j, k, vert);
+				}
 
 	}
 
-	private Vector3 ResizeVertex(Vector3 vert)
+	private Vector3 ResizeVertex (Vector3 vert)
 	{
 		Vector3 newCoords = vert * voxel_size;
 		return newCoords;
 	}
 	
-	private int getIndex(int x, int y, int z)
+	private int getIndex (int x, int y, int z)
 	{
 		return x * vertex_dim * vertex_dim + y * vertex_dim + z;
 	}
 
-	private Vector2 uvPackedInfo(DIR normal, int uv_x, int uv_y)
+	private Vector2 uvPackedInfo (DIR normal, int uv_x, int uv_y)
 	{
-		int packedInt = (uv_y & 0xF) | ((uv_x & 0xF) << 4) | ((((int)(normal))  & 0x7) << 8);
-		return new Vector2( System.BitConverter.ToSingle (System.BitConverter.GetBytes( packedInt ), 0), 0 );
+		int packedInt = (uv_y & 0xF) | ((uv_x & 0xF) << 4) | ((((int)(normal)) & 0x7) << 8);
+		return new Vector2 (System.BitConverter.ToSingle (System.BitConverter.GetBytes (packedInt), 0), 0);
 	}
 
-	private Color32 colorPackedInfo(DIR normal)
+	private Color32 colorPackedInfo (DIR normal)
 	{
 		Color32 ret = new Color32 ();
 		//ret.r = (byte)(((uint)uv_x) & 0xF);
@@ -380,15 +386,15 @@ public class ChunkTemplate
 		return ret;
 	}
 
-	private void setVertex(int x, int y, int z, Vector3 vert)
+	private void setVertex (int x, int y, int z, Vector3 vert)
 	{
 		#if USE_NORMALS
-		vertices [getIndex(x,y,z) + getDirOffset(DIR.DIR_UP)] = vert;
-		vertices [getIndex(x,y,z) + getDirOffset(DIR.DIR_DOWN)] = vert;
-		vertices [getIndex(x,y,z) + getDirOffset(DIR.DIR_LEFT)] = vert;
-		vertices [getIndex(x,y,z) + getDirOffset(DIR.DIR_RIGHT)] = vert;
-		vertices [getIndex(x,y,z) + getDirOffset(DIR.DIR_BACK)] = vert;
-		vertices [getIndex(x,y,z) + getDirOffset(DIR.DIR_FRONT)] = vert;
+		vertices [getIndex (x, y, z) + getDirOffset (DIR.DIR_UP)] = vert;
+		vertices [getIndex (x, y, z) + getDirOffset (DIR.DIR_DOWN)] = vert;
+		vertices [getIndex (x, y, z) + getDirOffset (DIR.DIR_LEFT)] = vert;
+		vertices [getIndex (x, y, z) + getDirOffset (DIR.DIR_RIGHT)] = vert;
+		vertices [getIndex (x, y, z) + getDirOffset (DIR.DIR_BACK)] = vert;
+		vertices [getIndex (x, y, z) + getDirOffset (DIR.DIR_FRONT)] = vert;
 		
 		//normals [getIndex(x,y,z) + getDirOffset(DIR.DIR_UP)] = new Vector3(0,1,0);
 		//normals [getIndex(x,y,z) + getDirOffset(DIR.DIR_DOWN)] = new Vector3(0,-1,0);
@@ -397,19 +403,19 @@ public class ChunkTemplate
 		//normals [getIndex(x,y,z) + getDirOffset(DIR.DIR_BACK)] = new Vector3(0,0,-1);
 		//normals [getIndex(x,y,z) + getDirOffset(DIR.DIR_FRONT)] = new Vector3(0,0,1);
 		#if USE_UV
-		colors [getIndex(x,y,z) + getDirOffset(DIR.DIR_UP)] = colorPackedInfo(DIR.DIR_UP);//new Vector2(x,z);
-		colors [getIndex(x,y,z) + getDirOffset(DIR.DIR_DOWN)] = colorPackedInfo(DIR.DIR_DOWN);//new Vector2(x,z);
-		colors [getIndex(x,y,z) + getDirOffset(DIR.DIR_LEFT)] = colorPackedInfo(DIR.DIR_LEFT);//new Vector2(z,y);
-		colors [getIndex(x,y,z) + getDirOffset(DIR.DIR_RIGHT)] = colorPackedInfo(DIR.DIR_RIGHT);//new Vector2(z,y);
-		colors [getIndex(x,y,z) + getDirOffset(DIR.DIR_BACK)] = colorPackedInfo(DIR.DIR_BACK);//new Vector2(x,y);
-		colors [getIndex(x,y,z) + getDirOffset(DIR.DIR_FRONT)] = colorPackedInfo(DIR.DIR_FRONT);//new Vector2(x,y);
+		colors [getIndex (x, y, z) + getDirOffset (DIR.DIR_UP)] = colorPackedInfo (DIR.DIR_UP);//new Vector2(x,z);
+		colors [getIndex (x, y, z) + getDirOffset (DIR.DIR_DOWN)] = colorPackedInfo (DIR.DIR_DOWN);//new Vector2(x,z);
+		colors [getIndex (x, y, z) + getDirOffset (DIR.DIR_LEFT)] = colorPackedInfo (DIR.DIR_LEFT);//new Vector2(z,y);
+		colors [getIndex (x, y, z) + getDirOffset (DIR.DIR_RIGHT)] = colorPackedInfo (DIR.DIR_RIGHT);//new Vector2(z,y);
+		colors [getIndex (x, y, z) + getDirOffset (DIR.DIR_BACK)] = colorPackedInfo (DIR.DIR_BACK);//new Vector2(x,y);
+		colors [getIndex (x, y, z) + getDirOffset (DIR.DIR_FRONT)] = colorPackedInfo (DIR.DIR_FRONT);//new Vector2(x,y);
 		#endif
 		#else
 		vertices [getIndex(x,y,z)] = vert;
 		#endif
 	}
 	
-	private int getDirOffset(DIR dir)
+	private int getDirOffset (DIR dir)
 	{
 		#if USE_NORMALS
 		return (int)dir * vertex_count;
@@ -440,10 +446,10 @@ public class Chunks
 	public bool spawnPopulated = false;
 
 
-	public Chunks() 
+	public Chunks ()
 	{
 		int chunk_size = (int)VoxelConsts.CHUNK_SIZE;
-		voxels = new Voxel[chunk_size,chunk_size,chunk_size];
+		voxels = new Voxel[chunk_size, chunk_size, chunk_size];
 
 		dirty = false;
 #if GREEDY_MESHING
@@ -463,7 +469,7 @@ public class Chunks
 		//istack = new IndexStack<int> (indices);
 	}
 
-	public void init(Mesh _mesh, Vector3 wc, Vec3Int cc)
+	public void init (Mesh _mesh, Vector3 wc, Vec3Int cc)
 	{
 		wrldCoords = wc;
 		chunkCoords = cc;
@@ -483,18 +489,18 @@ public class Chunks
 	
 	}
 
-	public Vector3 ResizeVertex(Vector3 vert)
+	public Vector3 ResizeVertex (Vector3 vert)
 	{
 		Vector3 newCoords = vert * ChunkTemplate.Instance.voxel_size;
 		return newCoords;
 	}
 
-	public int getIndex(int x, int y, int z)
+	public int getIndex (int x, int y, int z)
 	{
 		return x * ChunkTemplate.Instance.vertex_dim * ChunkTemplate.Instance.vertex_dim + y * ChunkTemplate.Instance.vertex_dim + z;
 	}
 
-	public int getDirOffset(DIR dir)
+	public int getDirOffset (DIR dir)
 	{
 #if USE_NORMALS
 		return (int)dir * ChunkTemplate.Instance.vertex_count;
@@ -503,14 +509,14 @@ public class Chunks
 #endif
 	}
 
-	public bool isEmpty()
+	public bool isEmpty ()
 	{
 		return voxel_count == 0;
 	}
 	
-	public Voxel getVoxel(Vec3Int localCoords)
+	public Voxel getVoxel (Vec3Int localCoords)
 	{
-		return voxels[localCoords.x, localCoords.y, localCoords.z];
+		return voxels [localCoords.x, localCoords.y, localCoords.z];
 	}
 	
 }
@@ -525,113 +531,101 @@ public class VoxelGrid
 
 
 
-	public VoxelGrid(int _chunks_x, int _chunks_y, int _chunks_z)
+	public VoxelGrid (int _chunks_x, int _chunks_y, int _chunks_z)
 	{
-		voxelGrid = new Chunks[_chunks_x,_chunks_y,_chunks_z];
-		voxel_size = 1.0f/VoxelConsts.VOXEL_RES;
+		voxelGrid = new Chunks[_chunks_x, _chunks_y, _chunks_z];
+		voxel_size = 1.0f / VoxelConsts.VOXEL_RES;
 
 		NUM_CHUNKS_X = _chunks_x;
 		NUM_CHUNKS_Y = _chunks_y;
 		NUM_CHUNKS_Z = _chunks_z;
 	}
 
-	public bool isChunkValid(Vec3Int chunkCoords)
+	public bool isChunkValid (Vec3Int chunkCoords)
 	{
 		return 	chunkCoords.x >= 0 && chunkCoords.y >= 0 && chunkCoords.z >= 0 &&
-				chunkCoords.x < NUM_CHUNKS_X && chunkCoords.y < NUM_CHUNKS_Y && chunkCoords.z < NUM_CHUNKS_Z &&
-				voxelGrid [chunkCoords.x, chunkCoords.y, chunkCoords.z] != null;//;
+			chunkCoords.x < NUM_CHUNKS_X && chunkCoords.y < NUM_CHUNKS_Y && chunkCoords.z < NUM_CHUNKS_Z &&
+			voxelGrid [chunkCoords.x, chunkCoords.y, chunkCoords.z] != null;//;
 	}
 
-	public Voxel getVoxel(Vec3Int coords)
+	public Voxel getVoxel (Vec3Int coords)
 	{
 		Vec3Int localCoords = coords % (int)VoxelConsts.CHUNK_SIZE;
 		Vec3Int chunkCoords = coords / (int)VoxelConsts.CHUNK_SIZE;
 
-		if(isChunkValid(chunkCoords))
-		{
-			return voxelGrid[chunkCoords.x, chunkCoords.y, chunkCoords.z].getVoxel(localCoords);
-		}
-		else
-		{
-			return new Voxel();
+		if (isChunkValid (chunkCoords)) {
+			return voxelGrid [chunkCoords.x, chunkCoords.y, chunkCoords.z].getVoxel (localCoords);
+		} else {
+			return new Voxel ();
 		}
 	}
 
-	public bool isOccupied(Vec3Int coords)
+	public bool isOccupied (Vec3Int coords)
 	{
 		Vec3Int localCoords = coords % (int)VoxelConsts.CHUNK_SIZE;
 		Vec3Int chunkCoords = coords / (int)VoxelConsts.CHUNK_SIZE;
 		
-		if(isChunkValid(chunkCoords))
-		{
-			return voxelGrid[chunkCoords.x, chunkCoords.y, chunkCoords.z].getVoxel(localCoords).isOccupied();
-		}
-		else
-		{
+		if (isChunkValid (chunkCoords)) {
+			return voxelGrid [chunkCoords.x, chunkCoords.y, chunkCoords.z].getVoxel (localCoords).isOccupied ();
+		} else {
 			return false;
 		}
 
 	}
 
-	VF invertflag(VF flag)
+	VF invertflag (VF flag)
 	{
 		int f = (int)flag;
 		return f % 2 == 0 ? (VF)(f + 1) : (VF)(f - 1);
 	}
 
-	void setVoxelFaces(Voxel vx, Vec3Int coords)
+	void setVoxelFaces (Voxel vx, Vec3Int coords)
 	{
-		Vector3 vec = coords.ToVec3 () + new Vector3(0.5f,0.5f,0.5f);
+		Vector3 vec = coords.ToVec3 () + new Vector3 (0.5f, 0.5f, 0.5f);
 		Vec3Int chunkCoord = coords / (int)VoxelConsts.CHUNK_SIZE;
-		for(int i=0;i<6;i++)
-		{
+		for (int i=0; i<6; i++) {
 			VF flag = (VF)i;
-			vx.setFace(flag,false);
+			vx.setFace (flag, false);
 
-			Vector3 dir = VoxelConsts.CardinalV3Dir[i];
+			Vector3 dir = VoxelConsts.CardinalV3Dir [i];
 
-			Vec3Int neighbourCoord = new Vec3Int(vec + dir);
+			Vec3Int neighbourCoord = new Vec3Int (vec + dir);
 			//Vec3Int neighbourChunk = neighbourCoord / (int)VoxelConsts.CHUNK_SIZE;
 
 			//if(neighbourChunk != chunkCoord && voxelGrid[neighbourChunk.x, neighbourChunk.y,neighbourChunk.z] != null)
 			//	voxelGrid[neighbourChunk.x, neighbourChunk.y,neighbourChunk.z].dirty = true;
 
-			Voxel neighbour = getVoxel(neighbourCoord);
-			bool occupied = neighbour.isOccupied();
+			Voxel neighbour = getVoxel (neighbourCoord);
+			bool occupied = neighbour.isOccupied ();
 
-			if(occupied)
-			{
-				vx.setFace(flag,false);
-				neighbour.setFace(invertflag(flag),false);
-			}
-			else
-			{
-				vx.setFace(flag,true);
+			if (occupied) {
+				vx.setFace (flag, false);
+				neighbour.setFace (invertflag (flag), false);
+			} else {
+				vx.setFace (flag, true);
 			}
 		}
 	}
 
-	void unSetVoxelFaces(Voxel vx, Vec3Int coords)
+	void unSetVoxelFaces (Voxel vx, Vec3Int coords)
 	{
-		Vector3 vec = coords.ToVec3 () + new Vector3(0.5f,0.5f,0.5f);
+		Vector3 vec = coords.ToVec3 () + new Vector3 (0.5f, 0.5f, 0.5f);
 		Vec3Int chunkCoord = coords / (int)VoxelConsts.CHUNK_SIZE;
-		for(int i=0;i<6;i++)
-		{
+		for (int i=0; i<6; i++) {
 			VF flag = (VF)i;
-			vx.setFace(flag,false);
+			vx.setFace (flag, false);
 
-			Vector3 dir = VoxelConsts.CardinalV3Dir[i];
+			Vector3 dir = VoxelConsts.CardinalV3Dir [i];
 
-			Vec3Int neighbourCoord = new Vec3Int(vec + dir);
+			Vec3Int neighbourCoord = new Vec3Int (vec + dir);
 			//Vec3Int neighbourChunk = neighbourCoord / (int)VoxelConsts.CHUNK_SIZE;
 
-			Voxel neighbour = getVoxel(neighbourCoord);
-			bool occupied = neighbour.isOccupied();
+			Voxel neighbour = getVoxel (neighbourCoord);
+			bool occupied = neighbour.isOccupied ();
 			
-			if(occupied)
-			{
+			if (occupied) {
 				//vx.setFace(flag,true);
-				neighbour.setFace(invertflag(flag),true);
+				neighbour.setFace (invertflag (flag), true);
 
 				//if(neighbourChunk != chunkCoord && voxelGrid[neighbourChunk.x, neighbourChunk.y,neighbourChunk.z] != null)
 				//	voxelGrid[neighbourChunk.x, neighbourChunk.y,neighbourChunk.z].dirty = true;
@@ -640,76 +634,72 @@ public class VoxelGrid
 		}
 	}
 
-	public void setVoxel(Vec3Int coords)
+	public void setVoxel (Vec3Int coords)
 	{
 		Vec3Int localCoords = coords % (int)VoxelConsts.CHUNK_SIZE;
 		Vec3Int chunkCoords = coords / (int)VoxelConsts.CHUNK_SIZE;
 		
-		if(isChunkValid(chunkCoords))
-		{
-			Chunks chunk = voxelGrid[chunkCoords.x, chunkCoords.y, chunkCoords.z];
-			Voxel vx = chunk.getVoxel(localCoords);
+		if (isChunkValid (chunkCoords)) {
+			Chunks chunk = voxelGrid [chunkCoords.x, chunkCoords.y, chunkCoords.z];
+			Voxel vx = chunk.getVoxel (localCoords);
 
-			if(vx.isOccupied())
+			if (vx.isOccupied ())
 				return;
 
-			vx.insertPoint();
-			if(vx.isOccupied())
-			{
-				setVoxelFaces(vx,coords);
+			vx.insertPoint ();
+			if (vx.isOccupied ()) {
+				setVoxelFaces (vx, coords);
 				chunk.voxel_count++;
 				chunk.dirty = true;
 			}
 		}
 	}
 
-	public void unSetVoxel(Vec3Int coords)
+	public void unSetVoxel (Vec3Int coords)
 	{
 		Vec3Int localCoords = coords % (int)VoxelConsts.CHUNK_SIZE;
 		Vec3Int chunkCoords = coords / (int)VoxelConsts.CHUNK_SIZE;
 		
-		if(isChunkValid(chunkCoords))
-		{
-			Chunks chunk = voxelGrid[chunkCoords.x, chunkCoords.y, chunkCoords.z];
-			if(chunk == null)
+		if (isChunkValid (chunkCoords)) {
+			Chunks chunk = voxelGrid [chunkCoords.x, chunkCoords.y, chunkCoords.z];
+			if (chunk == null)
 				return;
-			Voxel vx = chunk.getVoxel(localCoords);
+			Voxel vx = chunk.getVoxel (localCoords);
 
-			if(!vx.isOccupied())
+			if (!vx.isOccupied ())
 				return;
 
-			vx.setUnOccupied();
-			unSetVoxelFaces(vx,coords);
+			vx.setUnOccupied ();
+			unSetVoxelFaces (vx, coords);
 			chunk.voxel_count--;
 			chunk.dirty = true;
 		}
 	}
 
-	public void setVoxelImmediate(Vec3Int coords)
+	public void setVoxelImmediate (Vec3Int coords)
 	{
 		Vec3Int localCoords = coords % (int)VoxelConsts.CHUNK_SIZE;
 		Vec3Int chunkCoords = coords / (int)VoxelConsts.CHUNK_SIZE;
 		
-		if(isChunkValid(chunkCoords))
-		{
-			Chunks chunk = voxelGrid[chunkCoords.x, chunkCoords.y, chunkCoords.z];
-			Voxel vx = chunk.getVoxel(localCoords);
+		if (isChunkValid (chunkCoords)) {
+			Chunks chunk = voxelGrid [chunkCoords.x, chunkCoords.y, chunkCoords.z];
+			Voxel vx = chunk.getVoxel (localCoords);
 			
-			if(vx.isOccupied())
+			if (vx.isOccupied ())
 				return;
 			
-			vx.setOccupied();
-			setVoxelFaces(vx,coords);
+			vx.setOccupied ();
+			setVoxelFaces (vx, coords);
 			chunk.voxel_count++;
 			chunk.dirty = true;
 
 		}
 	}
 
-	public void unSetFast(Voxel vx,Vec3Int coords, Chunks chunk)
+	public void unSetFast (Voxel vx, Vec3Int coords, Chunks chunk)
 	{
-		vx.setUnOccupied();
-		unSetVoxelFaces(vx,coords);
+		vx.setUnOccupied ();
+		unSetVoxelFaces (vx, coords);
 		chunk.voxel_count--;
 		chunk.dirty = true;
 	}
@@ -721,7 +711,7 @@ public class ChunkPool
 	int max_chunks;
 	int num_alloced = 0;
 	private object lockthis = new object ();
-	public ChunkPool(int numchunks)
+	public ChunkPool (int numchunks)
 	{
 		chunks = new Chunks[numchunks];
 
@@ -731,17 +721,18 @@ public class ChunkPool
 		max_chunks = numchunks;
 	}
 
-	public Chunks allocNew()
+	public Chunks allocNew ()
 	{
 		//lock (lockthis) 
 		//{
-		if(num_alloced < max_chunks)
-			return chunks[num_alloced++];
-		else return new Chunks();
+		if (num_alloced < max_chunks)
+			return chunks [num_alloced++];
+		else
+			return new Chunks ();
 		//}
 	}
 
-	public int getNumAlloced()
+	public int getNumAlloced ()
 	{
 		return num_alloced;
 	}
@@ -759,38 +750,46 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 	float scale;
 
 	[HideInInspector]
-	public int num_voxels_x;
+	public int
+		num_voxels_x;
 	[HideInInspector]
-	public int num_voxels_y;
+	public int
+		num_voxels_y;
 	[HideInInspector]
-	public int num_voxels_z;
+	public int
+		num_voxels_z;
 
 	int num_verts_x;
 	int num_verts_y;
 	int num_verts_z;
 
 	[HideInInspector]
-	public float voxel_size;
+	public float
+		voxel_size;
 	[HideInInspector]
-	public VoxelGrid grid;
+	public VoxelGrid
+		grid;
 
-    [HideInInspector]
-	public GameObject[,,] chunkGameObjects;
+	[HideInInspector]
+	public GameObject[,,]
+		chunkGameObjects;
 
 	ChunkPool pool;
-	private object lockthis = new object(); 
+	private object lockthis = new object (); 
 
 	int vertex_count;
 
 	[HideInInspector]
-	public int chunk_size;
+	public int
+		chunk_size;
 	//Vector3 jitter;
 	public string debugString;
 	public Material debugMaterial;
 	public Camera camera;
 
 	[HideInInspector]
-	public IndexStack<Vec3Int> occupiedChunks;
+	public IndexStack<Vec3Int>
+		occupiedChunks;
 
 	Matrix4x4 MVP = Matrix4x4.identity;
 #if GREEDY_MESHING
@@ -802,15 +801,16 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 	
 	int[] indices;
 	IndexStack<int> istack;
-
+	#if UNITY_EDITOR
 	#if DEBUG_THIS
 	public bool fakeData;
 	//public TangoPointCloud debugPtCloud;
 #endif
+#endif
 
 
 	// Use this for initialization
-	void Awake() 
+	void Awake ()
 	{
 		chunk_size = (int)VoxelConsts.CHUNK_SIZE;
 
@@ -832,14 +832,13 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 
 		pool = new ChunkPool (2000);
 
-		for(int x=0;x<num_chunks_x;x++)
-			for(int y=0;y<num_chunks_y;y++)
-				for(int z=0;z<num_chunks_z;z++)
-			{
-				chunkGameObjects[x,y,z] = (GameObject)Instantiate(ChunkInstance,(new Vector3(x * chunk_size, y * chunk_size,z * chunk_size) - offset) * voxel_size,Quaternion.identity);
-				chunkGameObjects[x,y,z].GetComponent<MeshFilter>().mesh = new Mesh();
-				chunkGameObjects[x,y,z].GetComponent<MeshRenderer>().enabled = false;
-			}
+		for (int x=0; x<num_chunks_x; x++)
+			for (int y=0; y<num_chunks_y; y++)
+				for (int z=0; z<num_chunks_z; z++) {
+					chunkGameObjects [x, y, z] = (GameObject)Instantiate (ChunkInstance, (new Vector3 (x * chunk_size, y * chunk_size, z * chunk_size) - offset) * voxel_size, Quaternion.identity);
+					chunkGameObjects [x, y, z].GetComponent<MeshFilter> ().mesh = new Mesh ();
+					chunkGameObjects [x, y, z].GetComponent<MeshRenderer> ().enabled = false;
+				}
 
 		ChunkInstance.SetActive (false);
 		occupiedChunks = new IndexStack<Vec3Int> (new Vec3Int[2000]);
@@ -857,10 +856,10 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 		istack = new IndexStack<int> (indices);
 	}
 
-	bool isInFrustum(Vector3 p, ref Matrix4x4 MVP) 
+	bool isInFrustum (Vector3 p, ref Matrix4x4 MVP)
 	{
-		Vector4 clip = MVP * new Vector4(p.x,p.y,p.z,1.0f);
-		return Mathf.Abs(clip.x) < clip.w && Mathf.Abs(clip.y) < clip.w && clip.z > 0 && clip.z < clip.w;
+		Vector4 clip = MVP * new Vector4 (p.x, p.y, p.z, 1.0f);
+		return Mathf.Abs (clip.x) < clip.w && Mathf.Abs (clip.y) < clip.w && clip.z > 0 && clip.z < clip.w;
 	}
 
 #if USE_CHUNK_FRUSTUM_CULLING
@@ -879,7 +878,7 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 	}
 #endif
 
-	void renderVoxelGrid()
+	void renderVoxelGrid ()
 	{
 		
 		int timeslice = framecount % VoxelConsts.FRAME_THRES;
@@ -889,134 +888,120 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 		//	for(int j=0;j<num_chunks_y;j++)
 		//		for(int k=0;k<num_chunks_z;k++)
 		//int modcount = 0;
-		for(int i=0;i<occupiedChunks.getCount();i++)
-		{
-				Vec3Int chunkcoords = occupiedChunks.peek (i);
-				Chunks chunk = grid.voxelGrid[chunkcoords.x,chunkcoords.y,chunkcoords.z];
-				MeshRenderer meshrend = chunkGameObjects [chunkcoords.x,chunkcoords.y,chunkcoords.z].GetComponent<MeshRenderer>();
-				if(chunk == null)
-					continue;
-				if(chunk.isEmpty())
-				{
-					meshrend.enabled = false;
-					continue;
-				}
+		for (int i=0; i<occupiedChunks.getCount(); i++) {
+			Vec3Int chunkcoords = occupiedChunks.peek (i);
+			Chunks chunk = grid.voxelGrid [chunkcoords.x, chunkcoords.y, chunkcoords.z];
+			MeshRenderer meshrend = chunkGameObjects [chunkcoords.x, chunkcoords.y, chunkcoords.z].GetComponent<MeshRenderer> ();
+			if (chunk == null)
+				continue;
+			if (chunk.isEmpty ()) {
+				meshrend.enabled = false;
+				continue;
+			}
 
-				//if(modcount > 20)
-				//	break;
+			//if(modcount > 20)
+			//	break;
 
-				istack.clear ();
+			istack.clear ();
 
 
 				
-				//if((camera.transform.position - chunkGameObjects [i,j,k].transform.position).sqrMagnitude > 64)
-				//	continue;
+			//if((camera.transform.position - chunkGameObjects [i,j,k].transform.position).sqrMagnitude > 64)
+			//	continue;
 
-				if(chunk.dirty)
-				{
-					if(chunk.mesh == null)
-					{
-						chunk.init(chunkGameObjects [chunkcoords.x,chunkcoords.y,chunkcoords.z].GetComponent<MeshFilter>().mesh,
-					           	   chunkGameObjects [chunkcoords.x,chunkcoords.y,chunkcoords.z].transform.position,
+			if (chunk.dirty) {
+				if (chunk.mesh == null) {
+					chunk.init (chunkGameObjects [chunkcoords.x, chunkcoords.y, chunkcoords.z].GetComponent<MeshFilter> ().mesh,
+					           	   chunkGameObjects [chunkcoords.x, chunkcoords.y, chunkcoords.z].transform.position,
 					           	   chunkcoords);
-						meshrend.enabled = true;
-					}
+					meshrend.enabled = true;
+				}
 
-					if(meshrend.enabled == false)
-						continue;
+				if (meshrend.enabled == false)
+					continue;
 
-					//modcount++;
+				//modcount++;
 
-					for(int x=0;x<chunk_size;x++)
-						for(int y=0;y<chunk_size;y++)
-							for(int z=0;z<chunk_size;z++)
-						{
-							Vec3Int vcoord = new Vec3Int(x,y,z);
-							Voxel voxel = chunk.getVoxel(vcoord);
+				for (int x=0; x<chunk_size; x++)
+					for (int y=0; y<chunk_size; y++)
+						for (int z=0; z<chunk_size; z++) {
+							Vec3Int vcoord = new Vec3Int (x, y, z);
+							Voxel voxel = chunk.getVoxel (vcoord);
 
-							if(timeslice == 0)
-							{
+							if (timeslice == 0) {
 								voxel.pcount = 0;
 
 							}
 #if VOXEL_DELETION
-							if(del_timeslice == 0)
-							{
+							if (del_timeslice == 0) {
 								voxel.dcount = 0;
 							}
 #endif
-				///*
-							if(voxel.isOccupied())
-							{
+							///*
+							if (voxel.isOccupied ()) {
 								//front
-								if(voxel.getFace(VF.VX_FRONT_SHOWN))
-								{
+								if (voxel.getFace (VF.VX_FRONT_SHOWN)) {
 									//front
-									istack.push(chunk.getIndex(x,y,z + 1) + chunk.getDirOffset(DIR.DIR_FRONT));
-									istack.push(chunk.getIndex(x + 1,y,z + 1)+ chunk.getDirOffset(DIR.DIR_FRONT));
-									istack.push(chunk.getIndex(x + 1,y + 1,z + 1)+ chunk.getDirOffset(DIR.DIR_FRONT));
-									istack.push(chunk.getIndex(x,y + 1,z + 1)+ chunk.getDirOffset(DIR.DIR_FRONT));
+									istack.push (chunk.getIndex (x, y, z + 1) + chunk.getDirOffset (DIR.DIR_FRONT));
+									istack.push (chunk.getIndex (x + 1, y, z + 1) + chunk.getDirOffset (DIR.DIR_FRONT));
+									istack.push (chunk.getIndex (x + 1, y + 1, z + 1) + chunk.getDirOffset (DIR.DIR_FRONT));
+									istack.push (chunk.getIndex (x, y + 1, z + 1) + chunk.getDirOffset (DIR.DIR_FRONT));
 								}
 
-								if(voxel.getFace(VF.VX_RIGHT_SHOWN))
-								{
+								if (voxel.getFace (VF.VX_RIGHT_SHOWN)) {
 									//right
-									istack.push(chunk.getIndex(x+1,y,z)+ chunk.getDirOffset(DIR.DIR_RIGHT));
-									istack.push(chunk.getIndex(x+1,y+1,z)+ chunk.getDirOffset(DIR.DIR_RIGHT));
-									istack.push(chunk.getIndex(x+1,y + 1,z + 1)+ chunk.getDirOffset(DIR.DIR_RIGHT));
-									istack.push(chunk.getIndex(x+1,y,z+1)+ chunk.getDirOffset(DIR.DIR_RIGHT));
+									istack.push (chunk.getIndex (x + 1, y, z) + chunk.getDirOffset (DIR.DIR_RIGHT));
+									istack.push (chunk.getIndex (x + 1, y + 1, z) + chunk.getDirOffset (DIR.DIR_RIGHT));
+									istack.push (chunk.getIndex (x + 1, y + 1, z + 1) + chunk.getDirOffset (DIR.DIR_RIGHT));
+									istack.push (chunk.getIndex (x + 1, y, z + 1) + chunk.getDirOffset (DIR.DIR_RIGHT));
 								}
 
-								if(voxel.getFace(VF.VX_BACK_SHOWN))
-								{
+								if (voxel.getFace (VF.VX_BACK_SHOWN)) {
 									//back
-									istack.push(chunk.getIndex(x,y,z) + chunk.getDirOffset(DIR.DIR_BACK));
-									istack.push(chunk.getIndex(x,y + 1,z) + chunk.getDirOffset(DIR.DIR_BACK));
-									istack.push(chunk.getIndex(x + 1,y + 1,z) + chunk.getDirOffset(DIR.DIR_BACK));
-									istack.push(chunk.getIndex(x + 1,y,z) + chunk.getDirOffset(DIR.DIR_BACK));
+									istack.push (chunk.getIndex (x, y, z) + chunk.getDirOffset (DIR.DIR_BACK));
+									istack.push (chunk.getIndex (x, y + 1, z) + chunk.getDirOffset (DIR.DIR_BACK));
+									istack.push (chunk.getIndex (x + 1, y + 1, z) + chunk.getDirOffset (DIR.DIR_BACK));
+									istack.push (chunk.getIndex (x + 1, y, z) + chunk.getDirOffset (DIR.DIR_BACK));
 								}
 
-								if(voxel.getFace(VF.VX_LEFT_SHOWN))
-								{
+								if (voxel.getFace (VF.VX_LEFT_SHOWN)) {
 									//left
-									istack.push(chunk.getIndex(x,y,z)+ chunk.getDirOffset(DIR.DIR_LEFT));
-									istack.push(chunk.getIndex(x,y,z + 1)+ chunk.getDirOffset(DIR.DIR_LEFT));
-									istack.push(chunk.getIndex(x,y + 1,z + 1)+ chunk.getDirOffset(DIR.DIR_LEFT));
-									istack.push(chunk.getIndex(x,y + 1,z)+ chunk.getDirOffset(DIR.DIR_LEFT));
+									istack.push (chunk.getIndex (x, y, z) + chunk.getDirOffset (DIR.DIR_LEFT));
+									istack.push (chunk.getIndex (x, y, z + 1) + chunk.getDirOffset (DIR.DIR_LEFT));
+									istack.push (chunk.getIndex (x, y + 1, z + 1) + chunk.getDirOffset (DIR.DIR_LEFT));
+									istack.push (chunk.getIndex (x, y + 1, z) + chunk.getDirOffset (DIR.DIR_LEFT));
 								}
 
-								if(voxel.getFace(VF.VX_TOP_SHOWN))
-								{
+								if (voxel.getFace (VF.VX_TOP_SHOWN)) {
 									//top
-									istack.push(chunk.getIndex(x,y+1,z)+ chunk.getDirOffset(DIR.DIR_UP));
-									istack.push(chunk.getIndex(x,y+1,z+1)+ chunk.getDirOffset(DIR.DIR_UP));
-									istack.push(chunk.getIndex(x+1,y+1,z+1)+ chunk.getDirOffset(DIR.DIR_UP));
-									istack.push(chunk.getIndex(x+1,y+1,z)+ chunk.getDirOffset(DIR.DIR_UP));
+									istack.push (chunk.getIndex (x, y + 1, z) + chunk.getDirOffset (DIR.DIR_UP));
+									istack.push (chunk.getIndex (x, y + 1, z + 1) + chunk.getDirOffset (DIR.DIR_UP));
+									istack.push (chunk.getIndex (x + 1, y + 1, z + 1) + chunk.getDirOffset (DIR.DIR_UP));
+									istack.push (chunk.getIndex (x + 1, y + 1, z) + chunk.getDirOffset (DIR.DIR_UP));
 								}
 
-								if(voxel.getFace(VF.VX_BOTTOM_SHOWN))
-								{
+								if (voxel.getFace (VF.VX_BOTTOM_SHOWN)) {
 									//bottom
-									istack.push(chunk.getIndex(x,y,z)+ chunk.getDirOffset(DIR.DIR_DOWN));
-									istack.push(chunk.getIndex(x+1,y,z)+ chunk.getDirOffset(DIR.DIR_DOWN));
-									istack.push(chunk.getIndex(x+1,y,z+1)+ chunk.getDirOffset(DIR.DIR_DOWN));
-									istack.push(chunk.getIndex(x,y,z+1)+ chunk.getDirOffset(DIR.DIR_DOWN));
+									istack.push (chunk.getIndex (x, y, z) + chunk.getDirOffset (DIR.DIR_DOWN));
+									istack.push (chunk.getIndex (x + 1, y, z) + chunk.getDirOffset (DIR.DIR_DOWN));
+									istack.push (chunk.getIndex (x + 1, y, z + 1) + chunk.getDirOffset (DIR.DIR_DOWN));
+									istack.push (chunk.getIndex (x, y, z + 1) + chunk.getDirOffset (DIR.DIR_DOWN));
 								}
 							}
 //*/
 						}
 
-					//buildChunk(chunk);
-					int[] indexArray = new int[istack.getCount()];
-					System.Array.Copy(istack.getArray(),indexArray,istack.getCount());
+				//buildChunk(chunk);
+				int[] indexArray = new int[istack.getCount ()];
+				System.Array.Copy (istack.getArray (), indexArray, istack.getCount ());
 
-					chunk.mesh.SetIndices (indexArray , MeshTopology.Quads, 0);
-					//chunk.mesh.RecalculateBounds();
-					chunk.dirty = false;
+				chunk.mesh.SetIndices (indexArray, MeshTopology.Quads, 0);
+				//chunk.mesh.RecalculateBounds();
+				chunk.dirty = false;
 				#if GREEDY_MESHING
 					chunk.optimized = false;
 #endif
-				}
+			}
 #if GREEDY_MESHING
 				else if(chunk.mesh != null && !chunk.optimized && chunk.voxel_count > 16)
 				{
@@ -1031,19 +1016,19 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 					}
 				}
 #endif
-			}
-			framecount++;
+		}
+		framecount++;
 	}
 
-	public Vec3Int ToGrid(Vector3 pt)
+	public Vec3Int ToGrid (Vector3 pt)
 	{
 		Vector3 p = pt;
 		p = ToGridUnTrunc (p);
-		Vec3Int vec = new Vec3Int (Mathf.FloorToInt(p.x), Mathf.FloorToInt(p.y), Mathf.FloorToInt(p.z));
+		Vec3Int vec = new Vec3Int (Mathf.FloorToInt (p.x), Mathf.FloorToInt (p.y), Mathf.FloorToInt (p.z));
 		return vec;
 	}
 
-	public Vector3 ToGridUnTrunc(Vector3 pt)
+	public Vector3 ToGridUnTrunc (Vector3 pt)
 	{
 		Vector3 p = pt;
 
@@ -1054,7 +1039,7 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 		return p;
 	}
 
-	public Vector3 FromGridUnTrunc(Vector3 pt)
+	public Vector3 FromGridUnTrunc (Vector3 pt)
 	{
 		Vector3 p = pt;
 		p -= offset;
@@ -1063,7 +1048,7 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 		return p;
 	}
 
-	public Vector3 FromGrid(Vec3Int pt)
+	public Vector3 FromGrid (Vec3Int pt)
 	{
 		Vector3 p = new Vector3 (pt.x, pt.y, pt.z);
 		p = FromGridUnTrunc (p);
@@ -1071,72 +1056,69 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 		return p;
 	}
 
-	public bool isVoxelThere(Vector3 wldcoords)
+	public bool isVoxelThere (Vector3 wldcoords)
 	{
 		Vec3Int cvCoord = ToGrid (wldcoords);
-		Voxel vx = grid.getVoxel(cvCoord);
+		Voxel vx = grid.getVoxel (cvCoord);
 		return vx.isOccupied ();
 	}
 
-	public Vec3Int getVoxelCoordsFromPt(Vector3 wldcoords)
+	public Vec3Int getVoxelCoordsFromPt (Vector3 wldcoords)
 	{
 		return ToGrid (wldcoords);
 	}
 
-	public Voxel getVoxelFromPt(Vector3 wldcoords)
+	public Voxel getVoxelFromPt (Vector3 wldcoords)
 	{
 		Vec3Int cvCoord = ToGrid (wldcoords);
-		return grid.getVoxel(cvCoord);
+		return grid.getVoxel (cvCoord);
 	}
 
-	public Chunks getChunkFromPt(Vector3 wldcoords)
+	public Chunks getChunkFromPt (Vector3 wldcoords)
 	{
 		Vec3Int cc = ToGrid (wldcoords) / (int)VoxelConsts.CHUNK_SIZE;
 		return grid.voxelGrid [cc.x, cc.y, cc.z];
 	}
 
-	public Vec3Int getChunkCoords(Vector3 wldcoords)
+	public Vec3Int getChunkCoords (Vector3 wldcoords)
 	{
 		return ToGrid (wldcoords) / (int)VoxelConsts.CHUNK_SIZE;
 	}
 
-	public Vector3 getVoxelNormal(Voxel vx)
+	public Vector3 getVoxelNormal (Voxel vx)
 	{
 		Vector3 _normal = Vector3.zero;
-		for(int j=0;j<6;j++)
-		{
+		for (int j=0; j<6; j++) {
 			VF flag = (VF)j;
-			if(vx.getFace(flag) && Vector3.Dot (VoxelConsts.CardinalV3Dir[j],camera.transform.forward) < 0)
-			{
-				_normal += VoxelConsts.CardinalV3Dir[j];
+			if (vx.getFace (flag) && Vector3.Dot (VoxelConsts.CardinalV3Dir [j], camera.transform.forward) < 0) {
+				_normal += VoxelConsts.CardinalV3Dir [j];
 			}
 		}
 
 		return _normal.normalized;
 	}
 
-	public bool isSurfaceVoxel(Voxel vx)
+	public bool isSurfaceVoxel (Voxel vx)
 	{
 		if (!vx.isOccupied ())
 			return false;
 
 		bool isSurface = false;
 
-		for(int j=0;j<6;j++)
-		{
+		for (int j=0; j<6; j++) {
 			VF flag = (VF)j;
-			isSurface |= vx.getFace(flag);
+			isSurface |= vx.getFace (flag);
 		}
 
 		return isSurface;
 	}
 
-	public bool voxelHasSurface(Voxel vx, VF face)
+	public bool voxelHasSurface (Voxel vx, VF face)
 	{
 		return vx.getFace (face);
 	}
 
-	public bool isChunkASurface(DIR normal, Chunks chunk, float threshold)
+	public bool isChunkASurface (DIR normal, Chunks chunk, float threshold)
 	{
 		Vector3 norm = VoxelConsts.CardinalV3Dir [(int)normal];
 		int surfcount = 1;
@@ -1146,21 +1128,19 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 			return false;
 
 
-		for(int x=0;x<chunk_size;x++)
-			for(int y=0;y<chunk_size;y++)
-				for(int z=0;z<chunk_size;z++)
-			{
-				Vec3Int vcoord = new Vec3Int(x,y,z);
-				Voxel voxel = chunk.getVoxel(vcoord);
+		for (int x=0; x<chunk_size; x++)
+			for (int y=0; y<chunk_size; y++)
+				for (int z=0; z<chunk_size; z++) {
+					Vec3Int vcoord = new Vec3Int (x, y, z);
+					Voxel voxel = chunk.getVoxel (vcoord);
 
-				if(isSurfaceVoxel(voxel))
-				{
-					surfcount++;
+					if (isSurfaceVoxel (voxel)) {
+						surfcount++;
 
-					if(voxelHasSurface(voxel,VF.VX_TOP_SHOWN))
-						normalcount++;
+						if (voxelHasSurface (voxel, VF.VX_TOP_SHOWN))
+							normalcount++;
+					}
 				}
-			}
 		
 		return ((float)normalcount / (float)surfcount) > threshold;
 
@@ -1168,27 +1148,23 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 
 
 	//optimize later
-	public bool RayCast(Vector3 start, Vector3 dir, float dist, ref Vector3 vxcood, ref Vector3 normal, float step=1.0f)
+	public bool RayCast (Vector3 start, Vector3 dir, float dist, ref Vector3 vxcood, ref Vector3 normal, float step=1.0f)
 	{
 		Vector3 pt = ToGridUnTrunc (start);
 		dir = dir.normalized;
 
-		for(float i=0;i<dist;i+=step)
-		{
-			Vec3Int cvCoord = new Vec3Int(pt);
-			Voxel vx = grid.getVoxel(cvCoord);
+		for (float i=0; i<dist; i+=step) {
+			Vec3Int cvCoord = new Vec3Int (pt);
+			Voxel vx = grid.getVoxel (cvCoord);
 
-			if(vx.isOccupied())
-			{
-				vxcood = FromGridUnTrunc(cvCoord.ToVec3() + new Vector3(0.5f,0.5f,0.5f));
-				Vector3 _normal = new Vector3();
+			if (vx.isOccupied ()) {
+				vxcood = FromGridUnTrunc (cvCoord.ToVec3 () + new Vector3 (0.5f, 0.5f, 0.5f));
+				Vector3 _normal = new Vector3 ();
 
-				for(int j=0;j<6;j++)
-				{
+				for (int j=0; j<6; j++) {
 					VF flag = (VF)j;
-					if(vx.getFace(flag) && Vector3.Dot (dir, VoxelConsts.CardinalV3Dir[j]) < 0)
-					{
-						_normal += VoxelConsts.CardinalV3Dir[j];
+					if (vx.getFace (flag) && Vector3.Dot (dir, VoxelConsts.CardinalV3Dir [j]) < 0) {
+						_normal += VoxelConsts.CardinalV3Dir [j];
 					}
 				}
 
@@ -1200,23 +1176,21 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 			pt += dir;
 		}
 
-		vxcood = FromGridUnTrunc(pt);
+		vxcood = FromGridUnTrunc (pt);
 		return false;
 	}
 
 	//optimize later
-	public bool CheapRayCast(Vector3 start, Vector3 dir, float dist, float step=1.0f)
+	public bool CheapRayCast (Vector3 start, Vector3 dir, float dist, float step=1.0f)
 	{
 		Vector3 pt = ToGridUnTrunc (start);
 		dir = dir.normalized;
 		
-		for(float i=0;i<dist;i+=step)
-		{
-			Vec3Int cvCoord = new Vec3Int(pt);
-			Voxel vx = grid.getVoxel(cvCoord);
+		for (float i=0; i<dist; i+=step) {
+			Vec3Int cvCoord = new Vec3Int (pt);
+			Voxel vx = grid.getVoxel (cvCoord);
 			
-			if(vx.isOccupied())
-			{
+			if (vx.isOccupied ()) {
 				return true;
 			}
 			
@@ -1227,29 +1201,25 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 	}
 
 	//optimize later
-	public bool OccupiedRayCast(Vector3 start, Vector3 dir, float dist, ref Vector3 vxcood, ref Vector3 normal, float step=1.0f)
+	public bool OccupiedRayCast (Vector3 start, Vector3 dir, float dist, ref Vector3 vxcood, ref Vector3 normal, float step=1.0f)
 	{
 		Vector3 pt = ToGridUnTrunc (start);
 		dir = dir.normalized;
 		
-		for(float i=0;i<dist;i+=step)
-		{
-			Vec3Int cvCoord = new Vec3Int(pt);
-			Voxel vx = grid.getVoxel(cvCoord);
+		for (float i=0; i<dist; i+=step) {
+			Vec3Int cvCoord = new Vec3Int (pt);
+			Voxel vx = grid.getVoxel (cvCoord);
 			
-			if(!vx.isOccupied())
-			{
-				Voxel ovx = grid.getVoxel(new Vec3Int(pt - dir));
+			if (!vx.isOccupied ()) {
+				Voxel ovx = grid.getVoxel (new Vec3Int (pt - dir));
 
-				vxcood = FromGridUnTrunc(cvCoord.ToVec3() + new Vector3(0.5f,0.5f,0.5f));
-				Vector3 _normal = new Vector3();
+				vxcood = FromGridUnTrunc (cvCoord.ToVec3 () + new Vector3 (0.5f, 0.5f, 0.5f));
+				Vector3 _normal = new Vector3 ();
 				
-				for(int j=0;j<6;j++)
-				{
+				for (int j=0; j<6; j++) {
 					VF flag = (VF)j;
-					if(ovx.getFace(flag) && Vector3.Dot (dir, VoxelConsts.CardinalV3Dir[j]) < 0 )
-					{
-						_normal += VoxelConsts.CardinalV3Dir[j];
+					if (ovx.getFace (flag) && Vector3.Dot (dir, VoxelConsts.CardinalV3Dir [j]) < 0) {
+						_normal += VoxelConsts.CardinalV3Dir [j];
 					}
 				}
 				
@@ -1261,33 +1231,29 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 			pt += dir;
 		}
 
-		vxcood = FromGridUnTrunc(pt);
+		vxcood = FromGridUnTrunc (pt);
 		return false;
 	}
 
 	//optimize later
-	public bool GroundedRayCast(Vector3 start, Vector3 dir, float dist, ref Vector3 vxcood, ref Vector3 normal, ref bool notgrounded, float step=1.0f)
+	public bool GroundedRayCast (Vector3 start, Vector3 dir, float dist, ref Vector3 vxcood, ref Vector3 normal, ref bool notgrounded, float step=1.0f)
 	{
 		Vector3 pt = ToGridUnTrunc (start);
 		dir = dir.normalized;
 		notgrounded = false;
 
-		for(float i=0;i<dist;i+=step)
-		{
-			Vec3Int cvCoord = new Vec3Int(pt);
-			Voxel vx = grid.getVoxel(cvCoord);
+		for (float i=0; i<dist; i+=step) {
+			Vec3Int cvCoord = new Vec3Int (pt);
+			Voxel vx = grid.getVoxel (cvCoord);
 
-			if(vx.isOccupied())
-			{
-				vxcood = FromGridUnTrunc(cvCoord.ToVec3() + new Vector3(0.5f,0.5f,0.5f));
-				Vector3 _normal = new Vector3();
+			if (vx.isOccupied ()) {
+				vxcood = FromGridUnTrunc (cvCoord.ToVec3 () + new Vector3 (0.5f, 0.5f, 0.5f));
+				Vector3 _normal = new Vector3 ();
 				
-				for(int j=0;j<6;j++)
-				{
+				for (int j=0; j<6; j++) {
 					VF flag = (VF)j;
-					if(vx.getFace(flag) && Vector3.Dot (dir, VoxelConsts.CardinalV3Dir[j]) < 0)
-					{
-						_normal += VoxelConsts.CardinalV3Dir[j];
+					if (vx.getFace (flag) && Vector3.Dot (dir, VoxelConsts.CardinalV3Dir [j]) < 0) {
+						_normal += VoxelConsts.CardinalV3Dir [j];
 					}
 				}
 				
@@ -1296,21 +1262,20 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 				return true;
 			}
 
-			Voxel lowerVoxel = grid.getVoxel(cvCoord + VoxelConsts.CardinalDir[(int)DIR.DIR_DOWN]);
-			if(!lowerVoxel.isOccupied())
-			{
+			Voxel lowerVoxel = grid.getVoxel (cvCoord + VoxelConsts.CardinalDir [(int)DIR.DIR_DOWN]);
+			if (!lowerVoxel.isOccupied ()) {
 				notgrounded = true;
 				break;
 			}
 			pt += dir;
 		}
 		
-		vxcood = FromGridUnTrunc(pt);
+		vxcood = FromGridUnTrunc (pt);
 		return false;
 	}
 
 #if VOXEL_DELETION
-	public void KillerRayCast(Vector3 start)
+	public void KillerRayCast (Vector3 start)
 	{
 		const float step = 1.0f;
 		Vector3 end = camera.transform.position;
@@ -1324,18 +1289,16 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 		Vector3 pt = vstart + dir * offset;
 
 
-		for(float i=offset;i<mag;i+=step)
-		{
-			Vec3Int cvCoord = new Vec3Int(pt);
-			Voxel vx = grid.getVoxel(cvCoord);
-			Vec3Int cc = cvCoord / new Vec3Int(chunk_size,chunk_size,chunk_size);
-			Chunks chunk = grid.voxelGrid[cc.x,cc.y,cc.z];
+		for (float i=offset; i<mag; i+=step) {
+			Vec3Int cvCoord = new Vec3Int (pt);
+			Voxel vx = grid.getVoxel (cvCoord);
+			Vec3Int cc = cvCoord / new Vec3Int (chunk_size, chunk_size, chunk_size);
+			Chunks chunk = grid.voxelGrid [cc.x, cc.y, cc.z];
 
-			if(vx.isOccupied())
-			{
-				vx.removePoint();
-				if(!vx.isOccupied())
-					grid.unSetFast(vx,cvCoord,chunk);
+			if (vx.isOccupied ()) {
+				vx.removePoint ();
+				if (!vx.isOccupied ())
+					grid.unSetFast (vx, cvCoord, chunk);
 			}
 			
 			pt += dir * step;
@@ -1343,111 +1306,105 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 	}
 #endif
 
-	public void InstantiateChunkIfNeeded(Vec3Int coords)
+	public void InstantiateChunkIfNeeded (Vec3Int coords)
 	{
 		Vec3Int cc = coords / VoxelConsts.CHUNK_SIZE;
 
 
 		if (grid.voxelGrid [cc.x, cc.y, cc.z] == null) {
-			grid.voxelGrid [cc.x, cc.y, cc.z] = pool.allocNew();
+			grid.voxelGrid [cc.x, cc.y, cc.z] = pool.allocNew ();
 			occupiedChunks.push (cc);
 		}
 
 	}
 
-	public bool isChunkEmpty(Vec3Int coords)
+	public bool isChunkEmpty (Vec3Int coords)
 	{
 		Vec3Int cc = coords / (int)VoxelConsts.CHUNK_SIZE;
 		return grid.voxelGrid [cc.x, cc.y, cc.z] == null;
 	}
 
-	float sqrtApprox(float inX)
+	float sqrtApprox (float inX)
 	{
-		int x = System.BitConverter.ToInt32(System.BitConverter.GetBytes(inX),0);
+		int x = System.BitConverter.ToInt32 (System.BitConverter.GetBytes (inX), 0);
 		x = 0x1FBD1DF5 + (x >> 1);
-		return System.BitConverter.ToSingle(System.BitConverter.GetBytes(x),0);
+		return System.BitConverter.ToSingle (System.BitConverter.GetBytes (x), 0);
 	}
 
-	public void addAndRender (TangoPointCloud pointCloud) 
+	public void addAndRender (TangoPointCloud pointCloud)
 	{
 		int count = pointCloud.m_pointsCount;
 		int numrays = 250;
 		
 		#if VOXEL_DELETION
 		Random.seed = framecount % 20;
-		for (int i=0; i<numrays; i++) 
-		{
-			int index = Random.Range(0,count);
-			Vector3 pt = pointCloud.m_points[index];
+		for (int i=0; i<numrays; i++) {
+			int index = Random.Range (0, count);
+			Vector3 pt = pointCloud.m_points [index];
 			//Vector3 ranvec = new Vector3(Random.value - 0.5f, Random.value - 0.5f, Random.value - 0.5f) * voxel_size * 2;
-			KillerRayCast(pt);
+			KillerRayCast (pt);
 			
 		}
 		#endif
 
-		for(int i=0; i< count; i++)
-		{
+		for (int i=0; i< count; i++) {
 
-			Vector3 pt = pointCloud.m_points[i];
+			Vector3 pt = pointCloud.m_points [i];
 
-			Vec3Int coords = ToGrid(pt);
-			InstantiateChunkIfNeeded(coords);
+			Vec3Int coords = ToGrid (pt);
+			InstantiateChunkIfNeeded (coords);
 
-			grid.setVoxel(coords);
+			grid.setVoxel (coords);
 
 		}
 		
 		//renderVoxelGrid ();
 	}
 
-	void FixedUpdate() 
+	void FixedUpdate ()
 	{
 		renderVoxelGrid ();
 	}
 
-	float HighResoRandom()
+	float HighResoRandom ()
 	{
 		return Random.Range (-100.0f, 100.0f);
 	}
 
-	float f(float x, float y)
+	float f (float x, float y)
 	{
 		return (Mathf.Sin (x * 0.1f) + Mathf.Sin (y * 0.1f)) * 4 - 10;
 	}
 
-	void makeTestPlane()
+	void makeTestPlane ()
 	{
-		for(int i=0; i< num_voxels_x; i++)
-			for(int j=0; j< num_voxels_z; j++)
-		{
-			int x = i - num_voxels_x / 2;
-			int y = j - num_voxels_z / 2;
+		for (int i=0; i< num_voxels_x; i++)
+			for (int j=0; j< num_voxels_z; j++) {
+				int x = i - num_voxels_x / 2;
+				int y = j - num_voxels_z / 2;
 
-			if(  (x * x + y * y) < 10000)
-			{
-				//Debug.Log (x + " " + y);
-				float f1 = f (x,y);
-				float f2 = f (x,y+1);
-				float f3 = f (x+1,y);
-				for(float k=0;k<=1.0f;k+=0.02f)
-				{
-					int h = Mathf.FloorToInt(Mathf.Lerp(f1,f2,k));
-					Vec3Int coords = new Vec3Int(i,num_voxels_y / 2 + h,j);
-					InstantiateChunkIfNeeded(coords);
+				if ((x * x + y * y) < 10000) {
+					//Debug.Log (x + " " + y);
+					float f1 = f (x, y);
+					float f2 = f (x, y + 1);
+					float f3 = f (x + 1, y);
+					for (float k=0; k<=1.0f; k+=0.02f) {
+						int h = Mathf.FloorToInt (Mathf.Lerp (f1, f2, k));
+						Vec3Int coords = new Vec3Int (i, num_voxels_y / 2 + h, j);
+						InstantiateChunkIfNeeded (coords);
 					
-					grid.setVoxelImmediate(coords);
-				}
+						grid.setVoxelImmediate (coords);
+					}
 
-				for(float k=0;k<=1.0f;k+=0.02f)
-				{
-					int h = Mathf.FloorToInt(Mathf.Lerp(f1,f3,k));
-					Vec3Int coords = new Vec3Int(i,num_voxels_y / 2 + h,j);
-					InstantiateChunkIfNeeded(coords);
+					for (float k=0; k<=1.0f; k+=0.02f) {
+						int h = Mathf.FloorToInt (Mathf.Lerp (f1, f3, k));
+						Vec3Int coords = new Vec3Int (i, num_voxels_y / 2 + h, j);
+						InstantiateChunkIfNeeded (coords);
 					
-					grid.setVoxelImmediate(coords);
+						grid.setVoxelImmediate (coords);
+					}
 				}
 			}
-		}
 
 		/*
 		for(int i=0; i< num_voxels_x; i++)
@@ -1471,7 +1428,7 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 
 	}
 
-	void Update()
+	void Update ()
 	{
 		#if USE_CHUNK_FRUSTUM_CULLING
 		MVP = camera.projectionMatrix * camera.worldToCameraMatrix;
@@ -1503,13 +1460,13 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 
 
 
-
+#if UNITY_EDITOR
 		#if DEBUG_THIS
-		if(fakeData)
-		{
-			makeTestPlane();
+		if (fakeData) {
+			makeTestPlane ();
 			fakeData = false;
 		}
+
 		/*
 		if (fakeData) 
 		{
@@ -1537,13 +1494,14 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 			renderVoxelGrid ();
 		}*/
 		#endif
+		#endif
 	}
 
-	void OnGUI()
+	void OnGUI ()
 	{
-		GUI.Label (new Rect (200,120,200,200), "Num chunks allocated: " + pool.getNumAlloced()  );
-		GUI.Label (new Rect (200,140,200,200), "Frametime: " + (Time.deltaTime * 1000) + " ms" );
-		GUI.Label (new Rect (200,160,200,200), "Unity FPS: " + (1.0f/Time.deltaTime) + " fps" );
+		GUI.Label (new Rect (200, 120, 200, 200), "Num chunks allocated: " + pool.getNumAlloced ());
+		GUI.Label (new Rect (200, 140, 200, 200), "Frametime: " + (Time.deltaTime * 1000) + " ms");
+		GUI.Label (new Rect (200, 160, 200, 200), "Unity FPS: " + (1.0f / Time.deltaTime) + " fps");
 	}
 
 #if GREEDY_MESHING

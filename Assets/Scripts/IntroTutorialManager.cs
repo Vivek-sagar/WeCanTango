@@ -29,6 +29,8 @@ public class IntroTutorialManager : MonoBehaviour
 	public GameObject textObj, PetSpawner, ItemSpawner, EnvironmentSpawner;
 	public BiomeScript biome;
 	public Camera backCam;
+	public Material[] voxelMats;
+
 	// Use this for initialization
 	void Start ()
 	{
@@ -164,6 +166,7 @@ public class IntroTutorialManager : MonoBehaviour
 		mainLight.SetActive (true);
 		mainLight.transform.rotation = Quaternion.Euler (386f, 71f, 126f);
 		biome.resetBiomes ();
+		biome.swapMaterials (ref voxelMats);
 	}
 
 	/// <summary>
