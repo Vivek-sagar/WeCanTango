@@ -36,7 +36,7 @@ public class IntroTutorialManager : MonoBehaviour
 	// Use this for initialization
 	void Start ()
 	{
-		this.transform.position = new Vector3 (0, player.transform.position.y, -1.75f);
+		this.transform.position = new Vector3 (0, player.transform.position.y, -1.5f);
 		auSource.pitch = 0.75f;
 		ThePet.transform.position = watchTrans.position;
 
