@@ -16,23 +16,27 @@ public class IntroTutorialManager : MonoBehaviour
 		Finish,
 	};
 	public TutorialPhase tutorialPhase;
+	public GameObject player;
 	public TutorialGaze playerGazeScript;
 	public TutorialSheep sheepScript;
 	public PokeDector pokeScript;
-	public GameObject pocketWatch, tutorialSheep, gazeTutorialGameObjects;
-	public Transform[] gazeTargets; //Need the places the sheep moves to for the player to gaze
-	int gazeCount = 0;
-	public Animator myAnim;
-	public AudioSource auSource;
-	public GameObject player;
-	public GameObject mainLight;
-	public GameObject textObj, ThePet;
+	public GameObject pocketWatch, ThePet;
 	public Transform watchTrans;
+	public GameObject tutorialSheep, gazeTutorialGameObjects;
+	public Transform[] gazeTargets; //Need the places the sheep moves to for the player to gaze
+
+	
 	public GameObject ItemSpawner, EnvironmentSpawner;
 	public BiomeScript biome;
-	public Camera backCam;
+	//public Camera backCam;
 	public Material[] voxelMats;
 
+	public Animator myAnim;
+	public AudioSource auSource;
+	public GameObject mainLight;
+	public GameObject textObj;
+
+	int gazeCount = 0;
 	// Use this for initialization
 	void Start ()
 	{
