@@ -5,6 +5,7 @@ public class TriggerScript : MonoBehaviour
 {
 
 	public bool triggered = false;
+	public bool debug = false;
 	public ParticleSystem partsys;
 	public GameObject obj;
 	public BoxCollider cubeswitch;
@@ -47,6 +48,12 @@ public class TriggerScript : MonoBehaviour
 		if (!triggered && cubeswitch.gameObject.activeSelf && checkForVoxelsInCollider ()) {
 			triggeredEvent ();
 		}
+
+		//if(debug)
+		//{
+		//	debug = false;
+		//	triggeredEvent();
+		//}
 
 		if (vxe.isVoxelThere (obj.transform.position)) {
 			transform.position += Vector3.up * vxe.voxel_size;
@@ -91,7 +98,11 @@ public class TriggerScript : MonoBehaviour
 		cubeswitch.gameObject.SetActive (false);
 
 		triggered = true;
-		petcounter.PetTriggered ();
+		//petcounter.PetTriggered ();
+
+		Vec3Int cc = vxe.getChunkCoords (transform.position);
+
+		BiomeScript.Instance.doRandomChange (cc.x, cc.z);
 	}
 
 }

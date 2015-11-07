@@ -138,6 +138,7 @@ public class PopupManager : MonoBehaviour
     /// </summary>
     public void OnGUI()
     {
+
         if (showText)
         {
             int textLineSpacing = 20;

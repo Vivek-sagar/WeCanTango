@@ -13,11 +13,11 @@ using System.Collections;
 public static class VoxelConsts
 {
 	public static int CHUNK_SIZE = 8;
-	public static int PT_THRES = 30;
+	public static int PT_THRES = 40;
 	public static int VOXEL_RES = 10;
 	public static int FRAME_THRES = 5;
 	public static int DEL_FRAME_THRES = 5;
-	public static int PT_DEL_THRES = 20;
+	public static int PT_DEL_THRES = 30;
 	public static Vec3Int[] CardinalDir = new Vec3Int[]{ new Vec3Int(0,0,1), new Vec3Int(0,0,-1), new Vec3Int(-1,0,0), new Vec3Int(1,0,0), new Vec3Int(0,1,0), new Vec3Int(0,-1,0) };
 	public static Vector3[] CardinalV3Dir = new Vector3[]{ new Vector3(0,0,1), new Vector3(0,0,-1), new Vector3(-1,0,0), new Vector3(1,0,0), new Vector3(0,1,0), new Vector3(0,-1,0) };
 	public static BitArray surfaceSet = new BitArray (new bool[]{true,true,true,true,true,true,false,false});
@@ -72,6 +72,7 @@ public class IndexStack<T>
 	}
 }
 
+#if GREEDY_MESHING
 public class Quad
 {
 	public int x, y, w, h;
@@ -111,6 +112,7 @@ public class Quad
 		return false;
 	}
 }
+#endif
 
 public struct Vec3Int
 {
@@ -184,6 +186,7 @@ public struct Vec3Int
 		return a.x != b.x || a.y != b.y || a.z != b.z;
 	}
 }
+
 
 public enum VF : int
 {
@@ -830,7 +833,7 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 		grid = new VoxelGrid (num_chunks_x, num_chunks_y, num_chunks_z);
 		chunkGameObjects = new GameObject[num_chunks_x, num_chunks_y, num_chunks_z];
 
-		pool = new ChunkPool (2000);
+		pool = new ChunkPool (1500);
 
 		for(int x=0;x<num_chunks_x;x++)
 			for(int y=0;y<num_chunks_y;y++)
@@ -842,7 +845,7 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 			}
 
 		ChunkInstance.SetActive (false);
-		occupiedChunks = new IndexStack<Vec3Int> (new Vec3Int[2000]);
+		occupiedChunks = new IndexStack<Vec3Int> (new Vec3Int[1500]);
 
 #if GREEDY_MESHING
 		quadpool = new Quad[chunk_size, chunk_size];
@@ -1542,7 +1545,7 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 	void OnGUI()
 	{
 		GUI.Label (new Rect (200,120,200,200), "Num chunks allocated: " + pool.getNumAlloced()  );
-		GUI.Label (new Rect (200,140,200,200), "Frametime: " + (Time.deltaTime * 1000) + " ms" );
+		GUI.Label (new Rect (200,140,200,200), "Frametime: " + (Time.smoothDeltaTime * 1000) + " ms" );
 		GUI.Label (new Rect (200,160,200,200), "Unity FPS: " + (1.0f/Time.deltaTime) + " fps" );
 	}
 
