@@ -7,6 +7,7 @@ public class IntroTutorialManager : MonoBehaviour
 
 	public enum TutorialPhase
 	{
+		SetUpHypno,
 		Wait,
 		PocketWatchSwing,
 		SheepAppear,
@@ -16,38 +17,36 @@ public class IntroTutorialManager : MonoBehaviour
 		Finish,
 	};
 	public TutorialPhase tutorialPhase;
-	public GameObject player;
-	public TutorialGaze playerGazeScript;
+	public Transform playerTrans;
 	public TutorialSheep sheepScript;
-	public PokeDector pokeScript;
-	public GameObject pocketWatch, ThePet;
+	public PokeDector pWatchPokeScript, setUpPokeScript;
+	public GameObject pocketWatch, ThePet, tutorialSheep, ItemSpawner, EnvironmentSpawner, mainLight, textObj;
 	public Transform watchTrans;
-	public GameObject tutorialSheep, gazeTutorialGameObjects;
-	public Transform[] gazeTargets; //Need the places the sheep moves to for the player to gaze
 
-	
-	public GameObject ItemSpawner, EnvironmentSpawner;
 	public BiomeScript biome;
 	//public Camera backCam;
 	public Material[] voxelMats;
 
 	public Animator myAnim;
 	public AudioSource auSource;
-	public GameObject mainLight;
-	public GameObject textObj;
 
+	Transform[] gazeTargets; //Need the places the sheep moves to for the player to gaze
+	GameObject gazeTutorialGameObjects;
+	TutorialGaze playerGazeScript;
 	int gazeCount = 0;
 	// Use this for initialization
 	void Start ()
 	{
-		this.transform.position = new Vector3 (0, player.transform.position.y, -1.5f);
+		this.transform.position = new Vector3 (0, playerTrans.position.y, -1.5f);
 		auSource.pitch = 0.75f;
 		ThePet.transform.position = watchTrans.position;
 
+
 		tutorialPhase = TutorialPhase.Wait;
-		playerGazeScript = GameObject.FindGameObjectWithTag ("Player").GetComponent<TutorialGaze> ();
+		playerGazeScript = playerTrans.GetComponent<TutorialGaze> ();
 		SetMeshRenderersInChildren (tutorialSheep, false);
-		SetMeshRenderersInChildren (gazeTutorialGameObjects, false);
+		//Disable for now, will use GazeTutorial Later
+		//SetMeshRenderersInChildren (gazeTutorialGameObjects, false);
 		SetMainGameObjects (false);
 	}
 
@@ -69,9 +68,14 @@ public class IntroTutorialManager : MonoBehaviour
 	// Update is called once per frame
 	void FixedUpdate ()
 	{
+		if (tutorialPhase == TutorialPhase.SetUpHypno && setUpPokeScript.triggered) {
 
-		if (tutorialPhase == TutorialPhase.Wait && pokeScript.triggered) {
-			pocketWatch.transform.LookAt (player.transform.position);
+			pocketWatch.SetActive (true);
+			textObj.SetActive (true);
+			setUpPokeScript.gameObject.SetActive (false);
+			tutorialPhase = TutorialPhase.Wait;
+		} else if (tutorialPhase == TutorialPhase.Wait && pWatchPokeScript.triggered) {
+			pocketWatch.transform.LookAt (playerTrans.position);
 			tutorialPhase = TutorialPhase.PocketWatchSwing;
 		} else if (tutorialPhase == TutorialPhase.PocketWatchSwing) {
 			// Debug.LogError("AT PocketWatchSwing !!!");

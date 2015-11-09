@@ -4,19 +4,21 @@ using System.Collections;
 public class PokeDector : MonoBehaviour
 {
 	//TRIGGERED MUST START FALSE
-	public bool triggered = false;
+	public bool triggered = false, waitForNoVoxel;
 	public BoxCollider cubeswitch;
-	public Transform playerTrans;
 	public AudioSource audio;
 	VoxelExtractionPointCloud vxe;
 	Transform myTrans, cubeTrans;
-
+	float frames = 0f, maxFrames = 240f;
 	// Use this for initialization
 	void Start ()
 	{
 		myTrans = GetComponent<Transform> ();
 		cubeTrans = cubeswitch.gameObject.transform;
 		vxe = VoxelExtractionPointCloud.Instance;
+
+		if (waitForNoVoxel && gameObject.activeSelf)
+			gameObject.SetActive (false);
 	}
 	
 	/// <summary>
@@ -32,7 +34,8 @@ public class PokeDector : MonoBehaviour
 			for (float j=min.y; j<=max.y; j+= vxe.voxel_size)
 				for (float k=min.z; k<=max.z; k+= vxe.voxel_size) {
 					if (vxe.isVoxelThere (new Vector3 (i, j, k))) {
-						audio.Play ();
+						if (audio != null)	
+							audio.Play ();
 						return true;
 					}
 				}
@@ -44,13 +47,23 @@ public class PokeDector : MonoBehaviour
 	// Update is called once per frame
 	void Update ()
 	{
-
+			
 		if (!triggered && cubeswitch.gameObject.activeSelf && checkForVoxelsInCollider ()) {
 			triggered = true;
 		}
 		
 		if (vxe.isVoxelThere (myTrans.position)) {
 			transform.position += Vector3.up * vxe.voxel_size;
+		}
+
+		if (waitForNoVoxel) {
+			frames += Time.deltaTime;
+			bool isVoxel = checkForVoxelsInCollider ();
+			if (!isVoxel && frames > maxFrames) {
+				triggered = true;
+			} else if (isVoxel) {
+				transform.position += Vector3.up * vxe.voxel_size;
+			}
 		}
 	}
 
