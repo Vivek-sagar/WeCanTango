@@ -66,7 +66,7 @@ public class EnvironmentSpawner: MonoBehaviour
 		InitializeEnvironmentBiome (ref marshGameObjects, "MarshAssets", ref marshAssets);
 		spawns = new IndexStack<SpawnObject> (new SpawnObject[max_spawns]);
 		StartCoroutine (FullPullSpawn ());
-		//StartCoroutine (MaintainSpawns ());
+		StartCoroutine (MaintainSpawns ());
 	}
 
 	/// <summary>
@@ -214,6 +214,7 @@ public class EnvironmentSpawner: MonoBehaviour
 				spawns.peek(i).checkWeirdPosition();
 				yield return null;
 			}
+			yield return null;
 		}
 	}
 
