@@ -25,6 +25,7 @@ public class VoxelOverlayer : Singleton<VoxelOverlayer> {
 
 			overlayInstances [i,j,k] = Instantiate (overlay);
 			overlayInstances [i,j,k].GetComponent<MeshFilter>().mesh = mesh;
+				overlayInstances [i,j,k].transform.parent = transform;
 		}
 		overlay.SetActive (false);
 	}
@@ -124,11 +125,14 @@ public class VoxelOverlayer : Singleton<VoxelOverlayer> {
 		{
 			Vec3Int camchunk = chunkCoords + new Vec3Int(x,y,z);
 			Chunks chunk = vxe.grid.voxelGrid[camchunk.x, camchunk.y, camchunk.z];
+			
 			GameObject refChunk = vxe.chunkGameObjects [camchunk.x, camchunk.y, camchunk.z];
 			GameObject overlayInstance = overlayInstances[x + 1, y + 1, z + 1];
 			overlayInstance.transform.position = refChunk.transform.position - camera.transform.forward * 0.01f;
 			overlayInstance.GetComponent<MeshRenderer> ().material = material;
-
+			
+			if(chunk == null)
+					continue;
 			buildChunkMesh(chunk,camchunk,overlayInstance.GetComponent<MeshFilter>().mesh);
 		}
 	
@@ -136,6 +140,6 @@ public class VoxelOverlayer : Singleton<VoxelOverlayer> {
 
 	// Update is called once per frame
 	void Update () {
-
+		overlayCurrentChunk ();
 	}
 }

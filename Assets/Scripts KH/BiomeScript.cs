@@ -41,6 +41,8 @@ public class BiomeScript : Singleton<BiomeScript>
 	int num_chunks_x;
 	int num_chunks_y;
 	int num_chunks_z;
+
+	public bool changeTex = false;
 	// Use this for initialization
 	void Awake ()
 	{
@@ -87,18 +89,57 @@ public class BiomeScript : Singleton<BiomeScript>
 				}
 	}
 
+	public void doRandomChange(int hx, int hz)
+	{
+		StartCoroutine(resetBiomesThread(hx,hz));
+	}
+
 	/// <summary>
 	/// Resets the biomes.
 	/// </summary>
-	public IEnumerator resetBiomesThread ()
+	public IEnumerator resetBiomesThread (int hx, int hz)
 	{
-		for (int i=0; i<num_chunks_x; i++)
-			for (int j=0; j<num_chunks_z; j++)
-				for (int k=0; k<num_chunks_y; k++) {
-					chunkObjs [i, k, j].GetComponent<MeshRenderer> ().material = materials [(int)biomeMap [i, j]];
-					yield return null;
+		//int hx = vxe.num_chunks_x / 2;
+		//int hz = vxe.num_chunks_z / 2; 
+
+		Material randommat = materials [Random.Range (0, 4)];
+
+		for(float r = 0 ; r < 30; r+=0.5f)
+		{
+			int counter = 0;
+			for(int i=0;i<vxe.occupiedChunks.getCount();i++)
+			{
+				Vec3Int cc = vxe.occupiedChunks.peek (i);
+				int x = cc.x - hx;
+				int z = cc.z - hz;
+				float sqrlen = ((x * x) + (z * z));
+				if( sqrlen >= r * r && sqrlen < (r+0.5f) * (r+0.5f))
+				{
+					chunkObjs [cc.x,cc.y,cc.z].GetComponent<MeshRenderer> ().material = randommat;
+					Debug.Log ("changed" + cc.x +  " " + cc.y + " " + cc.z);
+					counter++;
+
+					yield return new WaitForSeconds(0.1f);
+						
 				}
+
+
+			}
+
+
+		}
+
 	}
+	/*
+	void Update()
+	{
+
+		if(changeTex)
+		{
+			changeTex = false;
+			StartCoroutine(resetBiomesThread());
+		}
+	}*/
 
 	/// <summary>
 	/// Swaps the materials for the biome with NewMat, and then resets all the biomes materials

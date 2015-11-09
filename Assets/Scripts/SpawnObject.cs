@@ -22,8 +22,8 @@ public class SpawnObject : MonoBehaviour
 		minDistSqr = 10 * vxe.voxel_size;
 		minDistSqr = minDistSqr * minDistSqr;
 	}
-	/*
-	void FixedUpdate ()
+
+	public void checkWeirdPosition ()
 	{
 
 		float distsqr = (transform.position - vxe.camera.transform.position).sqrMagnitude;
@@ -39,6 +39,6 @@ public class SpawnObject : MonoBehaviour
 				myTrans.position -= Vector3.up * vxe.voxel_size;
 			}
 		}
-	}*/
+	}
 
 }

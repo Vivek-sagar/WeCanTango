@@ -103,7 +103,7 @@ public class CustomTangoController : MonoBehaviour, ITangoPose
     /// </summary>
     private void Start()
     {
-        Application.targetFrameRate = 60;
+        Application.targetFrameRate = 90;
 
         m_tangoApplication = FindObjectOfType<TangoApplication>();
 
@@ -293,12 +293,13 @@ public class CustomTangoController : MonoBehaviour, ITangoPose
     private void OnGUI()
     {
         // TODO(jason): temporarily comment out this part, to do is to move this button to someother debug functionality class.
-        if (isShowingDebugButton)
+        /*
+		if (isShowingDebugButton)
         {
             if (GUI.Button(new Rect(Screen.width - 200, 50, 150, 80), "Reset Position"))
             {
                 ComputeTransformUsingPose(out m_zeroPosition, out m_zeroRotation, currPose);
             }
-        }
+        }*/
     }
 }
