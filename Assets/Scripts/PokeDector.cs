@@ -7,6 +7,7 @@ public class PokeDector : MonoBehaviour
 	public bool triggered = false;
 	public BoxCollider cubeswitch;
 	public Transform playerTrans;
+	public AudioSource audio;
 	VoxelExtractionPointCloud vxe;
 	Transform myTrans, cubeTrans;
 
@@ -30,8 +31,10 @@ public class PokeDector : MonoBehaviour
 		for (float i=min.x; i<=max.x; i+= vxe.voxel_size)
 			for (float j=min.y; j<=max.y; j+= vxe.voxel_size)
 				for (float k=min.z; k<=max.z; k+= vxe.voxel_size) {
-					if (vxe.isVoxelThere (new Vector3 (i, j, k)))
+					if (vxe.isVoxelThere (new Vector3 (i, j, k))) {
+						audio.Play ();
 						return true;
+					}
 				}
 		
 		return false;
