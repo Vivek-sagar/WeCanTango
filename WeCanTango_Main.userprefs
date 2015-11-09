@@ -1,21 +1,9 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\EnvironmentSpawner.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts KH\VoxelExtractionPointCloud.cs">
     <Files>
-      <File FileName="Assets\Scripts\EnvironmentSpawner.cs" Line="69" Column="5" />
-      <File FileName="Assets\Scripts KH\VoxelExtractionPointCloud.cs" Line="103" Column="3" />
-      <File FileName="Assets\Scripts KH\PetMessage.cs" Line="54" Column="7" />
-      <File FileName="Assets\Scripts\JumpingAI.cs" Line="95" Column="1" />
-      <File FileName="Assets\Scripts KH\BiomeScript.cs" Line="116" Column="54" />
-      <File FileName="Assets\Scripts\SpawnObject.cs" Line="33" Column="92" />
-      <File FileName="Assets\Scripts\TriggerScript.cs" Line="50" Column="4" />
-      <File FileName="Assets\Scripts\PetCounter.cs" Line="22" Column="29" />
-      <File FileName="Assets\Scripts\VoxelOverlayer.cs" Line="134" Column="4" />
-      <File FileName="Assets\TangoSDK\Core\Scripts\TangoWrappers\TangoApplication.cs" Line="917" Column="10" />
-      <File FileName="Assets\ExperimentalVirtualReality\Scripts\CustomTangoController.cs" Line="106" Column="40" />
-      <File FileName="Assets\ExperimentalVirtualReality\Scripts\PopupManager.cs" Line="127" Column="20" />
-      <File FileName="Assets\TangoSDK\TangoUX\Scripts\TangoUx.cs" Line="1" Column="1" />
-      <File FileName="Assets\TangoPrefabs\Scripts\TangoPointCloud.cs" Line="139" Column="74" />
+      <File FileName="Assets\Scripts\TriggerScript.cs" Line="106" Column="1" />
+      <File FileName="Assets\Scripts KH\VoxelExtractionPointCloud.cs" Line="1405" Column="2" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

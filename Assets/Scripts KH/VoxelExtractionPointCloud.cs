@@ -1400,13 +1400,13 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 
 		}
 		
-		//renderVoxelGrid ();
-	}
-
-	void FixedUpdate() 
-	{
 		renderVoxelGrid ();
 	}
+
+	//void FixedUpdate() 
+	//{
+	//	renderVoxelGrid ();
+	//}
 
 	float HighResoRandom()
 	{

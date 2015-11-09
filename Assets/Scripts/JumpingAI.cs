@@ -1,19 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class JumpingAI : MonoBehaviour
-{
-
-	enum AI_STATE
-	{
-		STOPPED,
-		MOVING,
-		JUMPING,
-		FALLING
-	}
-	;
-
-
+public class JumpingAI : MonoBehaviour {
 	VoxelExtractionPointCloud vxe;
 	AI_STATE ai_state;
 	Vector3 lastposition;
@@ -22,14 +10,7 @@ public class JumpingAI : MonoBehaviour
 	Vector3 movePosition;
 	public Camera camera;
 	ItemSpawner itemspawn;
-	static Vector3[] directions = {
-		new Vector3 (0, 0, 1),
-		new Vector3 (0, 0, -1),
-		new Vector3 (1, 0, 0),
-		new Vector3 (-1, 0, 0),
-		new Vector3 (0, 1, 0),
-		new Vector3 (0, -1, 0)
-	};
+	static Vector3[] directions = { new Vector3(0,0,1),new Vector3(0,0,-1),new Vector3(1,0,0),new Vector3(-1,0,0),new Vector3(0,1,0),new Vector3(0,-1,0) };
 	const int STEP = 5;
 	const int BIG_STEP = 64;
 	float stepdownThreshold;
@@ -39,8 +20,7 @@ public class JumpingAI : MonoBehaviour
 	const int MAX_JUMP_HEIGHT = 3;
 	const int JUMP_RANGE = 3;
 	// Use this for initialization
-	void Start ()
-	{
+	void Start () {
 		ai_state = AI_STATE.STOPPED;
 		vxe = VoxelExtractionPointCloud.Instance;
 		itemspawn = ItemSpawner.Instance;
@@ -50,7 +30,7 @@ public class JumpingAI : MonoBehaviour
 		//init ();
 	}
 
-	bool checkForJumpPositions (Vector3 dir, out Vector3 out_minAngleDir)
+	bool checkForJumpPositions(Vector3 dir, out Vector3 out_minAngleDir)
 	{
 		Vec3Int jumpCoords = vxe.ToGrid (transform.position);
 		
@@ -58,39 +38,44 @@ public class JumpingAI : MonoBehaviour
 		float maxdotprod = float.MinValue;
 		Vector3 minAngleDir = Vector3.zero;
 		
-		for (int i=-JUMP_RANGE; i<=JUMP_RANGE; i++)
-			for (int j=-JUMP_RANGE; j<=JUMP_RANGE; j++)
-				for (int k=MAX_JUMP_HEIGHT; k>=1; k--) {
-					Vec3Int vcoords = jumpCoords + new Vec3Int (i, k, j);
-					Voxel vx = vxe.grid.getVoxel (vcoords);
-					if (vx.isOccupied () && vxe.voxelHasSurface (vx, VF.VX_TOP_SHOWN)) {
-						Vector3 wrldcoords = vxe.FromGridUnTrunc (vcoords.ToVec3 () + new Vector3 (0.5f, 1.0f, 0.5f));
-						Vector3 vdir = Vector3.ProjectOnPlane ((wrldcoords - transform.position), Vector3.up).normalized;
-						float dotprod = Vector3.Dot (dir, vdir);
-						if (dotprod > 0) {
-							canJump = true;
-							if (dotprod > maxdotprod) {
-								maxdotprod = dotprod;
-								minAngleDir = vdir;
-								jumpPosition = wrldcoords;
-							}
+		for(int i=-JUMP_RANGE;i<=JUMP_RANGE;i++)
+			for(int j=-JUMP_RANGE;j<=JUMP_RANGE;j++)
+				for(int k=MAX_JUMP_HEIGHT;k>=1;k--)
+			{
+				Vec3Int vcoords = jumpCoords + new Vec3Int(i,k,j);
+				Voxel vx = vxe.grid.getVoxel(vcoords);
+				if(vx.isOccupied() &&  vxe.voxelHasSurface(vx,VF.VX_TOP_SHOWN))
+				{
+					Vector3 wrldcoords = vxe.FromGridUnTrunc(vcoords.ToVec3() + new Vector3(0.5f,1.0f,0.5f));
+					Vector3 vdir = Vector3.ProjectOnPlane((wrldcoords - transform.position),Vector3.up).normalized;
+					float dotprod = Vector3.Dot(dir,vdir);
+					if(dotprod > 0)
+					{
+						canJump = true;
+						if(dotprod > maxdotprod)
+						{
+							maxdotprod = dotprod;
+							minAngleDir = vdir;
+							jumpPosition = wrldcoords;
 						}
 					}
 				}
+			}
 		
 
 
-		out_minAngleDir = minAngleDir;
-		return canJump;
+			out_minAngleDir = minAngleDir;
+			return canJump;
 
 	}
 
 
-	Vector3 getNextMoveLimited ()
+	Vector3 getNextMoveLimited()
 	{
-		Vector3 targetPosition = camera.transform.position;
+        Vector3 targetPosition = camera.transform.position - Vector3.Normalize(camera.transform.position - transform.position);
 
-		if (tag == "Pet") {
+		if (tag == "Pet") 
+		{
 			for (int i=0; i<itemspawn.items.Length; i++) {
 				if (itemspawn.spawneditems [i] == null || itemspawn.spawneditems [i].GetComponent<TriggerScript> ().triggered)
 					continue;
@@ -98,12 +83,19 @@ public class JumpingAI : MonoBehaviour
 				float groundLength = (itemspawn.spawneditems [i].transform.position - transform.position).magnitude;
 				if (groundLength < vxe.voxel_size * 15) {
 					targetPosition = itemspawn.spawneditems [i].transform.position;
+                    ai_state = AI_STATE.CHASING;
 					break;
 				}
 			}
 		}
 
-		Vector3 dir = Vector3.ProjectOnPlane ((targetPosition - transform.position), Vector3.up).normalized;
+		Vector3 dir = Vector3.ProjectOnPlane((targetPosition - transform.position),Vector3.up).normalized;
+
+        if (Vector3.Distance(transform.position, targetPosition) < 0.5f)
+        {
+            ai_state = AI_STATE.STOPPED;
+            return dir;
+        }
 
 		Vector3 coords = Vector3.zero;
 		Vector3 norm = Vector3.zero;
@@ -117,66 +109,84 @@ public class JumpingAI : MonoBehaviour
 		float jumpPositionToTarget = (jumpPosition - targetPosition).sqrMagnitude;
 		float movePositionToTarget = (coords - targetPosition).sqrMagnitude;
 
-		if (canJump && jumpPositionToTarget < movePositionToTarget) {
+       
+		if(canJump && jumpPositionToTarget < movePositionToTarget)
+		{
 			ai_state = AI_STATE.JUMPING;
 			return jumpDir;
 		}
 
 
-		if (!hit) {
-			if (notgrounded) {
+		if(!hit)
+		{
+			if(notgrounded)
+			{
 				bool isThereGround = vxe.RayCast (coords, Vector3.down, BIG_STEP, ref fallPosition, ref norm, 0.5f);
-				if (isThereGround) {
+				if(isThereGround)
+				{
 					fallPosition += Vector3.up * vxe.voxel_size * 0.5f;
 					ai_state = AI_STATE.FALLING;
 					return dir;
 				}			
-			} else {
+			}
+			else
+			{
 				movePosition = coords;
 				ai_state = AI_STATE.MOVING;
 				return dir;
 			}
-		} else {
+		}
+		else
+		{
 			bool isThereSurface = vxe.OccupiedRayCast (coords, Vector3.up, JUMP_RANGE, ref jumpPosition, ref norm);
-			if (isThereSurface) {
+			if(isThereSurface)
+			{
 				jumpPosition -= Vector3.up * vxe.voxel_size * 0.5f;
 				ai_state = AI_STATE.JUMPING;
 				return dir;
 			}
 		}
-
+        
 		ai_state = AI_STATE.STOPPED;
 		return dir;
 
 	}
 
 
-	Vector3 getNextMove ()
+	Vector3 getNextMove()
 	{
 		Vector3 coords = Vector3.zero;
 		Vector3 norm = Vector3.zero;
 		bool notgrounded = false;
 
-		Vector3 dir = Vector3.ProjectOnPlane ((camera.transform.position - transform.position), Vector3.up).normalized;
+		Vector3 dir = Vector3.ProjectOnPlane((camera.transform.position - transform.position),Vector3.up).normalized;
 		bool hit = vxe.GroundedRayCast (transform.position, dir, STEP, ref coords, ref norm, ref notgrounded, 0.5f);
 
-		if (!hit) {
-			if (notgrounded) {
+		if(!hit)
+		{
+			if(notgrounded)
+			{
 				bool isThereGround = vxe.RayCast (coords, Vector3.down, BIG_STEP, ref fallPosition, ref norm, 0.5f);
-				if (isThereGround) {
+				if(isThereGround)
+				{
 					fallPosition += Vector3.up * vxe.voxel_size * 0.5f;
 					ai_state = AI_STATE.FALLING;
 					return dir;
 				}			
-			} else {
-				movePosition = coords;
-				ai_state = AI_STATE.MOVING;
-				return dir;
 			}
-		} else {
+			else
+			{
+					movePosition = coords;
+					ai_state = AI_STATE.MOVING;
+					return dir;
+			}
+		}
+		else
+		{
 			bool isThereSurface = vxe.OccupiedRayCast (coords, Vector3.up, BIG_STEP, ref jumpPosition, ref norm);
 			//bool ICannotJump = vxe.CheapRayCast(transform.position,Vector3.up, 5);
-			if (isThereSurface) {
+			if(isThereSurface)
+			{
 				jumpPosition -= Vector3.up * vxe.voxel_size * 0.5f;
 				ai_state = AI_STATE.JUMPING;
 				return dir;
@@ -188,23 +198,26 @@ public class JumpingAI : MonoBehaviour
 		
 	}
 
-	Vector3 getQuadBeizierPt (Vector3 p0, Vector3 p1, Vector3 p2, float t)
+	Vector3 getQuadBeizierPt(Vector3 p0, Vector3 p1, Vector3 p2, float t)
 	{
 		float oneMinusT = (1 - t);
 		return oneMinusT * oneMinusT * p0 + 2 * oneMinusT * t * p1 + t * t * p2;
 	}
 
 
-	IEnumerator moveit ()
+	IEnumerator moveit()
 	{
-		GetComponent<AudioSource> ().Play ();
-		yield return new WaitForSeconds (1.0f);
-		while (true) {	
-			if (stopcount > 200) {
+		GetComponent<AudioSource>().Play();
+		yield return new WaitForSeconds(1.0f);
+		while(true)
+		{	
+			if(stopcount > 200)
+			{
 				Vector3 coords = Vector3.zero, norm = Vector3.zero;
 				bool hitsomething = false;
-				while (!hitsomething) {
-					hitsomething = vxe.RayCast (camera.transform.position, Vector3.down, 64, ref coords, ref norm, 1.0f);
+				while(!hitsomething)
+				{
+					hitsomething = vxe.RayCast(camera.transform.position,Vector3.down,64,ref coords,ref norm,1.0f);
 					yield return null;
 				}
 
@@ -215,83 +228,91 @@ public class JumpingAI : MonoBehaviour
 			transform.forward = dir;
 			Vector3 currentPosition = transform.position;
 
-			switch (ai_state) {
+			switch(ai_state)
+			{
 			case AI_STATE.MOVING:
-				stopcount = 0;
-				for (float i=0; i< 1.0f; i+=Time.deltaTime * 0.5f) {
-					transform.position = Vector3.Lerp (currentPosition, movePosition, i);
+				stopcount=0;
+				for(float i=0; i< 1.0f; i+=Time.deltaTime * 0.5f)
+				{
+					transform.position = Vector3.Lerp(currentPosition,movePosition,i);
 					yield return null;
 				}
 				transform.position = movePosition;
-				yield return new WaitForSeconds (0.5f);
+				yield return new WaitForSeconds(0.5f);
 				break;
 			case AI_STATE.JUMPING:
 				{
-					stopcount = 0;
+					stopcount=0;
 					Vector3 highpt = (currentPosition + jumpPosition) * 0.5f;
 					highpt.y += vxe.voxel_size * 7.0f;
-					for (float i=0; i< 1.0f; i+=Time.deltaTime * 0.75f) {
-						transform.position = getQuadBeizierPt (currentPosition, highpt, jumpPosition, i);
+					for(float i=0; i< 1.0f; i+=Time.deltaTime * 0.75f)
+					{
+						transform.position = getQuadBeizierPt(currentPosition,highpt,jumpPosition,i);
 						yield return null;
 					}
 					transform.position = jumpPosition;
-					yield return new WaitForSeconds (1.0f);
+					yield return new WaitForSeconds(0.5f);
 				}
 				break;
 			case AI_STATE.FALLING:
 				{
-					stopcount = 0;
+					stopcount=0;
 					Vector3 highpt = (currentPosition + fallPosition) * 0.5f;
 					highpt.y += vxe.voxel_size * 5.0f;
-					for (float i=0; i< 1.0f; i+=Time.deltaTime * 0.75f) {
-						transform.position = getQuadBeizierPt (currentPosition, highpt, fallPosition, i);
+					for(float i=0; i< 1.0f; i+=Time.deltaTime * 0.75f)
+					{
+						transform.position = getQuadBeizierPt(currentPosition,highpt,fallPosition,i);
 						yield return null;
 					}
 					transform.position = fallPosition;
-					yield return new WaitForSeconds (1.0f);
+					yield return new WaitForSeconds(0.5f);
 				}
 				break;
 			case AI_STATE.STOPPED:
 			default:
 				stopcount++;
-				yield return new WaitForSeconds (0.5f);
+				yield return new WaitForSeconds(0.5f);
 				break;
 			}
 		}
 	}
 
 	
-	public void init ()
+	public void init()
 	{
 		ai_state = AI_STATE.MOVING;
 		StartCoroutine (moveit ());
 	}
 	
 	// Update is called once per frame
-	void Update ()
-	{
+	void Update () {
 
 	}
 
-	void OnGUI ()
+	void OnGUI()
 	{
-		switch (ai_state) {
+		switch(ai_state)
+		{
 		case AI_STATE.MOVING:
-			GUI.Label (new Rect (1000, 10, 100, 100), "MOVING");
+			GUI.Label (new Rect (1000,10,100,100),"MOVING");
 			//Debug.Log ("MOVING");
 			break;
 		case AI_STATE.JUMPING:
-			GUI.Label (new Rect (1000, 10, 100, 100), "JUMPING");
+			GUI.Label (new Rect (1000,10,100,100),"JUMPING");
 			//Debug.Log ("JUMPING");
 			break;
 		case AI_STATE.FALLING:
-			GUI.Label (new Rect (1000, 10, 100, 100), "FALLING");
+			GUI.Label (new Rect (1000,10,100,100),"FALLING");
 			//Debug.Log ("FALLING");
 			break;
 		case AI_STATE.STOPPED:
-			GUI.Label (new Rect (1000, 10, 100, 100), "STOPPED");
+			GUI.Label (new Rect (1000,10,100,100),"STOPPED");
 			//Debug.Log ("STOPPED");
 			break;
+        case AI_STATE.CHASING:
+            GUI.Label(new Rect(1000, 10, 100, 100), "CHASING");
+            //Debug.Log ("STOPPED");
+            break;
 		default:
 			break;
 			
