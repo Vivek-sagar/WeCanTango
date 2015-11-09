@@ -25,8 +25,8 @@ public class PokeDector : MonoBehaviour
 	/// <returns><c>true</c>, if for voxels in collider was checked, <c>false</c> otherwise.</returns>
 	bool checkForVoxelsInCollider ()
 	{
-		Vector3 max = cubeTrans.position + cubeswitch.bounds.extents;
-		Vector3 min = cubeTrans.position - cubeswitch.bounds.extents;
+		Vector3 max = cubeswitch.bounds.center + cubeswitch.bounds.extents;
+		Vector3 min = cubeswitch.bounds.center - cubeswitch.bounds.extents;
 		
 		for (float i=min.x; i<=max.x; i+= vxe.voxel_size)
 			for (float j=min.y; j<=max.y; j+= vxe.voxel_size)

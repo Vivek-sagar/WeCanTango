@@ -1450,27 +1450,10 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 					grid.setVoxelImmediate(coords);
 				}
 			}
-		}
 
-		/*
-		for(int i=0; i< num_voxels_x; i++)
-			for(int j=0; j< num_voxels_z; j++)
-		{
-			int x = i - num_voxels_x / 2;
-			int y = j - num_voxels_z / 2;
-			
-			if(  (x * x + y * y) > 2500 && (x * x + y * y) < 3600)
-			{
-				for(int k=0; k< 3; k++)
-				{
-					//Debug.Log (x + " " + y);
-					Vec3Int coords = new Vec3Int(i,num_voxels_y / 2 + k + 1,j);
-					InstantiateChunkIfNeeded(coords);
-					
-					grid.setVoxelImmediate(coords);
-				}
-			}
-		}*/
+
+		}
+		renderVoxelGrid ();
 
 	}
 
@@ -1506,40 +1489,26 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 
 
 
-
-		#if DEBUG_THIS
+#if UNITY_ANDROID && !UNITY_EDITOR
+#elif DEBUG_THIS
 		if(fakeData)
 		{
 			makeTestPlane();
 			fakeData = false;
 		}
-		/*
-		if (fakeData) 
+
+		if(Input.GetKeyDown(KeyCode.Space))
 		{
-			debugPtCloud.m_pointsCount = 2000;
+			Vector3 vpos = camera.transform.position + camera.transform.forward * voxel_size * 3;
+			Vec3Int vcoord = getVoxelCoordsFromPt(vpos);
 
-			Random.seed = (int)(Time.time * 1000) % 10;
-			
-			for(int i=0;i<2000;i++)
-			{
-				debugPtCloud.m_points[i] = new Vector3(HighResoRandom(), 0,HighResoRandom()) * 0.05f;
-			}
+			InstantiateChunkIfNeeded(vcoord);
+			grid.setVoxelImmediate(vcoord);
 
-			int count = debugPtCloud.m_pointsCount;
-			for(int i=0; i< 2000; i++)
-			{
-				
-				Vector3 pt = debugPtCloud.m_points[i];
-				
-				Vec3Int coords = ToGrid(pt);
-				InstantiateChunkIfNeeded(coords);
-				
-				grid.setVoxel(coords);
-			}
-			
 			renderVoxelGrid ();
-		}*/
-		#endif
+		}
+		
+#endif
 	}
 
 	void OnGUI()
