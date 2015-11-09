@@ -61,8 +61,8 @@ public class IntroTutorialManager : MonoBehaviour
 
 	void Update ()
 	{
-		if (Input.GetKeyDown (KeyCode.Space))
-			tutorialPhase = TutorialPhase.PocketWatchSwing;
+		//if (Input.GetKeyDown (KeyCode.Space))
+		//	tutorialPhase = TutorialPhase.PocketWatchSwing;
 
 	}
 
