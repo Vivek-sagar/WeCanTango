@@ -41,7 +41,7 @@ public class ItemSpawner : Singleton<ItemSpawner>
 
 	IEnumerator SpawnItems ()
 	{
-		yield return new WaitForSeconds (10.0f);
+		yield return new WaitForSeconds (30.0f);
 		Vector3 coords = Vector3.zero, norm = Vector3.zero;
 
 		bool hitsomething = false;
@@ -54,6 +54,7 @@ public class ItemSpawner : Singleton<ItemSpawner>
 
 		for (int i=0; i<items.Length; i++) {
 
+			TriggerScript sheepTrigger = null;
 			if (items [i].item.CompareTag ("Portal"))
 				yield return new WaitForSeconds (10.0f);
 
@@ -95,6 +96,10 @@ public class ItemSpawner : Singleton<ItemSpawner>
 										vxe.chunkGameObjects [chunkx, k, chunkz].GetComponent<MeshRenderer> ().material = vxe.debugMaterial;
 										currentItemToSpawn++;
 										spawned = true;
+
+										if (newItem.CompareTag ("Sheep"))
+											sheepTrigger = newItem.GetComponent<TriggerScript> ();
+
 										goto imout;
 									}
 									yield return null;
@@ -106,15 +111,11 @@ public class ItemSpawner : Singleton<ItemSpawner>
 
 				yield return new WaitForSeconds (1.0f);
 			}
+
+			while (sheepTrigger!=null &&!sheepTrigger.triggered) {
+				yield return new WaitForSeconds (3f);
+			}
 		}
-	}
-
-	// Update is called once per frame
-	void Update ()
-	{
-		
-
-		
 	}
 
 	void OnGUI ()

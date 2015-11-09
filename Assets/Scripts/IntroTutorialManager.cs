@@ -16,34 +16,47 @@ public class IntroTutorialManager : MonoBehaviour
 		Finish,
 	};
 	public TutorialPhase tutorialPhase;
+	public GameObject player;
 	public TutorialGaze playerGazeScript;
 	public TutorialSheep sheepScript;
 	public PokeDector pokeScript;
-	public GameObject pocketWatch, tutorialSheep, gazeTutorialGameObjects;
+	public GameObject pocketWatch, ThePet;
+	public Transform watchTrans;
+	public GameObject tutorialSheep, gazeTutorialGameObjects;
 	public Transform[] gazeTargets; //Need the places the sheep moves to for the player to gaze
-	int gazeCount = 0;
+
+	
+	public GameObject ItemSpawner, EnvironmentSpawner;
+	public BiomeScript biome;
+	//public Camera backCam;
+	public Material[] voxelMats;
+
 	public Animator myAnim;
 	public AudioSource auSource;
-	public GameObject player;
 	public GameObject mainLight;
-	public GameObject textObj, PetSpawner, ItemSpawner, EnvironmentSpawner;
-	public BiomeScript biome;
-	public Camera backCam;
+	public GameObject textObj;
+
+	int gazeCount = 0;
 	// Use this for initialization
 	void Start ()
 	{
-		this.transform.position = new Vector3 (0, player.transform.position.y, -1.75f);
-		auSource.pitch = 0.8f;
-	
+		this.transform.position = new Vector3 (0, player.transform.position.y, -1.5f);
+		auSource.pitch = 0.75f;
+		ThePet.transform.position = watchTrans.position;
 
 		tutorialPhase = TutorialPhase.Wait;
 		playerGazeScript = GameObject.FindGameObjectWithTag ("Player").GetComponent<TutorialGaze> ();
 		SetMeshRenderersInChildren (tutorialSheep, false);
 		SetMeshRenderersInChildren (gazeTutorialGameObjects, false);
-		PetSpawner.SetActive (false);
-		ItemSpawner.SetActive (false);
-		mainLight.SetActive (false);
-		EnvironmentSpawner.SetActive (false);
+		SetMainGameObjects (false);
+	}
+
+	void SetMainGameObjects (bool state)
+	{
+		ThePet.SetActive (state);
+		ItemSpawner.SetActive (state);
+		mainLight.SetActive (state);
+		EnvironmentSpawner.SetActive (state);
 	}
 
 	void Update ()
@@ -63,13 +76,17 @@ public class IntroTutorialManager : MonoBehaviour
 		} else if (tutorialPhase == TutorialPhase.PocketWatchSwing) {
 			// Debug.LogError("AT PocketWatchSwing !!!");
 			//Disable PocketWatch SetMeshRenderersInChildren (pocketWatch, false);
-			auSource.pitch = 1f;
+			//auSource.pitch = 1f;
 			myAnim.SetTrigger ("OpenPocketWatch");
 			textObj.SetActive (false);
 
 			tutorialPhase = TutorialPhase.SheepAppear;
 		} else if (tutorialPhase == TutorialPhase.DoneSwing) {
 			DonePocketWatchSwing ();
+
+			//REMOVE THIS LATER
+			//Enviroment Spawner should be setActive true in Finish Gaze function
+			SetMainGameObjects (true);
 			tutorialPhase = TutorialPhase.Finish;
 		} else if (tutorialPhase == TutorialPhase.SheepGaze) {
 			WaitForGaze ();
@@ -164,6 +181,7 @@ public class IntroTutorialManager : MonoBehaviour
 		mainLight.SetActive (true);
 		mainLight.transform.rotation = Quaternion.Euler (386f, 71f, 126f);
 		biome.resetBiomes ();
+		biome.swapMaterials (ref voxelMats);
 	}
 
 	/// <summary>
@@ -171,7 +189,7 @@ public class IntroTutorialManager : MonoBehaviour
 	/// </summary>
 	void FinishGaze ()
 	{
-		PetSpawner.SetActive (true);
+		ThePet.SetActive (true);
 		ItemSpawner.SetActive (true);
 		EnvironmentSpawner.SetActive (true);
 		sheepScript.DeActivate ();
