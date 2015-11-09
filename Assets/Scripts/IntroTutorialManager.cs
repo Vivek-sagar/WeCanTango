@@ -40,7 +40,7 @@ public class IntroTutorialManager : MonoBehaviour
 	// Use this for initialization
 	void Start ()
 	{
-		this.transform.position = new Vector3 (0, player.transform.position.y, -1.5f);
+		this.transform.position = new Vector3 (0, player.transform.position.y - .03f, -1.3f);
 		auSource.pitch = 0.75f;
 		ThePet.transform.position = watchTrans.position;
 
@@ -61,9 +61,10 @@ public class IntroTutorialManager : MonoBehaviour
 
 	void Update ()
 	{
+#if UNITY_EDITOR
 		if (Input.GetKeyDown (KeyCode.Space))
 			tutorialPhase = TutorialPhase.PocketWatchSwing;
-
+#endif
 	}
 
 	// Update is called once per frame
