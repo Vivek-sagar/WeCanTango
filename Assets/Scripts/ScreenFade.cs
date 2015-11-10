@@ -19,18 +19,25 @@ public class ScreenFade : MonoBehaviour
 		myCollider = GetComponent<Collider> ();
 	}
 
+	void Update ()
+	{
+		/*	if (Input.GetKeyDown (KeyCode.Q) && !isFading ()) {
+			StartCoroutine (doColorFade (Color.black, 2f));
+		}
+*/
+	}
+
 	/// <summary>
 	/// Check if it is fading.
 	/// </summary>
 	/// <returns><c>true</c>, if fading was ised, <c>false</c> otherwise.</returns>
 	public bool isFading ()
 	{
-		return fading;
+		return fading = hitMeshRenderer.enabled;
 	}
 	
 	public IEnumerator doColorFade (Color color, float fadeTime =1f)
 	{
-		
 		//hitSound.Play ();
 		float time = 0f;
 		hitMeshRenderer.enabled = true;
