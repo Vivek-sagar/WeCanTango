@@ -11,6 +11,7 @@ public class TriggerScript : MonoBehaviour
 	public GameObject littleSheep;
 	private bool isSleeping = true;
 
+
 	Vector3[] fourpts;
 	VoxelExtractionPointCloud vxe;
 
@@ -18,7 +19,7 @@ public class TriggerScript : MonoBehaviour
 	float defaultLightIntensity;
 	BoxCollider mycollider;
 	// Use this for initialization
-	void Awake ()
+	void Awake()
 	{
 		mycollider = GetComponent<BoxCollider> ();
 	}
@@ -50,14 +51,19 @@ public class TriggerScript : MonoBehaviour
 	// Update is called once per frame
 	void Update ()
 	{
-		if (!isSleeping) {
+		if (!isSleeping) 
+		{
 			if (!triggered && checkForVoxelsInCollider ()) {
 				triggeredEvent ();
 			}
 		}
 
-		if (vxe.isVoxelThere (littleSheep.transform.position)) {
+		if (isSleeping && 
+		    	(vxe.isVoxelThere (littleSheep.transform.position) || checkForVoxelsInCollider()) 
+		    )
+		{
 			littleSheep.transform.position += Vector3.up * vxe.voxel_size;
+			transform.position += Vector3.up * vxe.voxel_size;
 		}
 		
 	}
@@ -74,7 +80,7 @@ public class TriggerScript : MonoBehaviour
 
 			if (isSleeping) {
 				isSleeping = false;
-				partsys.Play ();
+				partsys.Play();
 			}
 		}
 	}

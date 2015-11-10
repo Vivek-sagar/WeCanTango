@@ -1,8 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class PetManager : Singleton<PetManager>
-{
+public class PetManager : Singleton<PetManager> {
 
 	enum MessageState
 	{
@@ -17,24 +16,23 @@ public class PetManager : Singleton<PetManager>
 	public Texture2D thankyou;
 	public Texture2D isclose;
 	public Texture2D sleeping;
-	public AudioSource audioSource;
-	public AudioClip sniffingAudio;
-	public AudioClip barkAudio;
+    public AudioSource audioSource;
+    public AudioClip doubleBeep;
+    public AudioClip happyRobot;
 	ItemSpawner itemspawn;
 	VoxelExtractionPointCloud vxe;
 	public Camera camera;
 	MessageState state;
 	// Use this for initialization
-	void Start ()
-	{
+	void Start () {
 		itemspawn = ItemSpawner.Instance;
 		vxe = VoxelExtractionPointCloud.Instance;
 		state = MessageState.NOTHING;
-		GetComponent<JumpingAI> ().init ();
+		GetComponent<JumpingAI>().init ();
 		StartCoroutine (messageSystem ());
 	}
 
-	IEnumerator messageSystem ()
+	IEnumerator messageSystem()
 	{
 		XZBillboard.Instance.changeTexture (tutorial);
 		state = MessageState.TUTORIAL;
@@ -42,40 +40,49 @@ public class PetManager : Singleton<PetManager>
 
 		XZBillboard.Instance.hide ();
 
-		while (true) {
-			if (state != MessageState.ISCLOSE) {
-				for (int i=0; i<itemspawn.currentItemToSpawn; i++) {					
-					float groundLength = (itemspawn.spawneditems [i].transform.position - transform.position).magnitude;
-					if (groundLength < vxe.voxel_size * 25) {
+		while(true)
+		{
+			if(state != MessageState.ISCLOSE)
+			{
+				for(int i=0;i<itemspawn.currentItemToSpawn;i++)
+				{					
+					if (itemspawn.spawneditems [i] == null || itemspawn.spawneditems [i].GetComponent<TriggerScript> ().triggered)
+						continue;
+
+					float groundLength = (itemspawn.spawneditems[i].transform.position - transform.position).magnitude;
+					if( groundLength < vxe.voxel_size * 25 )
+					{
 						XZBillboard.Instance.show ();
 						state = MessageState.ISCLOSE;
-						if (!audioSource.isPlaying) {
-							audioSource.clip = sniffingAudio;
-							audioSource.Play ();
-						}
+                        if (!audioSource.isPlaying)
+                        {
+                            audioSource.clip = doubleBeep;
+                            audioSource.Play();
+                        }
 						XZBillboard.Instance.changeTexture (isclose);
-						yield return new WaitForSeconds (10.0f);
+						yield return new WaitForSeconds(10.0f);
 						XZBillboard.Instance.hide ();
 						state = MessageState.NOTHING;
-						audioSource.Stop ();
+                        audioSource.Stop();
 						break;
 					}
 				}
 			}
 
-			if (state == MessageState.THANKYOU) {
-				//audioSource.clip = happyRobot;
-				audioSource.PlayOneShot (barkAudio);
-				yield return new WaitForSeconds (5.0f);
+			if(state == MessageState.THANKYOU)
+			{
+                //audioSource.clip = happyRobot;
+                audioSource.PlayOneShot(happyRobot);
+				yield return new WaitForSeconds(5.0f);
 				XZBillboard.Instance.hide ();
 				state = MessageState.NOTHING;
 			}
 
-			yield return new WaitForSeconds (1.0f);
+			yield return new WaitForSeconds(1.0f);
 		}
 	}
 
-	public void setThankYou ()
+	public void setThankYou()
 	{
 		state = MessageState.THANKYOU;
 		XZBillboard.Instance.show ();
@@ -83,8 +90,7 @@ public class PetManager : Singleton<PetManager>
 	}
 
 	// Update is called once per frame
-	void Update ()
-	{
+	void Update () {
 	    
 	}
 }
