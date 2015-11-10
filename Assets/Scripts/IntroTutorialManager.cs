@@ -20,7 +20,7 @@ public class IntroTutorialManager : MonoBehaviour
 	public Transform playerTrans, watchTrans;
 	public TutorialSheep sheepScript;
 	public PokeDector pWatchPokeScript, setUpPokeScript;
-	public GameObject pocketWatch, ThePet, tutorialSheep, ItemSpawner, EnvironmentSpawner, mainLight, textObj;
+	public GameObject ThePet, tutorialSheep, ItemSpawner, EnvironmentSpawner, mainLight, textObj;
 
 	public BiomeScript biome;
 	//public Camera backCam;
@@ -30,7 +30,7 @@ public class IntroTutorialManager : MonoBehaviour
 	AudioSource auSource;
 
 	Transform[] gazeTargets; //The places the sheep moves to for the player to gaze
-	GameObject gazeTutorialGameObjects;
+	GameObject pocketWatch, gazeTutorialGameObjects;
 	TutorialGaze playerGazeScript;
 	ScreenFade screenFadeScript;
 	int gazeCount = 0;
@@ -41,6 +41,9 @@ public class IntroTutorialManager : MonoBehaviour
 		auSource = GetComponent<AudioSource> ();
 		screenFadeScript = playerTrans.GetComponent<ScreenFade> ();
 		playerGazeScript = playerTrans.GetComponent<TutorialGaze> ();
+
+		pocketWatch = pWatchPokeScript.gameObject;
+		pocketWatch.SetActive (false);
 
 		this.transform.position = new Vector3 (0, playerTrans.position.y, -1.5f);
 		auSource.pitch = 0.75f;
@@ -180,7 +183,7 @@ public class IntroTutorialManager : MonoBehaviour
 		//Now Start the Sheep Gaze 
 		tutorialPhase = TutorialPhase.SheepGaze;
 #endif
-		StartCoroutine (screenFadeScript.doColorFade (Color.green));
+		StartCoroutine (screenFadeScript.doColorFade (Color.black));
 		mainLight.SetActive (true);
 		mainLight.transform.rotation = Quaternion.Euler (386f, 71f, 126f);
 		biome.resetBiomes ();
