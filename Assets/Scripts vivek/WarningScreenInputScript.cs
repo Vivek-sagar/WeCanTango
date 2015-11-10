@@ -143,7 +143,7 @@ public class WarningScreenInputScript : MonoBehaviour {
     public void Skip()
     {
         Debug.Log("Skipped");
-        Application.Quit();
+        Application.LoadLevel(1);
     }
 
     public void Next()
