@@ -20,7 +20,7 @@ public class IntroTutorialManager : MonoBehaviour
 	public Transform playerTrans, watchTrans;
 	public TutorialSheep sheepScript;
 	public PokeDector pWatchPokeScript, setUpPokeScript;
-	public GameObject ThePet, tutorialSheep, ItemSpawner, EnvironmentSpawner, mainLight, textObj;
+	public GameObject TheSheepDog, tutorialSheep, ItemSpawner, EnvironmentSpawner, MainLight, textObj;
 
 	public BiomeScript biome;
 	//public Camera backCam;
@@ -47,7 +47,7 @@ public class IntroTutorialManager : MonoBehaviour
 
 		this.transform.position = new Vector3 (0, playerTrans.position.y, -1.5f);
 		auSource.pitch = 0.75f;
-		ThePet.transform.position = watchTrans.position;
+		TheSheepDog.transform.position = watchTrans.position;
 
 
 		tutorialPhase = TutorialPhase.SetUpHypno;
@@ -59,9 +59,9 @@ public class IntroTutorialManager : MonoBehaviour
 
 	void SetMainGameObjects (bool state)
 	{
-		ThePet.SetActive (state);
+		TheSheepDog.SetActive (state);
 		ItemSpawner.SetActive (state);
-		mainLight.SetActive (state);
+		MainLight.SetActive (state);
 		EnvironmentSpawner.SetActive (state);
 	}
 
@@ -184,8 +184,8 @@ public class IntroTutorialManager : MonoBehaviour
 		tutorialPhase = TutorialPhase.SheepGaze;
 #endif
 		StartCoroutine (screenFadeScript.doColorFade (Color.black));
-		mainLight.SetActive (true);
-		mainLight.transform.rotation = Quaternion.Euler (386f, 71f, 126f);
+		MainLight.SetActive (true);
+		MainLight.transform.rotation = Quaternion.Euler (386f, 71f, 126f);
 		biome.resetBiomes ();
 		biome.swapMaterials (ref voxelMats);
 	}
@@ -195,7 +195,7 @@ public class IntroTutorialManager : MonoBehaviour
 	/// </summary>
 	void FinishGaze ()
 	{
-		ThePet.SetActive (true);
+		TheSheepDog.SetActive (true);
 		ItemSpawner.SetActive (true);
 		EnvironmentSpawner.SetActive (true);
 		sheepScript.DeActivate ();
