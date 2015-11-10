@@ -80,16 +80,23 @@ public class ItemSpawner : Singleton<ItemSpawner>
 
 				for (int k=floorChunkY + range; k >= floorChunkY; k--) 
 				{
+
 					chunk = vxe.grid.voxelGrid [chunkx, k, chunkz];
+
 					if (chunk != null && chunk.voxel_count > 20) 
 					{
 						Vector3 chunkBaseCoords = new Vector3 (chunkx, k, chunkz) * vxe.chunk_size;
 
-						for (int x=0; x<vxe.chunk_size; x++)
+							
+							
+							for (int x=0; x<vxe.chunk_size; x++)
 							for (int z=0; z<vxe.chunk_size; z++)
 								for (int y=vxe.chunk_size-1; y>=0; y--) 
 							{
 									Voxel vx = chunk.getVoxel (new Vec3Int (x, y, z));
+
+									
+
 									if (vx.isOccupied () && vxe.voxelHasSurface (vx, VF.VX_TOP_SHOWN)) 
 								{
 										Vector3 voxelCoords = vxe.FromGridUnTrunc (chunkBaseCoords + new Vector3 (x, y, z));

@@ -12,7 +12,6 @@ public class TriggerScript : MonoBehaviour
 	private bool isSleeping = true;
 
 
-    AudioSource audioSource;
 	Vector3[] fourpts;
 	VoxelExtractionPointCloud vxe;
 
@@ -23,7 +22,6 @@ public class TriggerScript : MonoBehaviour
 	void Awake()
 	{
 		mycollider = GetComponent<BoxCollider> ();
-		audioSource = GetComponent<AudioSource> ();
 	}
 
 	void Start ()
@@ -60,9 +58,12 @@ public class TriggerScript : MonoBehaviour
 			}
 		}
 
-		if (vxe.isVoxelThere (littleSheep.transform.position)) 
+		if (isSleeping && 
+		    	(vxe.isVoxelThere (littleSheep.transform.position) || checkForVoxelsInCollider()) 
+		    )
 		{
 			littleSheep.transform.position += Vector3.up * vxe.voxel_size;
+			transform.position += Vector3.up * vxe.voxel_size;
 		}
 		
 	}
@@ -79,7 +80,6 @@ public class TriggerScript : MonoBehaviour
 
 			if (isSleeping) {
 				isSleeping = false;
-                audioSource.Stop();
 				partsys.Play();
 			}
 		}

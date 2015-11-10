@@ -46,6 +46,9 @@ public class PetManager : Singleton<PetManager> {
 			{
 				for(int i=0;i<itemspawn.currentItemToSpawn;i++)
 				{					
+					if (itemspawn.spawneditems [i] == null || itemspawn.spawneditems [i].GetComponent<TriggerScript> ().triggered)
+						continue;
+
 					float groundLength = (itemspawn.spawneditems[i].transform.position - transform.position).magnitude;
 					if( groundLength < vxe.voxel_size * 25 )
 					{
