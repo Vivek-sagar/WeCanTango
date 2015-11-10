@@ -13,7 +13,7 @@ using System.Collections;
 public static class VoxelConsts
 {
 	public static int CHUNK_SIZE = 8;
-	public static int PT_THRES = 40;
+	public static int PT_THRES = 50;
 	public static int VOXEL_RES = 10;
 	public static int FRAME_THRES = 5;
 	public static int DEL_FRAME_THRES = 5;

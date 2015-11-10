@@ -20,6 +20,12 @@ public enum DIRECTIONS : int
 	DOWN = 5
 }
 
+public enum AI_TARGET : int
+{
+	PLAYER = 0,
+	SHEEP = 1
+}
+
 
 
 public class SimpleAI : MonoBehaviour

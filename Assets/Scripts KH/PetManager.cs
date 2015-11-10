@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class PetMessage : Singleton<PetMessage> {
+public class PetManager : Singleton<PetManager> {
 
 	enum MessageState
 	{
@@ -44,11 +44,8 @@ public class PetMessage : Singleton<PetMessage> {
 		{
 			if(state != MessageState.ISCLOSE)
 			{
-				for(int i=0;i<itemspawn.items.Length;i++)
-				{
-					if(itemspawn.spawneditems[i] == null || itemspawn.spawneditems[i].GetComponent<TriggerScript>().triggered || itemspawn.spawneditems[i].CompareTag("Portal"))
-						continue;
-					
+				for(int i=0;i<itemspawn.currentItemToSpawn;i++)
+				{					
 					float groundLength = (itemspawn.spawneditems[i].transform.position - transform.position).magnitude;
 					if( groundLength < vxe.voxel_size * 25 )
 					{

@@ -209,10 +209,13 @@ public class EnvironmentSpawner: MonoBehaviour
 	{
 		while(true)
 		{
+			int counter = 0;
 			for(int i=0;i<spawns.getCount();i++)
 			{
 				spawns.peek(i).checkWeirdPosition();
-				yield return null;
+				counter++;
+				if(counter % 3 == 0)
+					yield return null;
 			}
 			yield return null;
 		}

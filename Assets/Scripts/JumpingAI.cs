@@ -4,6 +4,7 @@ using System.Collections;
 public class JumpingAI : MonoBehaviour {
 	VoxelExtractionPointCloud vxe;
 	AI_STATE ai_state;
+	AI_TARGET ai_target;
 	Vector3 lastposition;
 	Vector3 jumpPosition;
 	Vector3 fallPosition;
@@ -14,6 +15,7 @@ public class JumpingAI : MonoBehaviour {
 	const int STEP = 5;
 	const int BIG_STEP = 64;
 	float stepdownThreshold;
+	float playerFaceThreshold;
 	int stopcount = 0;
 
 
@@ -27,6 +29,7 @@ public class JumpingAI : MonoBehaviour {
 		lastposition = new Vector3 ();
 		stepdownThreshold = vxe.voxel_size * 2;
 		stepdownThreshold = stepdownThreshold * stepdownThreshold;
+		playerFaceThreshold = vxe.voxel_size * 7;
 		//init ();
 	}
 
@@ -72,30 +75,36 @@ public class JumpingAI : MonoBehaviour {
 
 	Vector3 getNextMoveLimited()
 	{
-        Vector3 targetPosition = camera.transform.position - Vector3.Normalize(camera.transform.position - transform.position);
+		Vector3 targetPosition = camera.transform.position;
+		ai_target = AI_TARGET.PLAYER;
 
 		if (tag == "Pet") 
 		{
-			for (int i=0; i<itemspawn.items.Length; i++) {
+			for (int i=0; i<itemspawn.items.Length; i++) 
+			{
 				if (itemspawn.spawneditems [i] == null || itemspawn.spawneditems [i].GetComponent<TriggerScript> ().triggered)
 					continue;
 
 				float groundLength = (itemspawn.spawneditems [i].transform.position - transform.position).magnitude;
-				if (groundLength < vxe.voxel_size * 15) {
+				if (groundLength < vxe.voxel_size * 15) 
+				{
 					targetPosition = itemspawn.spawneditems [i].transform.position;
-                    ai_state = AI_STATE.CHASING;
+					ai_target = AI_TARGET.SHEEP;
 					break;
 				}
 			}
 		}
 
-		Vector3 dir = Vector3.ProjectOnPlane((targetPosition - transform.position),Vector3.up).normalized;
+		Vector3 rawdir = Vector3.ProjectOnPlane ((targetPosition - transform.position), Vector3.up);
+		Vector3 dir = rawdir.normalized;
 
-        if (Vector3.Distance(transform.position, targetPosition) < 0.5f)
-        {
-            ai_state = AI_STATE.STOPPED;
-            return dir;
-        }
+		//Debug.Log ( "dist: " + rawdir.magnitude + " " + playerFaceThreshold);
+
+		if(ai_target == AI_TARGET.PLAYER && rawdir.magnitude < playerFaceThreshold)
+		{
+			ai_state = AI_STATE.STOPPED;
+			return dir;
+		}
 
 		Vector3 coords = Vector3.zero;
 		Vector3 norm = Vector3.zero;
@@ -109,7 +118,6 @@ public class JumpingAI : MonoBehaviour {
 		float jumpPositionToTarget = (jumpPosition - targetPosition).sqrMagnitude;
 		float movePositionToTarget = (coords - targetPosition).sqrMagnitude;
 
-       
 		if(canJump && jumpPositionToTarget < movePositionToTarget)
 		{
 			ai_state = AI_STATE.JUMPING;
@@ -146,7 +154,7 @@ public class JumpingAI : MonoBehaviour {
 				return dir;
 			}
 		}
-        
+
 		ai_state = AI_STATE.STOPPED;
 		return dir;
 
@@ -207,7 +215,7 @@ public class JumpingAI : MonoBehaviour {
 
 	IEnumerator moveit()
 	{
-		GetComponent<AudioSource>().Play();
+		//GetComponent<AudioSource>().Play();
 		yield return new WaitForSeconds(1.0f);
 		while(true)
 		{	
@@ -245,7 +253,7 @@ public class JumpingAI : MonoBehaviour {
 					stopcount=0;
 					Vector3 highpt = (currentPosition + jumpPosition) * 0.5f;
 					highpt.y += vxe.voxel_size * 7.0f;
-					for(float i=0; i< 1.0f; i+=Time.deltaTime * 0.75f)
+					for(float i=0; i< 1.0f; i+=Time.deltaTime)
 					{
 						transform.position = getQuadBeizierPt(currentPosition,highpt,jumpPosition,i);
 						yield return null;
@@ -259,7 +267,7 @@ public class JumpingAI : MonoBehaviour {
 					stopcount=0;
 					Vector3 highpt = (currentPosition + fallPosition) * 0.5f;
 					highpt.y += vxe.voxel_size * 5.0f;
-					for(float i=0; i< 1.0f; i+=Time.deltaTime * 0.75f)
+					for(float i=0; i< 1.0f; i+=Time.deltaTime)
 					{
 						transform.position = getQuadBeizierPt(currentPosition,highpt,fallPosition,i);
 						yield return null;
@@ -309,10 +317,6 @@ public class JumpingAI : MonoBehaviour {
 			GUI.Label (new Rect (1000,10,100,100),"STOPPED");
 			//Debug.Log ("STOPPED");
 			break;
-        case AI_STATE.CHASING:
-            GUI.Label(new Rect(1000, 10, 100, 100), "CHASING");
-            //Debug.Log ("STOPPED");
-            break;
 		default:
 			break;
 			
