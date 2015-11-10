@@ -17,33 +17,37 @@ public class IntroTutorialManager : MonoBehaviour
 		Finish,
 	};
 	public TutorialPhase tutorialPhase;
-	public Transform playerTrans;
+	public Transform playerTrans, watchTrans;
 	public TutorialSheep sheepScript;
 	public PokeDector pWatchPokeScript, setUpPokeScript;
 	public GameObject pocketWatch, ThePet, tutorialSheep, ItemSpawner, EnvironmentSpawner, mainLight, textObj;
-	public Transform watchTrans;
 
 	public BiomeScript biome;
 	//public Camera backCam;
 	public Material[] voxelMats;
 
-	public Animator myAnim;
-	public AudioSource auSource;
+	Animator myAnim;
+	AudioSource auSource;
 
-	Transform[] gazeTargets; //Need the places the sheep moves to for the player to gaze
+	Transform[] gazeTargets; //The places the sheep moves to for the player to gaze
 	GameObject gazeTutorialGameObjects;
 	TutorialGaze playerGazeScript;
+	ScreenFade screenFadeScript;
 	int gazeCount = 0;
 	// Use this for initialization
 	void Start ()
 	{
+		myAnim = GetComponent<Animator> ();
+		auSource = GetComponent<AudioSource> ();
+		screenFadeScript = playerTrans.GetComponent<ScreenFade> ();
+		playerGazeScript = playerTrans.GetComponent<TutorialGaze> ();
+
 		this.transform.position = new Vector3 (0, playerTrans.position.y, -1.5f);
 		auSource.pitch = 0.75f;
 		ThePet.transform.position = watchTrans.position;
 
 
-		tutorialPhase = TutorialPhase.Wait;
-		playerGazeScript = playerTrans.GetComponent<TutorialGaze> ();
+		tutorialPhase = TutorialPhase.SetUpHypno;
 		SetMeshRenderersInChildren (tutorialSheep, false);
 		//Disable for now, will use GazeTutorial Later
 		//SetMeshRenderersInChildren (gazeTutorialGameObjects, false);
@@ -58,13 +62,6 @@ public class IntroTutorialManager : MonoBehaviour
 		EnvironmentSpawner.SetActive (state);
 	}
 
-	void Update ()
-	{
-		//if (Input.GetKeyDown (KeyCode.Space))
-		//	tutorialPhase = TutorialPhase.PocketWatchSwing;
-
-	}
-
 	// Update is called once per frame
 	void FixedUpdate ()
 	{
@@ -73,6 +70,7 @@ public class IntroTutorialManager : MonoBehaviour
 			pocketWatch.SetActive (true);
 			textObj.SetActive (true);
 			setUpPokeScript.gameObject.SetActive (false);
+			auSource.Play ();
 			tutorialPhase = TutorialPhase.Wait;
 		} else if (tutorialPhase == TutorialPhase.Wait && pWatchPokeScript.triggered) {
 			pocketWatch.transform.LookAt (playerTrans.position);
@@ -182,6 +180,7 @@ public class IntroTutorialManager : MonoBehaviour
 		//Now Start the Sheep Gaze 
 		tutorialPhase = TutorialPhase.SheepGaze;
 #endif
+		StartCoroutine (screenFadeScript.doColorFade (Color.green));
 		mainLight.SetActive (true);
 		mainLight.transform.rotation = Quaternion.Euler (386f, 71f, 126f);
 		biome.resetBiomes ();

@@ -9,16 +9,13 @@ public class PokeDector : MonoBehaviour
 	public AudioSource audio;
 	VoxelExtractionPointCloud vxe;
 	Transform myTrans, cubeTrans;
-	float frames = 0f, maxFrames = 240f;
+	float frames = 0f, maxFrames = 180f;
 	// Use this for initialization
 	void Start ()
 	{
 		myTrans = GetComponent<Transform> ();
 		cubeTrans = cubeswitch.gameObject.transform;
 		vxe = VoxelExtractionPointCloud.Instance;
-
-		if (waitForNoVoxel && gameObject.activeSelf)
-			gameObject.SetActive (false);
 	}
 	
 	/// <summary>
@@ -57,7 +54,7 @@ public class PokeDector : MonoBehaviour
 		}
 
 		if (waitForNoVoxel) {
-			frames += Time.deltaTime;
+			frames ++;
 			bool isVoxel = checkForVoxelsInCollider ();
 			if (!isVoxel && frames > maxFrames) {
 				triggered = true;
