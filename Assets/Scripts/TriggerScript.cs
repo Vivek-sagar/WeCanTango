@@ -5,13 +5,13 @@ public class TriggerScript : MonoBehaviour
 {
 
 	public bool triggered = false;
+	public bool debug = false;
 	public ParticleSystem partsys;
 	public GameObject obj;
 	public BoxCollider cubeswitch;
-	public PetCounter petcounter;
 	private bool isSleeping = true;
 
-    public AudioSource audioSource;
+	public AudioSource audioSource;
 	Vector3[] fourpts;
 	VoxelExtractionPointCloud vxe;
 
@@ -48,6 +48,12 @@ public class TriggerScript : MonoBehaviour
 			triggeredEvent ();
 		}
 
+		//if(debug)
+		//{
+		//	debug = false;
+		//	triggeredEvent();
+		//}
+
 		if (vxe.isVoxelThere (obj.transform.position)) {
 			transform.position += Vector3.up * vxe.voxel_size;
 		}
@@ -67,7 +73,7 @@ public class TriggerScript : MonoBehaviour
 				//obj.transform.Translate(new Vector3(-0.06f, -0.06f, 0f));
 				obj.transform.Rotate (new Vector3 (-90, 0, 0));
 				isSleeping = false;
-                audioSource.Stop();
+				audioSource.Stop ();
 			}
 		}
 	}
@@ -91,7 +97,11 @@ public class TriggerScript : MonoBehaviour
 		cubeswitch.gameObject.SetActive (false);
 
 		triggered = true;
-		petcounter.PetTriggered ();
+		//petcounter.PetTriggered ();
+
+		Vec3Int cc = vxe.getChunkCoords (transform.position);
+
+		BiomeScript.Instance.doRandomChange (cc.x, cc.z);
 	}
 
 }

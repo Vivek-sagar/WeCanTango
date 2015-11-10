@@ -23,10 +23,13 @@ public class EnvironmentSpawner: MonoBehaviour
 		new Vector3 (1, 0, -1),
 	};
 
-	public int spawnInterval = 30, minVoxelCount = 20;
+	public int spawnInterval = 30, minVoxelCount = 10;
 	public float surfaceThreshold = 0.6f;
 	public Transform playerTrans;
 	public GameObject desertGameObjects, grassGameObjects, IceGameObjects, marshGameObjects;
+	public int max_spawns = 1000;
+	int spawnCount = 0;
+	IndexStack<SpawnObject> spawns;
 	//May want to use public string tags
 	string desertTag, grassTag, IceTag, marshTag;
 	
@@ -52,27 +55,18 @@ public class EnvironmentSpawner: MonoBehaviour
 		mybiome = biome.biomeArea [0].biome;
 		occupiedNearMe = new List<Chunks> ();
 		assetChunkTable = new Dictionary<Vec3Int, GameObject> ();
-		//desertEnvironment = new List<GameObject> ();
+
 		if (playerTrans == null)
 			playerTrans = GameObject.FindWithTag ("Player").GetComponent<Transform> ();
 
-		/*if (desertBiome == null)
-			desertBiome = GameObject.FindGameObjectWithTag ("Respawn");
-		Transform[] children = desertBiome.GetComponentsInChildren<Transform> ();
-		Transform listParentTrans = desertBiome.transform;
-
-		desertAssets.Clear ();
-		foreach (Transform obj in children) {
-			if (!obj.Equals (listParentTrans)) {
-				desertAssets.Add (obj.gameObject);
-				obj.gameObject.SetActive (false);
-			}
-		}*/
 
 		InitializeEnvironmentBiome (ref desertGameObjects, "DesertAssets", ref desertAssets);
 		InitializeEnvironmentBiome (ref grassGameObjects, "GrassAssets", ref grassAssets);
 		InitializeEnvironmentBiome (ref IceGameObjects, "IceAssets", ref iceAssets);
 		InitializeEnvironmentBiome (ref marshGameObjects, "MarshAssets", ref marshAssets);
+		spawns = new IndexStack<SpawnObject> (new SpawnObject[max_spawns]);
+		StartCoroutine (FullPullSpawn ());
+		StartCoroutine (MaintainSpawns ());
 	}
 
 	/// <summary>
@@ -94,7 +88,7 @@ public class EnvironmentSpawner: MonoBehaviour
 			assetList.Add (myTrans.GetChild (i).gameObject);
 			assetList [i].SetActive (false);
 		}
-	
+	 
 	}
 
 
@@ -115,11 +109,6 @@ public class EnvironmentSpawner: MonoBehaviour
 	void Update ()
 	{
 		framecount++;
-		if (framecount % spawnInterval != 0 || isSpawning) {
-			return;
-		}
-		isSpawning = true;
-		StartCoroutine (FullPullSpawn ());
 	}
 
 	/// <summary>
@@ -177,57 +166,56 @@ public class EnvironmentSpawner: MonoBehaviour
 		 * Check if Vec3Int is in table and If the voxel Count meets the miniVoxel Count
 		 * Then spawn 3-5  objects in Chunk
 		 */ 
+		while (true) 
+		{
+			for (int i =vxe.occupiedChunks.getCount() - 1; i>-1; i--) {
+			
+				//Chunk Voxel Coordinates from the Occupied Chunk Stack
+				Vec3Int chunkVXCoords = vxe.occupiedChunks.peek (i);
 
-		for (int i =vxe.occupiedChunks.getCount(); i>-1; i--) {
-			//Vec3Int vec3 = vxe.occupiedChunks.peek (i);
+				//Get the Correct Environment Assets based on Biome
+				assetList = GetEnvironmentListBasedOnBiome (chunkVXCoords);
 
-			//LOOP through List of Environment Objects***********************************
-			//Consider Looping just through the List of Occupied Chunks
-			//for (int i =directions.Length-1; i>-1; i--) {
+				//Chunks World Coords
 
-			//Set the Environment List based upon the players position and the direction around them
-			//assetList = SetEnvironmentListBasedOnBiome (playerTrans.position + directions [i]);
+				chunk = vxe.grid.voxelGrid [chunkVXCoords.x, chunkVXCoords.y, chunkVXCoords.z];
 
-			/*Gets the Chunk at my position
-			chunk = vxe.getChunkFromPt (playerTrans.position + directions [i]);
-			Vec3Int chunkVXCoords = vxe.getChunkCoords (playerTrans.position + directions [i]);
-			*/
+				if (chunk == null || assetList.Count == 0) 
+				{
+					continue;
+				}
 
-			//Chunk Voxel Coordinates from the Occupied Chunk Stack
-			Vec3Int chunkVXCoords = vxe.occupiedChunks.peek (i);
+				if(spawnCount > max_spawns)
+					yield break;
+				//If the chunk is a surface and is not in the HashTable, do Spawning code
+				if (!chunk.spawnPopulated && chunk.voxel_count > minVoxelCount) {
 
-			//Get the Correct Environment Assets based on Biome
-			assetList = GetEnvironmentListBasedOnBiome (chunkVXCoords);
+					if(Random.Range (0,3) == 0)
+					{
+						GameObject gbj = assetList [Random.Range (0,assetList.Count)];
+						onManyVoxelPosition (chunk, chunkVXCoords, gbj);
+					}
 
-			//Chunks World Coords
-			chunkBaseCoords = vxe.FromGrid (chunkVXCoords * vxe.chunk_size);
-			chunk = vxe.getChunkFromPt (chunkBaseCoords);
+					chunk.spawnPopulated = true;
 
-			if (chunk == null || assetList.Count == 0)
-				continue;
+				}   
+				yield return null;
+			}
+			yield return new WaitForSeconds(1.0f);
+		}
+	}
 
-			//isSurface = vxe.isChunkASurface (DIR.DIR_UP, chunk, surfaceThreshold);
-			inHashTable = assetChunkTable.ContainsKey (chunkVXCoords);
-
-			//If the chunk is a surface and is not in the HashTable, do Spawning code
-			if (!inHashTable && chunk.voxel_count > minVoxelCount) {
-				GameObject gbj = assetList [0];
-				//Vector3 pos = onVoxelPosition (chunk, chunkVXCoords);
-
-
-				//gbj.GetComponent<Transform> ().position = pos;
-				//gbj.SetActive (true);
-				onManyVoxelPosition (chunk, chunkVXCoords, gbj);
-				assetChunkTable.Add (chunkVXCoords, gbj);
-				assetList.RemoveAt (0);
-				goto doneSpawn;
-			}   
+	IEnumerator MaintainSpawns ()
+	{
+		while(true)
+		{
+			for(int i=0;i<spawns.getCount();i++)
+			{
+				spawns.peek(i).checkWeirdPosition();
+				yield return null;
+			}
 			yield return null;
 		}
-		doneSpawn:
-		yield return new WaitForSeconds (1.0f);
-		isSpawning = false;
-
 	}
 
 	/// <summary>
@@ -250,38 +238,6 @@ public class EnvironmentSpawner: MonoBehaviour
 	}
 
 	/// <summary>
-	/// Ons the voxel position.
-	/// </summary>
-	/// <returns>The voxel position.</returns>
-	/// <param name="floorChunkY">Floor chunk y.</param>
-	/// <param name="range">Range.</param>
-	/// <param name="chunk">Chunk.</param>
-	/// <param name="chunkBaseCoords">Chunk base coords.</param>
-	Vector3 onVoxelPosition (Chunks chunk, Vec3Int chunkGridCoord)
-	{
-		Vector3 chunkBCoords = new Vector3 (chunkGridCoord.x, chunkGridCoord.y, chunkGridCoord.z) * vxe.chunk_size;
-				
-		for (int x=0; x<vxe.chunk_size; x++)
-			for (int z=0; z<vxe.chunk_size; z++)
-				for (int y=vxe.chunk_size-1; y>=0; y--) {
-					Voxel vx = chunk.getVoxel (new Vec3Int (x, y, z));
-					if (vx.isOccupied () && vxe.voxelHasSurface (vx, VF.VX_TOP_SHOWN)) {
-						Vector3 voxelCoords = vxe.FromGridUnTrunc (chunkBCoords + new Vector3 (x, y, z));
-						//if (voxelCoords.y <= coords.y + items [currentItemToSpawn].minSpawnHeightOffFloor * vxe.voxel_size)
-						//	continue;
-						//vxe.chunkGameObjects [chunkGridCoord.x, chunkGridCoord.y, chunkGridCoord.z].GetComponent<MeshRenderer> ().material = vxe.debugMaterial;
-						//Debug.LogError ("Chunk Coord " + chunkBCoords + " Voxel Coord " + voxelCoords);
-					            
-						return voxelCoords + Vector3.up * vxe.voxel_size * 1.0f;
-						//GameObject newItem = (GameObject)Instantiate (items [currentItemToSpawn].item, , Quaternion.identity);
-						break;
-					}
-				}
-
-		return chunkBCoords;
-	}
-
-	/// <summary>
 	/// Spawns a GameObject on many voxels in a chunk.
 	/// </summary>
 	/// <param name="chunk">Chunk.</param>
@@ -290,25 +246,32 @@ public class EnvironmentSpawner: MonoBehaviour
 	void onManyVoxelPosition (Chunks chunk, Vec3Int chunkGridCoord, GameObject obj)
 	{
 		Vector3 chunkBCoords = new Vector3 (chunkGridCoord.x, chunkGridCoord.y, chunkGridCoord.z) * vxe.chunk_size;
-		
-		for (int x=0; x<vxe.chunk_size; x++)
-			for (int z=0; z<vxe.chunk_size; z++)
-				for (int y=vxe.chunk_size-1; y>=0; y--) {
-					Voxel vx = chunk.getVoxel (new Vec3Int (x, y, z));
-					if (vx.isOccupied () && vxe.voxelHasSurface (vx, VF.VX_TOP_SHOWN)) {
-						Vector3 voxelCoords = vxe.FromGridUnTrunc (chunkBCoords + new Vector3 (x, y, z));
-						//if (voxelCoords.y <= coords.y + items [currentItemToSpawn].minSpawnHeightOffFloor * vxe.voxel_size)
-						//	continue;
-						//vxe.chunkGameObjects [chunkGridCoord.x, chunkGridCoord.y, chunkGridCoord.z].GetComponent<MeshRenderer> ().material = vxe.debugMaterial;
-						//Debug.LogError ("Chunk Coord " + chunkBCoords + " Voxel Coord " + voxelCoords);
 
-						GameObject newObj = Instantiate (obj, voxelCoords + Vector3.up * vxe.voxel_size * 1.0f, Quaternion.identity) as GameObject;
-						newObj.transform.parent = obj.transform.parent;	
-						newObj.SetActive (true);
-						//GameObject newItem = (GameObject)Instantiate (items [currentItemToSpawn].item, , Quaternion.identity);
-						
+		Random.seed = (int)Time.frameCount;
+
+		for (int x=0; x<vxe.chunk_size; x++)
+			for (int z=0; z<vxe.chunk_size; z++) 
+			{
+				for (int y=vxe.chunk_size-1; y>=0; y--) 
+				{
+					Voxel vx = chunk.getVoxel (new Vec3Int (x, y, z));
+					
+					if (vx.isOccupied () && vxe.voxelHasSurface (vx, VF.VX_TOP_SHOWN)) 
+					{
+						Vector3 voxelCoords = vxe.FromGridUnTrunc (chunkBCoords + new Vector3 (x, y, z));
+
+						if (Random.Range (0, 20) == 0) 
+						{
+							GameObject newObj = Instantiate (obj, voxelCoords + Vector3.up * vxe.voxel_size * 1.0f, Quaternion.AngleAxis(Random.Range (0,360),Vector3.up)) as GameObject;
+							newObj.transform.parent = obj.transform.parent;	
+							newObj.SetActive (true);
+							spawns.push(newObj.GetComponent<SpawnObject>());
+							spawnCount++;
+							break;
+						}						
 					}
 				}
+			}
 	}
 
 	/// <summary>

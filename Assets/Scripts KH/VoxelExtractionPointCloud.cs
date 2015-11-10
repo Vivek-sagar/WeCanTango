@@ -13,11 +13,11 @@ using System.Collections;
 public static class VoxelConsts
 {
 	public static int CHUNK_SIZE = 8;
-	public static int PT_THRES = 30;
+	public static int PT_THRES = 40;
 	public static int VOXEL_RES = 10;
 	public static int FRAME_THRES = 5;
 	public static int DEL_FRAME_THRES = 5;
-	public static int PT_DEL_THRES = 20;
+	public static int PT_DEL_THRES = 30;
 	public static Vec3Int[] CardinalDir = new Vec3Int[]{ new Vec3Int(0,0,1), new Vec3Int(0,0,-1), new Vec3Int(-1,0,0), new Vec3Int(1,0,0), new Vec3Int(0,1,0), new Vec3Int(0,-1,0) };
 	public static Vector3[] CardinalV3Dir = new Vector3[]{ new Vector3(0,0,1), new Vector3(0,0,-1), new Vector3(-1,0,0), new Vector3(1,0,0), new Vector3(0,1,0), new Vector3(0,-1,0) };
 	public static BitArray surfaceSet = new BitArray (new bool[]{true,true,true,true,true,true,false,false});
@@ -72,6 +72,7 @@ public class IndexStack<T>
 	}
 }
 
+#if GREEDY_MESHING
 public class Quad
 {
 	public int x, y, w, h;
@@ -111,6 +112,7 @@ public class Quad
 		return false;
 	}
 }
+#endif
 
 public struct Vec3Int
 {
@@ -184,6 +186,7 @@ public struct Vec3Int
 		return a.x != b.x || a.y != b.y || a.z != b.z;
 	}
 }
+
 
 public enum VF : int
 {
@@ -428,13 +431,17 @@ public class Chunks
 
 	//int[] indices;
 
-	public bool dirty;
+
 #if GREEDY_MESHING
 	public bool optimized;
 #endif
 	public uint voxel_count = 0;
 	public Vector3 wrldCoords;
 	public Vec3Int chunkCoords;
+	public bool dirty;
+
+	public bool spawnPopulated = false;
+
 
 	public Chunks() 
 	{
@@ -803,8 +810,10 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 	public bool fakeData;
 	//public TangoPointCloud debugPtCloud;
 #endif
+
+
 	// Use this for initialization
-	void Start () 
+	void Awake() 
 	{
 		chunk_size = (int)VoxelConsts.CHUNK_SIZE;
 
@@ -824,7 +833,7 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 		grid = new VoxelGrid (num_chunks_x, num_chunks_y, num_chunks_z);
 		chunkGameObjects = new GameObject[num_chunks_x, num_chunks_y, num_chunks_z];
 
-		pool = new ChunkPool (2000);
+		pool = new ChunkPool (1500);
 
 		for(int x=0;x<num_chunks_x;x++)
 			for(int y=0;y<num_chunks_y;y++)
@@ -836,7 +845,7 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 			}
 
 		ChunkInstance.SetActive (false);
-		occupiedChunks = new IndexStack<Vec3Int> (new Vec3Int[2000]);
+		occupiedChunks = new IndexStack<Vec3Int> (new Vec3Int[1500]);
 
 #if GREEDY_MESHING
 		quadpool = new Quad[chunk_size, chunk_size];
@@ -1391,17 +1400,22 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 
 		}
 		
-		//renderVoxelGrid ();
-	}
-
-	void FixedUpdate() 
-	{
 		renderVoxelGrid ();
 	}
+
+	//void FixedUpdate() 
+	//{
+	//	renderVoxelGrid ();
+	//}
 
 	float HighResoRandom()
 	{
 		return Random.Range (-100.0f, 100.0f);
+	}
+
+	float f(float x, float y)
+	{
+		return (Mathf.Sin (x * 0.1f) + Mathf.Sin (y * 0.1f)) * 4 - 10;
 	}
 
 	void makeTestPlane()
@@ -1415,12 +1429,32 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 			if(  (x * x + y * y) < 10000)
 			{
 				//Debug.Log (x + " " + y);
-				Vec3Int coords = new Vec3Int(i,num_voxels_y / 2,j);
-				InstantiateChunkIfNeeded(coords);
-				
-				grid.setVoxelImmediate(coords);
+				float f1 = f (x,y);
+				float f2 = f (x,y+1);
+				float f3 = f (x+1,y);
+				for(float k=0;k<=1.0f;k+=0.02f)
+				{
+					int h = Mathf.FloorToInt(Mathf.Lerp(f1,f2,k));
+					Vec3Int coords = new Vec3Int(i,num_voxels_y / 2 + h,j);
+					InstantiateChunkIfNeeded(coords);
+					
+					grid.setVoxelImmediate(coords);
+				}
+
+				for(float k=0;k<=1.0f;k+=0.02f)
+				{
+					int h = Mathf.FloorToInt(Mathf.Lerp(f1,f3,k));
+					Vec3Int coords = new Vec3Int(i,num_voxels_y / 2 + h,j);
+					InstantiateChunkIfNeeded(coords);
+					
+					grid.setVoxelImmediate(coords);
+				}
 			}
+
+
 		}
+		renderVoxelGrid ();
+
 	}
 
 	void Update()
@@ -1455,46 +1489,32 @@ public class VoxelExtractionPointCloud : Singleton<VoxelExtractionPointCloud>
 
 
 
-
-		#if DEBUG_THIS
+#if UNITY_ANDROID && !UNITY_EDITOR
+#elif DEBUG_THIS
 		if(fakeData)
 		{
 			makeTestPlane();
 			fakeData = false;
 		}
-		/*
-		if (fakeData) 
+
+		if(Input.GetKeyDown(KeyCode.Space))
 		{
-			debugPtCloud.m_pointsCount = 2000;
+			Vector3 vpos = camera.transform.position + camera.transform.forward * voxel_size * 3;
+			Vec3Int vcoord = getVoxelCoordsFromPt(vpos);
 
-			Random.seed = (int)(Time.time * 1000) % 10;
-			
-			for(int i=0;i<2000;i++)
-			{
-				debugPtCloud.m_points[i] = new Vector3(HighResoRandom(), 0,HighResoRandom()) * 0.05f;
-			}
+			InstantiateChunkIfNeeded(vcoord);
+			grid.setVoxelImmediate(vcoord);
 
-			int count = debugPtCloud.m_pointsCount;
-			for(int i=0; i< 2000; i++)
-			{
-				
-				Vector3 pt = debugPtCloud.m_points[i];
-				
-				Vec3Int coords = ToGrid(pt);
-				InstantiateChunkIfNeeded(coords);
-				
-				grid.setVoxel(coords);
-			}
-			
 			renderVoxelGrid ();
-		}*/
-		#endif
+		}
+		
+#endif
 	}
 
 	void OnGUI()
 	{
 		GUI.Label (new Rect (200,120,200,200), "Num chunks allocated: " + pool.getNumAlloced()  );
-		GUI.Label (new Rect (200,140,200,200), "Frametime: " + (Time.deltaTime * 1000) + " ms" );
+		GUI.Label (new Rect (200,140,200,200), "Frametime: " + (Time.smoothDeltaTime * 1000) + " ms" );
 		GUI.Label (new Rect (200,160,200,200), "Unity FPS: " + (1.0f/Time.deltaTime) + " fps" );
 	}
 
