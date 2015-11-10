@@ -45,7 +45,7 @@ public class ItemSpawner : Singleton<ItemSpawner>
 
 	IEnumerator SpawnItems ()
 	{
-		yield return new WaitForSeconds (30.0f);
+		yield return new WaitForSeconds (10.0f);
 		Vector3 coords = Vector3.zero, norm = Vector3.zero;
 
 		bool hitsomething = false;

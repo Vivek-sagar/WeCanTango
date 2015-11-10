@@ -1,14 +1,17 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts KH\PetManager.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts KH\ItemSpawner.cs">
     <Files>
       <File FileName="Assets\Scripts\SpawnObject.cs" Line="31" Column="29" />
       <File FileName="Assets\Scripts KH\Singleton.cs" Line="47" Column="1" />
-      <File FileName="Assets\Scripts KH\BiomeScript.cs" Line="119" Column="8" />
-      <File FileName="Assets\Scripts\JumpingAI.cs" Line="101" Column="5" />
-      <File FileName="Assets\Scripts KH\SimpleAI.cs" Line="25" Column="13" />
+      <File FileName="Assets\Scripts KH\BiomeScript.cs" Line="93" Column="3" />
+      <File FileName="Assets\Scripts\JumpingAI.cs" Line="85" Column="1" />
+      <File FileName="Assets\Scripts KH\SimpleAI.cs" Line="1" Column="1" />
       <File FileName="Assets\Shaders\voxelShader.shader" Line="16" Column="19" />
-      <File FileName="Assets\Scripts KH\PetManager.cs" Line="11" Column="16" />
+      <File FileName="Assets\Scripts KH\PetManager.cs" Line="58" Column="26" />
+      <File FileName="Assets\Scripts\TriggerScript.cs" Line="62" Column="3" />
+      <File FileName="Assets\Scripts KH\ItemSpawner.cs" Line="93" Column="75" />
+      <File FileName="Assets\Scripts KH\VoxelExtractionPointCloud.cs" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
