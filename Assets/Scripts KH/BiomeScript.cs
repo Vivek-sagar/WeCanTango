@@ -116,10 +116,11 @@ public class BiomeScript : Singleton<BiomeScript>
 				if( sqrlen >= r * r && sqrlen < (r+0.5f) * (r+0.5f))
 				{
 					chunkObjs [cc.x,cc.y,cc.z].GetComponent<MeshRenderer> ().material = randommat;
-					Debug.Log ("changed" + cc.x +  " " + cc.y + " " + cc.z);
+					//Debug.Log ("changed" + cc.x +  " " + cc.y + " " + cc.z);
 					counter++;
 
-					yield return new WaitForSeconds(0.1f);
+					if(counter % Mathf.FloorToInt(r/3.0f * r/3.0f + 1.0f) == 0)
+						yield return new WaitForSeconds(0.2f);
 						
 				}
 

@@ -30,8 +30,18 @@ public class SpawnObject : MonoBehaviour
 
 		if (distsqr < minDistSqr) 
 		{
+			//low quality check
 			voxelBelow = vxe.isVoxelThere (myTrans.position + Vector3.down * 0.5f * vxe.voxel_size);
+			//voxelBelow |= vxe.isVoxelThere (myTrans.position + Vector3.down * 0.5f * vxe.voxel_size + Vector3.right * 0.2f * vxe.voxel_size);
+			//voxelBelow |= vxe.isVoxelThere (myTrans.position + Vector3.down * 0.5f * vxe.voxel_size + Vector3.left * 0.2f * vxe.voxel_size);
+			//voxelBelow |= vxe.isVoxelThere (myTrans.position + Vector3.down * 0.5f * vxe.voxel_size + Vector3.forward * 0.2f * vxe.voxel_size);
+			//voxelBelow |= vxe.isVoxelThere (myTrans.position + Vector3.down * 0.5f * vxe.voxel_size + Vector3.back * 0.2f * vxe.voxel_size);
+
 			stuckInVoxel = vxe.isVoxelThere (myTrans.position + Vector3.up * 0.5f * vxe.voxel_size);
+			//stuckInVoxel |= vxe.isVoxelThere (myTrans.position + Vector3.up * 0.5f * vxe.voxel_size + Vector3.right * 0.2f * vxe.voxel_size);
+			//stuckInVoxel |= vxe.isVoxelThere (myTrans.position + Vector3.up * 0.5f * vxe.voxel_size + Vector3.left * 0.2f * vxe.voxel_size);
+			//stuckInVoxel |= vxe.isVoxelThere (myTrans.position + Vector3.up * 0.5f * vxe.voxel_size + Vector3.forward * 0.2f * vxe.voxel_size);
+			//stuckInVoxel |= vxe.isVoxelThere (myTrans.position + Vector3.up * 0.5f * vxe.voxel_size + Vector3.back * 0.2f * vxe.voxel_size);
 
 			if (stuckInVoxel) {
 				myTrans.position += Vector3.up * vxe.voxel_size;
