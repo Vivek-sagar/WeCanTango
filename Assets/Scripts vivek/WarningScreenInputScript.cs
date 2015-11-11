@@ -9,6 +9,11 @@ public class WarningScreenInputScript : MonoBehaviour {
     public GameObject screen4;
     public GameObject startButton;
     public GameObject skipButton;
+
+    public GameObject OpeningScreen;
+    public GameObject OpeningFT;
+    public GameObject OpeningExp;
+
     GameObject screen;
     private int screenCount = 0;
     private Vector2 touchStartPos;
@@ -154,5 +159,13 @@ public class WarningScreenInputScript : MonoBehaviour {
             Skip();
         }
         StartCoroutine("ChangeScene", screen);
+    }
+
+    public void BeginSlideshow()
+    {
+        OpeningScreen.SetActive(false);
+        OpeningFT.SetActive(false);
+        OpeningExp.SetActive(false);
+        skipButton.SetActive(true);
     }
 }
