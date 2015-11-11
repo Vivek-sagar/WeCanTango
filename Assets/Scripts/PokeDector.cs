@@ -9,7 +9,7 @@ public class PokeDector : MonoBehaviour
 	public AudioSource audio;
 	VoxelExtractionPointCloud vxe;
 	Transform myTrans, cubeTrans;
-	float frames = 0f, maxFrames = 300f;
+	float frames = 0f, maxFrames = 60f;
 	// Use this for initialization
 	void Start ()
 	{
@@ -56,8 +56,10 @@ public class PokeDector : MonoBehaviour
 		if (waitForNoVoxel) {
 			frames ++;
 			bool isVoxel = checkForVoxelsInCollider ();
+
 			if (!isVoxel && frames > maxFrames) {
-				triggered = true;
+				triggered = vxe.occupiedChunks.getCount () > 20f;
+				frames = 0;
 			} else if (isVoxel) {
 				transform.position += Vector3.up * vxe.voxel_size;
 			}
