@@ -9,7 +9,7 @@ public class PokeDector : MonoBehaviour
 	public AudioSource audio;
 	VoxelExtractionPointCloud vxe;
 	Transform myTrans, cubeTrans;
-	float frames = 0f, maxFrames = 180f;
+	float frames = 0f, maxFrames = 300f;
 	// Use this for initialization
 	void Start ()
 	{

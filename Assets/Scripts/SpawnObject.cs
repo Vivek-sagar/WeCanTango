@@ -9,7 +9,7 @@ public class SpawnObject : MonoBehaviour
 	Vector3 onVoxelDown, vxCoord, normal;
 	bool voxelBelow, stuckInVoxel;
 	Transform myTrans;
-    float minDistSqr;
+	float minDistSqr;
 
 	void Start ()
 	{
@@ -25,11 +25,12 @@ public class SpawnObject : MonoBehaviour
 
 	public void checkWeirdPosition ()
 	{
-
+		//Don't know yet why, but for some SpawnObjects, they have not had their Start function occur so vxe would be null
+		if (vxe == null)
+			vxe = VoxelExtractionPointCloud.Instance;
 		float distsqr = (transform.position - vxe.camera.transform.position).sqrMagnitude;
 
-		if (distsqr < minDistSqr) 
-		{
+		if (distsqr < minDistSqr) {
 			//low quality check
 			voxelBelow = vxe.isVoxelThere (myTrans.position + Vector3.down * 0.5f * vxe.voxel_size);
 			//voxelBelow |= vxe.isVoxelThere (myTrans.position + Vector3.down * 0.5f * vxe.voxel_size + Vector3.right * 0.2f * vxe.voxel_size);

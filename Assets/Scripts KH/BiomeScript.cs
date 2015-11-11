@@ -82,16 +82,18 @@ public class BiomeScript : Singleton<BiomeScript>
 	/// </summary>
 	public void resetBiomes ()
 	{
+		Debug.Log ("Swap Materials");
 		for (int i=0; i<num_chunks_x; i++)
 			for (int j=0; j<num_chunks_z; j++)
 				for (int k=0; k<num_chunks_y; k++) {
 					chunkObjs [i, k, j].GetComponent<MeshRenderer> ().material = materials [(int)biomeMap [i, j]];
 				}
+		Debug.Log ("Swap Materials DONE");
 	}
 
-	public void doRandomChange(int hx, int hz)
+	public void doRandomChange (int hx, int hz)
 	{
-		StartCoroutine(resetBiomesThread(hx,hz));
+		StartCoroutine (resetBiomesThread (hx, hz));
 	}
 
 	/// <summary>
@@ -101,26 +103,23 @@ public class BiomeScript : Singleton<BiomeScript>
 	{
 		//int hx = vxe.num_chunks_x / 2;
 		//int hz = vxe.num_chunks_z / 2; 
-
+		Debug.Log ("Reset Biome Thread");
 		Material randommat = materials [Random.Range (0, 4)];
 
-		for(float r = 0 ; r < 30; r+=0.5f)
-		{
+		for (float r = 0; r < 30; r+=0.5f) {
 			int counter = 0;
-			for(int i=0;i<vxe.occupiedChunks.getCount();i++)
-			{
+			for (int i=0; i<vxe.occupiedChunks.getCount(); i++) {
 				Vec3Int cc = vxe.occupiedChunks.peek (i);
 				int x = cc.x - hx;
 				int z = cc.z - hz;
 				float sqrlen = ((x * x) + (z * z));
-				if( sqrlen >= r * r && sqrlen < (r+0.5f) * (r+0.5f))
-				{
-					chunkObjs [cc.x,cc.y,cc.z].GetComponent<MeshRenderer> ().material = randommat;
+				if (sqrlen >= r * r && sqrlen < (r + 0.5f) * (r + 0.5f)) {
+					chunkObjs [cc.x, cc.y, cc.z].GetComponent<MeshRenderer> ().material = randommat;
 					//Debug.Log ("changed" + cc.x +  " " + cc.y + " " + cc.z);
 					counter++;
 
-					if(counter % Mathf.FloorToInt(r/3.0f * r/3.0f + 1.0f) == 0)
-						yield return new WaitForSeconds(0.2f);
+					if (counter % Mathf.FloorToInt (r / 3.0f * r / 3.0f + 1.0f) == 0)
+						yield return new WaitForSeconds (0.2f);
 						
 				}
 
@@ -129,6 +128,7 @@ public class BiomeScript : Singleton<BiomeScript>
 
 
 		}
+		Debug.Log ("Reset Biome Thread DONE");
 
 	}
 	/*
@@ -146,14 +146,25 @@ public class BiomeScript : Singleton<BiomeScript>
 	/// Swaps the materials for the biome with NewMat, and then resets all the biomes materials
 	/// </summary>
 	/// <param name="newMat">New materials to use.</param>
-	public void swapMaterials (ref Material[] newMat)
+	public void swapMaterials (ref Material[] newMat, bool reset =true)
 	{
 		Material[] tempMat = materials;
 		materials = newMat;
 		newMat = tempMat;
 
 		//setAllMaterials(materials[0]);
-		resetBiomes ();
+		if (reset)
+			resetBiomes ();
+	}
+
+	public void swapMaterialsThread (ref Material[] newMat, int hx, int hz)
+	{
+		Material[] tempMat = materials;
+		materials = newMat;
+		newMat = tempMat;
+		
+		//setAllMaterials(materials[0]);
+		StartCoroutine (resetBiomesThread (hx, hz));
 	}
 
 	public void setAllMaterials (Material mat)

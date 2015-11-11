@@ -26,6 +26,7 @@ public class IntroTutorialManager : MonoBehaviour
 	//public Camera backCam;
 	public Material[] voxelMats;
 
+	VoxelExtractionPointCloud vxe;
 	Animator myAnim;
 	AudioSource auSource;
 
@@ -37,6 +38,7 @@ public class IntroTutorialManager : MonoBehaviour
 	// Use this for initialization
 	void Start ()
 	{
+		vxe = VoxelExtractionPointCloud.Instance;
 		myAnim = GetComponent<Animator> ();
 		auSource = GetComponent<AudioSource> ();
 		screenFadeScript = playerTrans.GetComponent<ScreenFade> ();
@@ -45,7 +47,7 @@ public class IntroTutorialManager : MonoBehaviour
 		pocketWatch = pWatchPokeScript.gameObject;
 		pocketWatch.SetActive (false);
 
-		this.transform.position = new Vector3 (0, playerTrans.position.y, -1.5f);
+
 		auSource.pitch = 0.75f;
 		TheSheepDog.transform.position = watchTrans.position;
 
@@ -69,14 +71,15 @@ public class IntroTutorialManager : MonoBehaviour
 	void FixedUpdate ()
 	{
 		if (tutorialPhase == TutorialPhase.SetUpHypno && setUpPokeScript.triggered) {
-
+			this.transform.position = setUpPokeScript.transform.position;
 			pocketWatch.SetActive (true);
+			pocketWatch.transform.LookAt (playerTrans.position);
+
 			textObj.SetActive (true);
 			setUpPokeScript.gameObject.SetActive (false);
 			auSource.Play ();
 			tutorialPhase = TutorialPhase.Wait;
 		} else if (tutorialPhase == TutorialPhase.Wait && pWatchPokeScript.triggered) {
-			pocketWatch.transform.LookAt (playerTrans.position);
 			tutorialPhase = TutorialPhase.PocketWatchSwing;
 		} else if (tutorialPhase == TutorialPhase.PocketWatchSwing) {
 			// Debug.LogError("AT PocketWatchSwing !!!");
@@ -96,7 +99,17 @@ public class IntroTutorialManager : MonoBehaviour
 		} else if (tutorialPhase == TutorialPhase.SheepGaze) {
 			WaitForGaze ();
 		} 
-		
+
+		if (Input.GetKeyDown (KeyCode.Q)) {
+			Vec3Int chunkCoords = vxe.getChunkCoords (watchTrans.position);
+			//		
+			biome.swapMaterialsThread (ref voxelMats, chunkCoords.x, chunkCoords.z);
+
+		} 
+		if (Input.GetKeyDown (KeyCode.E)) {
+			biome.swapMaterials (ref voxelMats);
+
+		}
 	}
 
 	/// <summary>
@@ -183,11 +196,14 @@ public class IntroTutorialManager : MonoBehaviour
 		//Now Start the Sheep Gaze 
 		tutorialPhase = TutorialPhase.SheepGaze;
 #endif
-		StartCoroutine (screenFadeScript.doColorFade (Color.black));
+		//StartCoroutine (screenFadeScript.doColorFade (Color.black));
 		MainLight.SetActive (true);
 		MainLight.transform.rotation = Quaternion.Euler (386f, 71f, 126f);
-		biome.resetBiomes ();
-		biome.swapMaterials (ref voxelMats);
+		//biome.resetBiomes ();
+
+		Vec3Int chunkCoords = vxe.getChunkCoords (watchTrans.position);
+//		Debug.LogError ("Chunk Coords " + chunkCoords.x + " " + chunkCoords.y + " " + chunkCoords.z);
+		biome.swapMaterialsThread (ref voxelMats, chunkCoords.x, chunkCoords.z);
 	}
 
 	/// <summary>
