@@ -105,7 +105,7 @@ public class BiomeScript : Singleton<BiomeScript>
 		//int hz = vxe.num_chunks_z / 2; 
 		Debug.Log ("Reset Biome Thread");
 		Material randommat;
-		if (index > -1 && index < materials.Length ())
+		if (index > -1 && index < materials.Length)
 			randommat = materials [index];
 		else
 			randommat = materials [Random.Range (0, 4)];
