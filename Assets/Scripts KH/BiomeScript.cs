@@ -99,12 +99,16 @@ public class BiomeScript : Singleton<BiomeScript>
 	/// <summary>
 	/// Resets the biomes.
 	/// </summary>
-	public IEnumerator resetBiomesThread (int hx, int hz)
+	public IEnumerator resetBiomesThread (int hx, int hz, int index=-1)
 	{
 		//int hx = vxe.num_chunks_x / 2;
 		//int hz = vxe.num_chunks_z / 2; 
 		Debug.Log ("Reset Biome Thread");
-		Material randommat = materials [Random.Range (0, 4)];
+		Material randommat;
+		if (index > -1 && index < materials.Length ())
+			randommat = materials [index];
+		else
+			randommat = materials [Random.Range (0, 4)];
 
 		for (float r = 0; r < 30; r+=0.5f) {
 			int counter = 0;

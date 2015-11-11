@@ -67,6 +67,10 @@ public class IntroTutorialManager : MonoBehaviour
 		EnvironmentSpawner.SetActive (state);
 	}
 
+	/// <summary>
+	/// Setups the pocket watch.
+	/// </summary>
+	/// <returns>The pocket watch.</returns>
 	IEnumerator setupPocketWatch ()
 	{
 		Transform pocketTrans = pocketWatch.transform;
