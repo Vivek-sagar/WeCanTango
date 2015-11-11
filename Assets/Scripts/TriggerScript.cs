@@ -6,29 +6,36 @@ public class TriggerScript : MonoBehaviour
 
 	public bool triggered = false;
 	public bool debug = false;
+	//public bool init = false;
 	public ParticleSystem partsys;
-	public GameObject obj;
-	public BoxCollider cubeswitch;
+	public GameObject littleSheep;
 	private bool isSleeping = true;
 
-	public AudioSource audioSource;
+
 	Vector3[] fourpts;
 	VoxelExtractionPointCloud vxe;
 
 	CameraClearFlags defaultFlag;
 	float defaultLightIntensity;
+	BoxCollider mycollider;
 	// Use this for initialization
+	void Awake()
+	{
+		mycollider = GetComponent<BoxCollider> ();
+	}
+
 	void Start ()
 	{
 		vxe = VoxelExtractionPointCloud.Instance;
-		cubeswitch.gameObject.SetActive (false);
+		partsys.Stop ();
+		//cubeswitch.gameObject.SetActive (false);
 	}
 
 
 	bool checkForVoxelsInCollider ()
 	{
-		Vector3 max = cubeswitch.gameObject.transform.position + cubeswitch.bounds.extents;
-		Vector3 min = cubeswitch.gameObject.transform.position - cubeswitch.bounds.extents;
+		Vector3 max = mycollider.bounds.center + mycollider.bounds.extents;
+		Vector3 min = mycollider.bounds.center - mycollider.bounds.extents;
 
 		for (float i=min.x; i<=max.x; i+= vxe.voxel_size)
 			for (float j=min.y; j<=max.y; j+= vxe.voxel_size)
@@ -44,19 +51,21 @@ public class TriggerScript : MonoBehaviour
 	// Update is called once per frame
 	void Update ()
 	{
-		if (!triggered && cubeswitch.gameObject.activeSelf && checkForVoxelsInCollider ()) {
-			triggeredEvent ();
+		if (!isSleeping) 
+		{
+			if (!triggered && checkForVoxelsInCollider ()) {
+				triggeredEvent ();
+			}
 		}
 
-		//if(debug)
-		//{
-		//	debug = false;
-		//	triggeredEvent();
-		//}
-
-		if (vxe.isVoxelThere (obj.transform.position)) {
+		if (isSleeping && 
+		    	(vxe.isVoxelThere (littleSheep.transform.position) || checkForVoxelsInCollider()) 
+		    )
+		{
+			littleSheep.transform.position += Vector3.up * vxe.voxel_size;
 			transform.position += Vector3.up * vxe.voxel_size;
 		}
+		
 	}
 
 	void OnTriggerEnter (Collider other)
@@ -68,12 +77,10 @@ public class TriggerScript : MonoBehaviour
 		if (othergo.tag == "Pet") {
 			//triggeredEvent();
 			partsys.Emit (100);
-			cubeswitch.gameObject.SetActive (true);
+
 			if (isSleeping) {
-				//obj.transform.Translate(new Vector3(-0.06f, -0.06f, 0f));
-				obj.transform.Rotate (new Vector3 (-90, 0, 0));
 				isSleeping = false;
-				audioSource.Stop ();
+				partsys.Play();
 			}
 		}
 	}
@@ -89,12 +96,10 @@ public class TriggerScript : MonoBehaviour
 		partsys.Stop ();
 		partsys.Emit (500);
 
-		GetComponent<JumpingAI> ().init ();
+		littleSheep.GetComponent<JumpingAI> ().init ();
 
 
-		PetMessage.Instance.setThankYou ();
-		cubeswitch.gameObject.GetComponent<MeshRenderer> ().enabled = false;
-		cubeswitch.gameObject.SetActive (false);
+		PetManager.Instance.setThankYou ();
 
 		triggered = true;
 		//petcounter.PetTriggered ();
@@ -102,6 +107,7 @@ public class TriggerScript : MonoBehaviour
 		Vec3Int cc = vxe.getChunkCoords (transform.position);
 
 		BiomeScript.Instance.doRandomChange (cc.x, cc.z);
+		ItemSpawner.Instance.canSpawn = true;
 	}
 
 }

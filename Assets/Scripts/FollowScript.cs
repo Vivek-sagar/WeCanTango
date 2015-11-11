@@ -17,5 +17,7 @@ public class FollowScript : MonoBehaviour
 	void Update ()
 	{
 		myTrans.position = target.position;
+		myTrans.rotation = Quaternion.Euler (new Vector3 (0, myTrans.rotation.eulerAngles.y, 0));
+
 	}
 }

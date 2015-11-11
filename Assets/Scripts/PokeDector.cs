@@ -10,6 +10,7 @@ public class PokeDector : MonoBehaviour
 	VoxelExtractionPointCloud vxe;
 	Transform myTrans, cubeTrans;
 	float frames = 0f, maxFrames = 180f;
+	Vector3 safeSpawnPos;
 	// Use this for initialization
 	void Start ()
 	{
@@ -40,27 +41,35 @@ public class PokeDector : MonoBehaviour
 		return false;
 	}
 	
-	
+	public Vector3 getSafeSpawnPos ()
+	{
+		return safeSpawnPos;
+	}
 	// Update is called once per frame
 	void Update ()
 	{
-			
-		if (!triggered && cubeswitch.gameObject.activeSelf && checkForVoxelsInCollider ()) {
-			triggered = true;
-		}
-		
-		if (vxe.isVoxelThere (myTrans.position)) {
-			transform.position += Vector3.up * vxe.voxel_size;
-		}
 
 		if (waitForNoVoxel) {
 			frames ++;
 			bool isVoxel = checkForVoxelsInCollider ();
+
 			if (!isVoxel && frames > maxFrames) {
-				triggered = true;
+				triggered = vxe.occupiedChunks.getCount () > 200;
+				if (triggered)
+					safeSpawnPos = myTrans.position;
+				frames = 0;
 			} else if (isVoxel) {
 				transform.position += Vector3.up * vxe.voxel_size;
 			}
+		} else {
+			if (!triggered && cubeswitch.gameObject.activeSelf && checkForVoxelsInCollider ()) {
+				triggered = true;
+			}
+			
+			if (vxe.isVoxelThere (myTrans.position)) {
+				transform.position += Vector3.up * vxe.voxel_size;
+			}
+
 		}
 	}
 
