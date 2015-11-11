@@ -45,8 +45,8 @@ public class IntroTutorialManager : MonoBehaviour
 		playerGazeScript = playerTrans.GetComponent<TutorialGaze> ();
 
 		pocketWatch = pWatchPokeScript.gameObject;
-		pocketWatch.SetActive (false);
-
+		pWatchPokeScript.enabled = false;
+		SetMeshRenderersInChildren (pocketWatch, false);
 
 		auSource.pitch = 0.75f;
 		TheSheepDog.transform.position = watchTrans.position;
@@ -67,17 +67,37 @@ public class IntroTutorialManager : MonoBehaviour
 		EnvironmentSpawner.SetActive (state);
 	}
 
+	IEnumerator setupPocketWatch ()
+	{
+		Transform pocketTrans = pocketWatch.transform;
+		pocketTrans.position = setUpPokeScript.getSafeSpawnPos ();
+		setUpPokeScript.gameObject.SetActive (false);
+
+		pWatchPokeScript.enabled = true;
+		SetMeshRenderersInChildren (pocketWatch, true);
+
+		yield return null;
+		auSource.Play ();
+
+		/*bool hit = false;
+		RaycastHit hitInfo;
+
+		while (!hit) {
+			hit = Physics.Raycast (pocketWatch.transform, pocketWatch.transform.forward, 2f, out hitInfo);
+			hit = hitInfo.transform.CompareTag ("Player");
+
+		}*/
+
+		pocketTrans.LookAt (playerTrans.position);
+		pocketTrans.rotation = Quaternion.Euler (new Vector3 (0, pocketTrans.rotation.eulerAngles.y, 0));
+		textObj.SetActive (true);
+
+	}
 	// Update is called once per frame
 	void FixedUpdate ()
 	{
 		if (tutorialPhase == TutorialPhase.SetUpHypno && setUpPokeScript.triggered) {
-			this.transform.position = setUpPokeScript.transform.position;
-			pocketWatch.SetActive (true);
-			pocketWatch.transform.LookAt (playerTrans.position);
-
-			textObj.SetActive (true);
-			setUpPokeScript.gameObject.SetActive (false);
-			auSource.Play ();
+			StartCoroutine (setupPocketWatch ());
 			tutorialPhase = TutorialPhase.Wait;
 		} else if (tutorialPhase == TutorialPhase.Wait && pWatchPokeScript.triggered) {
 			tutorialPhase = TutorialPhase.PocketWatchSwing;
@@ -100,6 +120,7 @@ public class IntroTutorialManager : MonoBehaviour
 			WaitForGaze ();
 		} 
 
+#if UNITY_EDITOR
 		if (Input.GetKeyDown (KeyCode.Q)) {
 			Vec3Int chunkCoords = vxe.getChunkCoords (watchTrans.position);
 			//		
@@ -110,6 +131,7 @@ public class IntroTutorialManager : MonoBehaviour
 			biome.swapMaterials (ref voxelMats);
 
 		}
+#endif
 	}
 
 	/// <summary>
@@ -183,8 +205,7 @@ public class IntroTutorialManager : MonoBehaviour
 	/// </summary>
 	void DonePocketWatchSwing ()
 	{
-		SetMeshRenderersInChildren (pocketWatch, false);
-
+		Destroy (pocketWatch);
 #if GazeTut
 		//After Pocket Watch Swing is done, allow the TutorialSheep and TutorialGaze 
 		//script to start doing stuff
